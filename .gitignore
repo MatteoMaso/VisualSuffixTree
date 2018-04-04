@@ -2,4 +2,6 @@ tasks.xml
 out/
 .idea/
 build/
+Example/
 cmake-build-debug-mingw/
+cmake-build-debug/
