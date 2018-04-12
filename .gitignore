@@ -5,3 +5,4 @@ build/
 Example/
 cmake-build-debug-mingw/
 cmake-build-debug/
+.bin
