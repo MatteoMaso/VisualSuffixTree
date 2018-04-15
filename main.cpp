@@ -13,7 +13,7 @@ typedef cst_sct3<> cst_t;
  *
  * @param inputFileName file that contains the strings that you want to analyze
  */
-void treeParser(char *inputFileName);
+void treeParser(char *inputFileName, char *outputFileName);
 
 /**
  * This method take an input file well formatted and create a flameGraph as output
@@ -114,29 +114,11 @@ std::istream &operator>>(std::istream &is, BitIo<N> &bio) {
     return is;
 }
 
+//Parametri per il parser e per il coso
+static const int parameters[10] = {10, 10, 8, 8};
 
 int main(int argc, char *argv[]) {
 
-//    std::ofstream bin_out("./bf.bin", std::ios::out | std::ios::binary);
-//
-//    BitIo<16> bio;
-//
-//    bio.push_back(std::bitset<16>("1001011010010110"));
-//    bio.push_back(std::bitset<16>("0000000011111111"));
-//    bio.push_back(std::bitset<16>("1111111100000000"));
-//    bio.push_back(std::bitset<16>("0011001111001100"));
-//
-//    bin_out << bio;
-//    bin_out.close(); // bf.bin is 8 bytes
-//
-//    std::ifstream bin_in("./bf.bin", std::ios::binary);
-//
-//    BitIo<16> bio2;
-//    bin_in >> bio2;
-//
-//    while (!bio2.empty()) {
-//        std::cout << bio2.pop_front() << std::endl; // Prints the 4 16-bit bitsets in correct order.
-//    }
 
 
     if (argc < 2) {
@@ -148,7 +130,7 @@ int main(int argc, char *argv[]) {
     char secondProgram[5] = "-svg";
 
     if (strcmp(argv[1], firstProgram) == 0) {
-        treeParser(argv[2]);
+        treeParser(argv[2], argv[3]);
     } else if (strcmp(argv[1], secondProgram) == 0) {
         createSvg(argv[2]);
     } else {
@@ -157,6 +139,7 @@ int main(int argc, char *argv[]) {
 }
 
 string partitioner(string s, int from, int to){
+
     string a = "";
 
     for (int i = from; i <= to; ++i) {
@@ -174,10 +157,11 @@ void createSvg(char *inputFileName) {
     const int bitDepth = 10;
     const int bitLb = 8;
     const int bitRb = 8;
+    const int bitCharRepresentation = 2;
 
     //Read input file
     //    std::ifstream bin_in(inputFileName, std::ios::binary); //usare questo per passaggio parametri
-    std::ifstream bin_in("./Output/test.bin", std::ios::binary);
+    std::ifstream bin_in(inputFileName , std::ios::binary);
 
     BitIo<16> bio2;
     bin_in >> bio2;
@@ -189,6 +173,8 @@ void createSvg(char *inputFileName) {
     } else {
         nodeInfoLength = nodeInfoDim / 16 + 1;
     }
+
+
 
     std::cout << nodeInfoLength << std::endl; // Prints the 4 16-bit bitsets in correct order.
 
@@ -208,15 +194,73 @@ void createSvg(char *inputFileName) {
                   << stoi(partitioner(nodeInfo, 28, 35), nullptr, 2) << "]" <<  std::endl;
 
         std::cout << nodeInfo << std::endl; //
+    }
+};
 
+string charEncoding(char &c, vector <string> &a, string &inputLine){
+
+    for (int i = 0; i < inputLine.size(); i++) {
+        char temp = inputLine[i];
+        if ( c == temp ){
+            return a[i];
+        }
     }
 
-};
+
+    std::cout << "Errore in charEncoding, carattere: "<< c << " non trovato!" << std::endl; //
+    exit(1);
+
+}
 
 /**
  * FORMAT OUTPUT FILE
  */
-void treeParser(char *inputFileName) {
+void treeParser(char *inputFileName, char *outputFileName) {
+
+    std::cout << "Insert the alphabet: ABC or ARFS ... etc" << std::endl; //
+    string inputLine;
+    getline(cin, inputLine);
+    cout << inputLine.length() << endl;
+
+    vector <string> charCoding; //Vuoto per ora
+
+    //TODO RENDERLO PARAMETRICO
+    if (inputLine.length() <= 2){
+        //1 bit
+        charCoding.push_back("0");
+        charCoding.push_back("1");
+
+    } else if ( inputLine.length() > 2 && inputLine.length() <= 4){
+//        2 bit
+        charCoding.push_back("00");
+        charCoding.push_back("01");
+        charCoding.push_back("10");
+        charCoding.push_back("11");
+    } else if ( inputLine.length() > 4 && inputLine.length() <= 8){
+        //3 bit
+        charCoding.push_back("000");
+        charCoding.push_back("001");
+        charCoding.push_back("010");
+        charCoding.push_back("011");
+        charCoding.push_back("100");
+        charCoding.push_back("101");
+        charCoding.push_back("110");
+        charCoding.push_back("111");
+    } else {
+        std::cout << "To much alphabet character! Todo implement" << std::endl; //
+        exit(1);
+    }
+
+
+
+    for (int j = 0; j < inputLine.length(); j++) {
+        std::cout << "Char: " << inputLine[j] << " Encoded: " << charCoding[j] << std::endl; //
+    }
+
+
+
+
+
 
     //Lunghezza dei parametri, poi dovrò settarli da interfaccia e dovranno essere comuni anche al file che crea l'svg per essere in grado di leggerlo
     const int bitNodeDepth = 10; //fino a 1024
@@ -230,7 +274,7 @@ void treeParser(char *inputFileName) {
     int nodeCounter = 0; //Contatore del numero di nodi così so quanto spazio occupa il file e quanto spazio potrei salvare
 
     //Constuct 01: 8 bits initialized to zero
-    bitset<8> bitset1(string("11111100"));
+//    bitset<8> bitset1(string("11111100"));
 
     cst_t cst;                              //declare the suffix tree
     construct(cst, inputFileName, 1);       //initialize the suffix tree
@@ -243,7 +287,7 @@ void treeParser(char *inputFileName) {
 
     string nodeInfo = "";
 
-    std::ofstream bin_out("./Output/test.bin", std::ios::out | std::ios::binary);
+    std::ofstream bin_out(outputFileName, std::ios::out | std::ios::binary);
     BitIo<16> bio;
 
     for (iterator it = begin; it != end; ++it) {
@@ -266,9 +310,9 @@ void treeParser(char *inputFileName) {
 
         str_length = cst.depth(*it);
 
-/*        std::cout << "\nNode info " << nodeInfo << std::endl;
 
 
+        //TODO DA STAMPARE SOLO IL RAMO E NON TUTTA LA STRINGA
         string edge = "";
 
         if ((cst.node_depth(*it) == 0) ||
@@ -277,8 +321,8 @@ void treeParser(char *inputFileName) {
         } else {
 
             if (cst.lb(*it) == cst.rb(*it)) {
-
-                edge = "leaf:         ";
+                //leaf
+                edge = "";
 
                 for (int i = 1; i < str_length - 1; i++) {
                     edge += cst.edge(*it, i);
@@ -288,8 +332,8 @@ void treeParser(char *inputFileName) {
                 edge += "#";
 
             } else {
-
-                edge = "internal_node: ";
+                //internal node
+                edge = "";
 
                 for (int i = 1; i <= str_length; i++) {
                     edge += cst.edge(*it, i);
@@ -297,14 +341,27 @@ void treeParser(char *inputFileName) {
             }
         }
 
-        std::cout << "NodeDepth: " << cst.node_depth(*it) << " Depth: " << cst.depth(*it) << "-[" << cst.lb(*it) << ","
-                  << cst.rb(*it) << "]" << edge << std::endl;*/
+//        std::cout << "NodeDepth: " << cst.node_depth(*it) << " Depth: " << cst.depth(*it) << "-[" << cst.lb(*it) << ","
+//                  << cst.rb(*it) << "]" << edge << std::endl;
+//
+
+        //TODO DEVO STAMPARE PRIMA IL NUMERO DI CARATTERI DELL'EDGE COSI POI IN LETTURA SO QUANTI LEGGERNE
+//        nodeInfo += std::bitset<bitRb>(edge.length()).to_string();
+
+        //todo togliere gli hashtag o tenerne conto di default
+
+        for (int k = 0; k < edge.length(); k++) {
+            nodeInfo += std::bitset<bitRb>(charEncoding(edge[k], charCoding, inputLine)).to_string();
+//            std::cout << charEncoding(edge[k], charCoding, inputLine) << std::endl; //
+        }
+
+
 
         printBinFile(nodeInfo, bin_out);
 
     }
 
-    bin_out.close(); // bf.bin is 8 bytes
+    bin_out.close();
 };
 
 
@@ -319,7 +376,6 @@ void printBinFile(string &s, std::ofstream &bin_out) {
         for (int k = 0 + j*16; k <= 15 + j*16; k++) {
             if (k >=  s.length()) {
                 temp += "0";
-
             } else {
                 temp += s[k];
             }
@@ -331,3 +387,4 @@ void printBinFile(string &s, std::ofstream &bin_out) {
     bin_out << bio;
 
 }
+
