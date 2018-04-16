@@ -11,6 +11,6 @@ link_directories(/opt/sdsl/lib)
 
 set(SOURCE_FILE main.cpp)
 
-add_executable(VisualSuffixTree main.cpp)
+add_executable(VisualSuffixTree main.cpp src/SvgCreator.cpp Include/SvgCreator.h src/TreeParser.cpp Include/TreeParser.h)
 
 target_link_libraries(VisualSuffixTree sdsl divsufsort divsufsort64)
