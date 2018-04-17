@@ -121,25 +121,25 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName) {
     //TODO RENDERLO PARAMETRICO
     if (inputLine.length() <= 2){
         //1 bit
-        charCoding.push_back("0");
-        charCoding.push_back("1");
+        charCoding.emplace_back("0");
+        charCoding.emplace_back("1");
 
     } else if ( inputLine.length() > 2 && inputLine.length() <= 4){
 //        2 bit
-        charCoding.push_back("00");
-        charCoding.push_back("01");
-        charCoding.push_back("10");
-        charCoding.push_back("11");
+        charCoding.emplace_back("00");
+        charCoding.emplace_back("01");
+        charCoding.emplace_back("10");
+        charCoding.emplace_back("11");
     } else if ( inputLine.length() > 4 && inputLine.length() <= 8){
         //3 bit
-        charCoding.push_back("000");
-        charCoding.push_back("001");
-        charCoding.push_back("010");
-        charCoding.push_back("011");
-        charCoding.push_back("100");
-        charCoding.push_back("101");
-        charCoding.push_back("110");
-        charCoding.push_back("111");
+        charCoding.emplace_back("000");
+        charCoding.emplace_back("001");
+        charCoding.emplace_back("010");
+        charCoding.emplace_back("011");
+        charCoding.emplace_back("100");
+        charCoding.emplace_back("101");
+        charCoding.emplace_back("110");
+        charCoding.emplace_back("111");
     } else {
         std::cout << "To much alphabet character! Todo implement" << std::endl; //
         exit(1);
@@ -173,7 +173,7 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName) {
 
     int str_length = 0;
 
-    string nodeInfo = "";
+    string nodeInfo;
 
     std::ofstream bin_out(outputFileName, std::ios::out | std::ios::binary);
     BitIo<16> bio;
@@ -184,8 +184,6 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName) {
         nodeInfo = "";
 
         //Per ogni nodo stampo le sue proprità
-        //Print Node_depth  [0-?]
-        unsigned long i = cst.node_depth(*it);
         nodeInfo += std::bitset<bitNodeDepth>(cst.node_depth(*it)).to_string();
 
 
@@ -196,12 +194,12 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName) {
         nodeInfo += std::bitset<bitRb>(cst.rb(*it)).to_string();
 
 
-        str_length = cst.depth(*it);
+        str_length = (int)cst.depth(*it);
 
 
 
         //TODO DA STAMPARE SOLO IL RAMO E NON TUTTA LA STRINGA
-        string edge = "";
+        string edge;
 
         if ((cst.node_depth(*it) == 0) ||
             (cst.node_depth(*it) == 1 && str_length == 1 && (cst.lb(*it) == cst.rb(*it)))) {
@@ -259,7 +257,7 @@ void printBinFile(string &s, std::ofstream &bin_out) {
 
     for (int j = 0; j <= s.length() / 16; j++) {
 
-        string temp = "";
+        string temp;
 
         for (int k = 0 + j*16; k <= 15 + j*16; k++) {
             if (k >=  s.length()) {
