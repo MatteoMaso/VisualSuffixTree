@@ -111,8 +111,8 @@ SvgCreator::SvgCreator(char *inputFileName) {
 
         const int bitNodeDepth = 10; //fino a 1024
         const int bitDepth = 10;
-        const int bitLb = 8;
-        const int bitRb = 8;
+        const int bitLb = 16;
+        const int bitRb = 16;
         const int bitCharRepresentation = 2;
 
 
@@ -124,7 +124,7 @@ SvgCreator::SvgCreator(char *inputFileName) {
         BitIo<16> bio2;
         bin_in >> bio2;
 
-        int nodeInfoDim = 36;
+        int nodeInfoDim = 52;
         int nodeInfoLength = 0;
         if ((nodeInfoDim % 16)  == 0){
             nodeInfoLength = nodeInfoDim / 16;
@@ -152,9 +152,9 @@ SvgCreator::SvgCreator(char *inputFileName) {
                 nodeInfo += bio2.pop_front().to_string();
             }
 
-            a = stoi(partitioner(nodeInfo, 0, 9), nullptr, 2);
-            b = stoi(partitioner(nodeInfo, 20, 27), nullptr, 2);
-            c = stoi(partitioner(nodeInfo, 28, 35), nullptr, 2);
+            a = stoi(partitioner(nodeInfo,  0,  9), nullptr, 2);
+            b = stoi(partitioner(nodeInfo, 20, 35), nullptr, 2);
+            c = stoi(partitioner(nodeInfo, 36, 51), nullptr, 2);
 
 
             x = x0 + b;
@@ -162,8 +162,7 @@ SvgCreator::SvgCreator(char *inputFileName) {
             y = y0 + (a*H);
             w = (c-b) +1 ;
 
-            std::cout << "\nBitNode depth: " << a << " [" << b << "-" << c << "]\n" << std::endl;
-
+//            std::cout << "\nBit Nodedepth: " << a << " [" << b << "-" << c << "]\n" << "w\t" << w<< std::endl;
 
 
 //        std::cout << "\n<g class=\"func_g\" onmouseover=\"s(this)\" onmouseout=\"c()\" onclick=\"zoom(this)\">\n"

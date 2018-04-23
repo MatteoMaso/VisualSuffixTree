@@ -156,8 +156,8 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName) {
     //Lunghezza dei parametri, poi dovrò settarli da interfaccia e dovranno essere comuni anche al file che crea l'svg per essere in grado di leggerlo
     const int bitNodeDepth = 10; //fino a 1024
     const int bitDepth = 10;
-    const int bitLb = 8;
-    const int bitRb = 8;
+    const int bitLb = 16;
+    const int bitRb = 16;
 
     const int bitCharacter = 2;
 
@@ -226,9 +226,9 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName) {
             }
         }
 
-//        std::cout << "NodeDepth: " << cst.node_depth(*it) << " Depth: " << cst.depth(*it) << "-[" << cst.lb(*it) << ","
-//                  << cst.rb(*it) << "]" << edge << std::endl;
-//
+//        std::cout << "NodeDepth: " << cst.node_depth(*it) << " Depth: " << cst.depth(*it) << "-[" << cst.lb(*it) << "-"
+//                  << cst.rb(*it) << "]" << std::endl;
+
 
         //TODO DEVO STAMPARE PRIMA IL NUMERO DI CARATTERI DELL'EDGE COSI POI IN LETTURA SO QUANTI LEGGERNE
 //        nodeInfo += std::bitset<bitRb>(edge.length()).to_string();
