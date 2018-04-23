@@ -10,7 +10,7 @@ using namespace std;
 class SvgCreator {
 
 public:
-    SvgCreator(char *inputFileName);
+    SvgCreator(char *inputFileName, char *outputFile);
 
     string partitioner(string s, int from, int to){
 

@@ -11,15 +11,16 @@
 
 using namespace std;
 
-SvgCreator::SvgCreator(char *inputFileName) {
+SvgCreator::SvgCreator(char *inputFileName, char *outputFile) {
 
     //BEGIN SVG CREATOR
-    std::ofstream svg_out("./Output/svg.html", std::ios::out | std::ios::binary);
+    std::ofstream svg_out(outputFile, std::ios::out | std::ios::binary);
 
 
     std::ifstream bin_in(inputFileName, std::ios::binary);
     if (!bin_in.is_open()) {
-        std::cout << "I'm not able to open file: " << inputFileName << std::endl;
+        std::cout << "I'm not able to open file: " << inputFileName << " probably you must create the file test.bin inside Output with "
+                                     " the first program"                                  << std::endl;
     }
 
     BitIo<16> bio2;
@@ -45,7 +46,11 @@ SvgCreator::SvgCreator(char *inputFileName) {
 
     BitDecoder decoder;
 
-    //TODO ADD warning se non trova il file test.bin oppure se è sbagliato o vuoto
+    //Check that the node property file generate with the first program must contain informations
+    if (bio2.size() == 8){
+        std::cout << "The node property file generated with the first program is empty, probably you have passed a bad string path" << std::endl;
+        exit(-1);
+    }
 
     while (!bio2.empty()) {
 

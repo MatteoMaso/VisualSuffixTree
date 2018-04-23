@@ -146,8 +146,6 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName) {
 ////            std::cout << charEncoding(edge[k], charCoding, inputLine) << std::endl; //
 //        }
 
-
-
         printBinFile(nodeInfo, bin_out);
 
     }

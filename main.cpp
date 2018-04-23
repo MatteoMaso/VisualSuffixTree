@@ -4,6 +4,7 @@
 #include <bitset> //to use quickly bit representation
 #include <vector>
 #include <fstream>
+#include <sys/stat.h>
 
 #include "Include/TreeParser.h"
 #include "Include/SvgCreator.h"
@@ -19,8 +20,7 @@ static const int parameters[10] = {10, 10, 16, 16};
 
 int main(int argc, char *argv[]) {
 
-
-
+    int status = mkdir("Output", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 
     if (argc < 2) {
         cout << "insert -data nameInput for starting treeParser or -svg to create the SVG file" << std::endl;
@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
 
         TreeParser(argv[2], argv[3]);
     } else if (strcmp(argv[1], secondProgram) == 0) {
-        SvgCreator svgCreator(argv[2]);
+        SvgCreator svgCreator(argv[2], argv[3]);
 
     } else {
         printf("Bad arguments!");
