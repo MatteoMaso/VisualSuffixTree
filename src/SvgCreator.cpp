@@ -136,10 +136,10 @@ SvgCreator::SvgCreator(char *inputFileName) {
         svg_out << getHeader("headerSvg.txt"); //Insert the header SVG into the file
 
         int a, b, c;
-        int x, y, i, j, z, x0, y0, H;
+        int x, y, i, j, z, x0, y0, H, w;
 
         x0 = 10;
-        y0 = 577;
+        y0 = 0;
         H = 15;
 
         while (!bio2.empty()) {
@@ -155,10 +155,10 @@ SvgCreator::SvgCreator(char *inputFileName) {
             c = stoi(partitioner(nodeInfo, 28, 35), nullptr, 2);
 
 
-            x = x0 + a;
+            x = x0 + b;
             H = 15;
-            z = a;
-            y = y0 - (z*H);
+            y = y0 + (a*H);
+            w = (c-b) +1 ;
 
 
 //        std::cout << "\n<g class=\"func_g\" onmouseover=\"s(this)\" onmouseout=\"c()\" onclick=\"zoom(this)\">\n"
@@ -170,7 +170,9 @@ SvgCreator::SvgCreator(char *inputFileName) {
             temp+= to_string(x);
             temp+= "\" y=\"";
             temp+= to_string(y);
-            temp+= "\" width=\"980\" ""height=\"15.0\" fill=\"rgb(225,0,0)\" rx=\"2\" ry=\"2\" />\n""</g>";
+            temp+= "\" width=\"";
+            temp+= to_string(w);
+            temp+= "\" ""height=\"15.0\" fill=\"rgb(225,0,0)\" rx=\"2\" ry=\"2\" />\n""</g>";
 
             char str[temp.length()];
             strcpy(str, temp.c_str());
