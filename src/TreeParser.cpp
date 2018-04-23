@@ -186,7 +186,6 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName) {
         //Per ogni nodo stampo le sue proprità
         nodeInfo += std::bitset<bitNodeDepth>(cst.node_depth(*it)).to_string();
 
-
         nodeInfo += std::bitset<bitDepth>(cst.depth(*it)).to_string();
 
         nodeInfo += std::bitset<bitLb>(cst.lb(*it)).to_string();
@@ -237,10 +236,10 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName) {
         //todo togliere gli hashtag o tenerne conto di default
 
         //todo decommentare quando saro elaborare le stringhe del edge dall'SVG
-        for (int k = 0; k < edge.length(); k++) {
-            nodeInfo += std::bitset<bitRb>(charEncoding(edge[k], charCoding, inputLine)).to_string();
-//            std::cout << charEncoding(edge[k], charCoding, inputLine) << std::endl; //
-        }
+//        for (int k = 0; k < edge.length(); k++) {
+//            nodeInfo += std::bitset<bitRb>(charEncoding(edge[k], charCoding, inputLine)).to_string();
+////            std::cout << charEncoding(edge[k], charCoding, inputLine) << std::endl; //
+//        }
 
 
 

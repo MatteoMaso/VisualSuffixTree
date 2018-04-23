@@ -1,7 +1,7 @@
 #include <sdsl/suffix_trees.hpp>
 #include <iostream>
 #include <string>
-#include <bitset> //to use quickly bit representation
+#include <bitset>       //to use quickly bit representation
 #include <vector>
 #include <fstream>
 
@@ -139,8 +139,10 @@ SvgCreator::SvgCreator(char *inputFileName) {
         int x, y, i, j, z, x0, y0, H, w;
 
         x0 = 10;
-        y0 = 0;
+        y0 = 40;
         H = 15;
+
+        //TODO ADD warning se non trova il file test.bin oppure se è sbagliato o vuoto
 
         while (!bio2.empty()) {
 
@@ -159,6 +161,9 @@ SvgCreator::SvgCreator(char *inputFileName) {
             H = 15;
             y = y0 + (a*H);
             w = (c-b) +1 ;
+
+            std::cout << "\nBitNode depth: " << a << " [" << b << "-" << c << "]\n" << std::endl;
+
 
 
 //        std::cout << "\n<g class=\"func_g\" onmouseover=\"s(this)\" onmouseout=\"c()\" onclick=\"zoom(this)\">\n"
