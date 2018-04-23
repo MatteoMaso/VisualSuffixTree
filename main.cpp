@@ -15,9 +15,11 @@ using namespace sdsl;
 typedef cst_sct3<> cst_t;
 
 
-static const int parameters[10] = {10, 10, 8, 8};
+static const int parameters[10] = {10, 10, 16, 16};
 
 int main(int argc, char *argv[]) {
+
+
 
 
     if (argc < 2) {

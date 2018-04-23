@@ -6,103 +6,13 @@
 #include <fstream>
 
 #include "../Include/TreeParser.h"
+#include "../Include/BitIo.h"
+#include "../Include/BitEncode.h"
 
 using namespace std;
 using namespace sdsl;
 
 typedef cst_sct3<> cst_t;
-
-/**
- * Class for binary file manipulation
- */
-template<std::size_t N>
-class BitIo {
-public:
-
-    void push_back(const std::bitset<N> &bs) {
-        std::vector<Byte> result((N + 7) >> 3);
-        for (int j = 0; j < int(N); ++j) {
-            result[j >> 3] |= (bs[j] << (j & 7));
-        }
-        for (const Byte &byte : result) {
-            bytes.push_back(byte);
-        }
-        num_bytes += NUM_BYTES_PER_BITSET;
-    }
-
-    std::bitset<N> pop_front() {
-        std::bitset<N> result;
-        for (int j = 0; j < int(N); ++j) {
-            result[j] = ((bytes[(j >> 3) + offset] >> (j & 7)) & 1);
-        }
-        offset += NUM_BYTES_PER_BITSET;
-        num_bytes -= NUM_BYTES_PER_BITSET;
-        return result;
-    }
-
-    bool empty() {
-        return num_bytes < NUM_BYTES_PER_BITSET;
-    }
-
-    void clear() {
-        bytes.clear();
-        num_bytes = 0;
-    }
-
-    std::size_t size() {
-        return num_bytes;
-    }
-
-private:
-
-    using Byte = unsigned char;
-    static constexpr std::size_t NUM_BYTES_PER_BITSET = N / 8;
-
-    template<std::size_t T>
-    friend std::ostream &operator<<(std::ostream &os, const BitIo<T> &bio);
-
-    template<std::size_t T>
-    friend std::istream &operator>>(std::istream &is, BitIo<T> &bio);
-
-    std::istream &read_file(std::istream &is) {
-        bytes.clear();
-
-        std::streampos current_pos, file_size;
-        current_pos = is.tellg();
-        is.seekg(0, std::ios::end);
-        file_size = is.tellg() - current_pos;
-        is.seekg(current_pos, std::ios::beg);
-
-        bytes.resize(file_size);
-        is.read((char *) &bytes[0], file_size);
-
-        num_bytes += file_size;
-
-        return is;
-    }
-
-    std::vector<Byte> bytes;
-    std::size_t offset = 0;
-    std::size_t num_bytes = 0;
-};
-
-template<std::size_t N>
-std::ostream &operator<<(std::ostream &os, const BitIo<N> &bio) {
-    for (const auto &byte : bio.bytes) {
-        os << byte;
-    }
-    return os;
-}
-
-template<std::size_t N>
-std::istream &operator>>(std::istream &is, BitIo<N> &bio) {
-    if (!is) {
-        is.setstate(std::ios::failbit);
-    }
-    bio.read_file(is);
-    return is;
-}
-
 
 void printBinFile(string &s, std::ofstream &bin_out);
 
@@ -153,13 +63,8 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName) {
 
 
 
-    //Lunghezza dei parametri, poi dovrò settarli da interfaccia e dovranno essere comuni anche al file che crea l'svg per essere in grado di leggerlo
-    const int bitNodeDepth = 10; //fino a 1024
-    const int bitDepth = 10;
-    const int bitLb = 16;
-    const int bitRb = 16;
-
     const int bitCharacter = 2;
+
 
     //Devo aggiornarlo ogni volta che aggiungo un nodo
     int nodeCounter = 0; //Contatore del numero di nodi così so quanto spazio occupa il file e quanto spazio potrei salvare
@@ -178,19 +83,19 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName) {
     std::ofstream bin_out(outputFileName, std::ios::out | std::ios::binary);
     BitIo<16> bio;
 
+    BitEncode e;
+
     for (iterator it = begin; it != end; ++it) {
 
         //Resetto la stringa del nodo info
         nodeInfo = "";
 
         //Per ogni nodo stampo le sue proprità
-        nodeInfo += std::bitset<bitNodeDepth>(cst.node_depth(*it)).to_string();
 
-        nodeInfo += std::bitset<bitDepth>(cst.depth(*it)).to_string();
-
-        nodeInfo += std::bitset<bitLb>(cst.lb(*it)).to_string();
-
-        nodeInfo += std::bitset<bitRb>(cst.rb(*it)).to_string();
+        nodeInfo += e.nodeDepthToString(cst.node_depth(*it));   //Nodedepth
+        nodeInfo += e.depthToString(cst.depth(*it));            //Depth
+        nodeInfo += e.lbToString(cst.lb(*it));                  //Lb
+        nodeInfo += e.rbToString(cst.rb(*it));                  //Rb
 
 
         str_length = (int)cst.depth(*it);
@@ -226,8 +131,8 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName) {
             }
         }
 
-//        std::cout << "NodeDepth: " << cst.node_depth(*it) << " Depth: " << cst.depth(*it) << "-[" << cst.lb(*it) << "-"
-//                  << cst.rb(*it) << "]" << std::endl;
+        std::cout << "NodeDepth: " << cst.node_depth(*it) << " Depth: " << cst.depth(*it) << "-[" << cst.lb(*it) << "-"
+                  << cst.rb(*it) << "]" << std::endl;
 
 
         //TODO DEVO STAMPARE PRIMA IL NUMERO DI CARATTERI DELL'EDGE COSI POI IN LETTURA SO QUANTI LEGGERNE
