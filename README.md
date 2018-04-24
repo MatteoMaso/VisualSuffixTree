@@ -10,11 +10,12 @@ include_directories(<SDSL_include_dir>)
 link_directories(<SDSL_lib_dir>)
 ```
 
-After proper SDSL library installation you can build the project with this command
-put into a terminal from your VisualSuffixTree path:
+Finally, build the project from its root path:
 
-    cmake CMakeList.txt
-    make
+```
+cmake CMakeList.txt
+make
+```
 
 Usage
 -----
