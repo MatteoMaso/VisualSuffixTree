@@ -1,3 +1,6 @@
+Representing suffix trees as flame graphs
+=========
+
 Installation
 ------------
 First, install the [SDSL library](https://github.com/simongog/sdsl.git) into a known path. Then, set the corresponding SDSL installation directories in the `CMakeList.txt` file of the project:
