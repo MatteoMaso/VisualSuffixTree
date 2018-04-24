@@ -1,7 +1,8 @@
 # VisualSuffixTree
 A tool for a visual representation of a suffix tree using the FlameGraph structure
 
-##Installation
+Installation
+------------
 In order to use this program you have to install the sdsl library provided by this
 link repository: https://github.com/simongog/sdsl.git into a known path.
 
@@ -16,16 +17,19 @@ put into a terminal from your VisualSuffixTree path:
     cmake CMakeList.txt
     make
 
-##Usage
+Usage
+-----
 The main program contain two program
 
-###Program 1: TREE PARSER
+Program 1: TREE PARSER
+----------------------
 This program take a txt file as input and create a binary file with all the information reguarding the node
 of the suffix tree built from the string.
 
     @user: VisualSuffixTree -data [input_string.txt] [output_file.bin]
 
-###Program 2: SVG CREATOR
+Program 2: SVG CREATOR
+----------------------
 This program take as input a binary file created with the program 1 and create as output
 an html file that represent a flameGraph of our string
 
