@@ -6,8 +6,8 @@ Installation
 First, install the [SDSL library](https://github.com/simongog/sdsl.git) into a known path. Then, set the corresponding SDSL installation directories in the `CMakeList.txt` file of the project:
 
 ```
-include_directories("include_directory")
-link_directories("lib_directory")
+include_directories(<SDSL_include_dir>)
+link_directories(<SDSL_lib_dir>)
 ```
 
 After proper SDSL library installation you can build the project with this command
