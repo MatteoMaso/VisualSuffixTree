@@ -1,15 +1,14 @@
 # VisualSuffixTree
-A tool for a visual representation of a suffix tree using the FlameGraph structure
+A tool for representing suffix trees as flame graphs.
 
 Installation
 ------------
-In order to use this program you have to install the sdsl library provided by this
-link repository: https://github.com/simongog/sdsl.git into a known path.
+First, install the [SDSL library](https://github.com/simongog/sdsl.git) into a known path. Then, set the corresponding SDSL installation directories in the `CMakeList.txt` file of the project:
 
-Then you have to setting the SDSL installation path into CMakeList.txt of the project:
-
-    include_directories("include_directory")
-    link_directories("lib_directory")
+```
+include_directories("include_directory")
+link_directories("lib_directory")
+```
 
 After proper SDSL library installation you can build the project with this command
 put into a terminal from your VisualSuffixTree path:
