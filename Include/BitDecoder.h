@@ -3,6 +3,7 @@
 //
 #include <string>
 #include <bitset>
+#include "BitIo.h"
 
 #ifndef VISUALSUFFIXTREE_BITDECODER_H
 #define VISUALSUFFIXTREE_BITDECODER_H
@@ -13,32 +14,24 @@ class BitDecoder {
 
 public:
 
-    BitDecoder() {
-        coding[bitNodeDepth-1] = 10;
-        coding[bitDepth-1] = 10;
-        coding[bitLb-1] = 16;
-        coding[bitRb-1] = 16;
-        coding[bitCharRepresentation-1] = 2;
-    }
+    BitDecoder(BitIo<16> *b);
 
-    string getNodeDepth(string nodeInfo) {
-        return partitioner(nodeInfo, bitNodeDepth);
-    }
+    int getNodeInfoLength();
 
-    string getDepth(string nodeInfo) {
-        return partitioner(nodeInfo, bitDepth);
-    }
+    string getNodeDepth(string nodeInfo);
 
-    string getLb(string nodeInfo) {
-        return partitioner(nodeInfo, bitLb);
-    }
+    string getDepth(string nodeInfo);
 
-    string getRb(string nodeInfo) {
-        return partitioner(nodeInfo, bitRb);
-    }
+    string getLb(string nodeInfo);
 
-    int coding[10] = {10 ,10, 16, 16, 2};
-    //potrei renderlo più veloce salvandomi degli altri vettori
+    string getRb(string nodeInfo);
+
+
+private:
+
+    static const int PARAMETER_NUMBER = 10;
+
+    int coding[PARAMETER_NUMBER] = {0, 0, 0, 0, 0};
 
     int bitNodeDepth = 1; //fino a 1024
     int bitDepth = 2;
@@ -46,25 +39,9 @@ public:
     int bitRb = 4;
     int bitCharRepresentation = 5;
 
-private:
-    string partitioner(string s, int element){
+    string partitioner(string s, int element);
 
-        int from = 0;
-
-        for (int j = 0; j < element - 1; j++) {
-            from += coding[j];
-        }
-
-        int to = from + coding[element-1] - 1;
-
-        string a = "";
-
-        for (int i = from; i <= to; ++i) {
-            a += s[i];
-        }
-
-        return a;
-    }
+    bool initializeHeader(BitIo<16> *bio2, int *coding, int dim);
 
 };
 

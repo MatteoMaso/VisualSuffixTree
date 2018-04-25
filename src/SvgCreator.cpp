@@ -26,14 +26,6 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile) {
     BitIo<16> bio2;
     bin_in >> bio2;
 
-    int nodeInfoDim = 52;
-    int nodeInfoLength = 0;
-    if ((nodeInfoDim % 16) == 0) {
-        nodeInfoLength = nodeInfoDim / 16;
-    } else {
-        nodeInfoLength = nodeInfoDim / 16 + 1;
-    }
-
 
     svg_out << getHeader("headerSvg.txt"); //Insert the header SVG into the file
 
@@ -44,13 +36,19 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile) {
     y0 = 40;
     H = 15;
 
-    BitDecoder decoder;
 
     //Check that the node property file generate with the first program must contain informations
     if (bio2.size() == 8){
         std::cout << "The node property file generated with the first program is empty, probably you have passed a bad string path" << std::endl;
         exit(-1);
     }
+
+
+    BitDecoder decoder(&bio2);
+
+
+    int nodeInfoLength = decoder.getNodeInfoLength();
+
 
     while (!bio2.empty()) {
 
@@ -63,7 +61,6 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile) {
         a = stoi(decoder.getNodeDepth(nodeInfo), nullptr, 2);
         b = stoi(decoder.getLb(nodeInfo), nullptr, 2);
         c = stoi(decoder.getRb(nodeInfo), nullptr, 2);
-
 
         x = x0 + b;
         H = 15;

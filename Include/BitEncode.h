@@ -9,34 +9,22 @@
 
 using namespace std;
 
-const int bitNodeDepth = 10;
-const int bitDepth = 10;
-const int bitLb = 16;
-const int bitRb = 16;
-
 class BitEncode {
 
 public:
 
+    string nodeDepthToString(unsigned long s);
 
-    string nodeDepthToString(unsigned long s) {
-        return std::bitset<bitNodeDepth>(s).to_string();
-    }
+    string depthToString(unsigned long s);
 
-    string depthToString(unsigned long s) {
-        return std::bitset<bitDepth>(s).to_string();
-    }
+    string lbToString(unsigned long s) ;
 
-    string lbToString(unsigned long s) {
-        return std::bitset<bitLb>(s).to_string();
-    }
+    string rbToString(unsigned long s);
 
-    string rbToString(unsigned long s) {
-        return std::bitset<bitRb>(s).to_string();
-    }
-
-
+    /*
+     * In this method I create an Header file to put in the binary file with the bit indication for decoder
+     */
+    string createHeader();
 };
-
 
 #endif //VISUALSUFFIXTREE_BITENCODE_H

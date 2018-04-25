@@ -85,6 +85,10 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName) {
 
     BitEncode e;
 
+    //Create Header file
+    string header = e.createHeader();
+    printBinFile(header, bin_out);
+
     for (iterator it = begin; it != end; ++it) {
 
         //Resetto la stringa del nodo info
@@ -131,8 +135,8 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName) {
             }
         }
 
-        std::cout << "NodeDepth: " << cst.node_depth(*it) << " Depth: " << cst.depth(*it) << "-[" << cst.lb(*it) << "-"
-                  << cst.rb(*it) << "]" << std::endl;
+//        std::cout << "NodeDepth: " << cst.node_depth(*it) << " Depth: " << cst.depth(*it) << "-[" << cst.lb(*it) << "-"
+//                  << cst.rb(*it) << "]" << std::endl;
 
 
         //TODO DEVO STAMPARE PRIMA IL NUMERO DI CARATTERI DELL'EDGE COSI POI IN LETTURA SO QUANTI LEGGERNE
@@ -147,7 +151,6 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName) {
 //        }
 
         printBinFile(nodeInfo, bin_out);
-
     }
 
     bin_out.close();
@@ -156,8 +159,13 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName) {
 void printBinFile(string &s, std::ofstream &bin_out) {
 
     BitIo<16> bio;
+    int counter = s.length() / 16;
 
-    for (int j = 0; j <= s.length() / 16; j++) {
+    if ((s.length() % 16) != 0){
+        counter++;
+    }
+
+    for (int j = 0; j < counter; j++) {
 
         string temp;
 
