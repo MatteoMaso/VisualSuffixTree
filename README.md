@@ -1,32 +1,26 @@
-# VisualSuffixTree
-A tool for a visual representation of a suffix tree using the FlameGraph structure
+Representing suffix trees as flame graphs
+=========
 
-##Installation
-In order to use this program you have to install the sdsl library provided by this
-link repository: https://github.com/simongog/sdsl.git into a known path.
+Installation
+------------
+First, install the [SDSL library](https://github.com/simongog/sdsl.git) into a known path. Then, set the corresponding SDSL installation directories in the `CMakeList.txt` file of the project:
+```
+include_directories(<SDSL_include_dir>)
+link_directories(<SDSL_lib_dir>)
+```
+Finally, build the project from its root path:
+```
+cmake CMakeList.txt
+make
+```
 
-Then you have to setting the SDSL installation path into CMakeList.txt of the project:
-
-    include_directories("include_directory")
-    link_directories("lib_directory")
-
-After proper SDSL library installation you can build the project with this command
-put into a terminal from your VisualSuffixTree path:
-
-    cmake CMakeList.txt
-    make
-
-##Usage
-The main program contain two program
-
-###Program 1: TREE PARSER
-This program take a txt file as input and create a binary file with all the information reguarding the node
-of the suffix tree built from the string.
-
-    @user: VisualSuffixTree -data [input_string.txt] [output_file.bin]
-
-###Program 2: SVG CREATOR
-This program take as input a binary file created with the program 1 and create as output
-an html file that represent a flameGraph of our string
-
-    @user: VisualSuffixTree -svg [input_file.bin] [output_file.html]
+Usage
+-----
+Given a file containing a string as a sequence of characters on a single line without headers, you first need to build an index that contains all the necessary information for drawing the suffix tree later. This is done by issuing the command:
+```
+./VisualSuffixTree -data [string.txt] [index.bin]
+```
+Given the index, you can create an SVG drawing of the suffix tree as follows:
+```
+./VisualSuffixTree -svg [index.bin] [drawing.html]
+```
