@@ -8,6 +8,7 @@
 #include "../Include/TreeParser.h"
 #include "../Include/BitIo.h"
 #include "../Include/BitEncode.h"
+#include "../Include/ConfigParser.h"
 
 using namespace std;
 using namespace sdsl;
@@ -17,7 +18,8 @@ typedef cst_sct3<> cst_t;
 
 TreeParser::TreeParser(char *inputFileName, char *outputFileName) {
 
-//    const int bitCharacter = 2;
+    map<string, string> configParameter;
+    ConfigParser cfPars("./Settings/config.cfg", &configParameter); //Initialize the configurations Parameter
 
     //Devo aggiornarlo ogni volta che aggiungo un nodo
     int nodeCounter = 0; //Contatore del numero di nodi così so quanto spazio occupa il file e quanto spazio potrei salvare

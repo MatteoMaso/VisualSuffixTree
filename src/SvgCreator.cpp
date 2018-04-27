@@ -8,10 +8,14 @@
 #include "../Include/SvgCreator.h"
 #include "../Include/BitIo.h"
 #include "../Include/BitDecoder.h"
+#include "../Include/ConfigParser.h"
 
 using namespace std;
 
 SvgCreator::SvgCreator(char *inputFileName, char *outputFile) {
+
+    map<string, string> configParameter;
+    ConfigParser cfPars("./Settings/config.cfg", &configParameter); //Initialize the configurations Parameter
 
     //BEGIN SVG CREATOR
     std::ofstream svg_out(outputFile, std::ios::out | std::ios::binary);
