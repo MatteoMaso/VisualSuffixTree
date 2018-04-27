@@ -26,22 +26,30 @@ public:
 
     string getRb(string nodeInfo);
 
+    string getEdge(string nodeInfo);
+
+    string edgeStringExtractor(int cNumber, string nodeInfo);
 
 private:
 
     static const int PARAMETER_NUMBER = 10;
 
-    int coding[PARAMETER_NUMBER] = {0, 0, 0, 0, 0};
+    int coding[PARAMETER_NUMBER] = {0, 0, 0, 0, 0, 0, 0, 0};
 
-    int bitNodeDepth = 1; //fino a 1024
-    int bitDepth = 2;
-    int bitLb = 3;
-    int bitRb = 4;
-    int bitCharRepresentation = 5;
+    const int BITSTRINGLENGTH = 1;
+    const int BITCHARREPRESENTATION = 2;
+    const int BITNODEDEPTH = 3; //fino a 1024
+    const int BITDEPTH = 4;
+    const int BITLB = 5;
+    const int BITRB = 6;
+    const int BITEDGELENGTH = 7;
 
     string partitioner(string s, int element);
 
     bool initializeHeader(BitIo<16> *bio2, int *coding, int dim);
+
+    string encodeCharacter(string c);
+
 
 };
 

@@ -16,6 +16,8 @@ make
 
 Usage
 -----
+In order to configure properly the output you have to setting up the config.txt file
+
 Given a file containing a string as a sequence of characters on a single line without headers, you first need to build an index that contains all the necessary information for drawing the suffix tree later. This is done by issuing the command:
 ```
 ./VisualSuffixTree -data [string.txt] [index.bin]

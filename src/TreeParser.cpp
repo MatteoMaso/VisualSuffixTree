@@ -14,57 +14,10 @@ using namespace sdsl;
 
 typedef cst_sct3<> cst_t;
 
-void printBinFile(string &s, std::ofstream &bin_out);
-
-string charEncoding(char &c, vector <string> &a, string &inputLine);
-
 
 TreeParser::TreeParser(char *inputFileName, char *outputFileName) {
 
-    std::cout << "Insert the alphabet: ABC or ARFS ... etc" << std::endl; //
-    string inputLine;
-    getline(cin, inputLine);
-    cout << inputLine.length() << endl;
-
-    vector <string> charCoding; //Vuoto per ora
-
-    //TODO RENDERLO PARAMETRICO
-    if (inputLine.length() <= 2){
-        //1 bit
-        charCoding.emplace_back("0");
-        charCoding.emplace_back("1");
-
-    } else if ( inputLine.length() > 2 && inputLine.length() <= 4){
-//        2 bit
-        charCoding.emplace_back("00");
-        charCoding.emplace_back("01");
-        charCoding.emplace_back("10");
-        charCoding.emplace_back("11");
-    } else if ( inputLine.length() > 4 && inputLine.length() <= 8){
-        //3 bit
-        charCoding.emplace_back("000");
-        charCoding.emplace_back("001");
-        charCoding.emplace_back("010");
-        charCoding.emplace_back("011");
-        charCoding.emplace_back("100");
-        charCoding.emplace_back("101");
-        charCoding.emplace_back("110");
-        charCoding.emplace_back("111");
-    } else {
-        std::cout << "To much alphabet character! Todo implement" << std::endl; //
-        exit(1);
-    }
-
-
-
-    for (int j = 0; j < inputLine.length(); j++) {
-        std::cout << "Char: " << inputLine[j] << " Encoded: " << charCoding[j] << std::endl; //
-    }
-
-
-
-    const int bitCharacter = 2;
-
+//    const int bitCharacter = 2;
 
     //Devo aggiornarlo ogni volta che aggiungo un nodo
     int nodeCounter = 0; //Contatore del numero di nodi così so quanto spazio occupa il file e quanto spazio potrei salvare
@@ -75,8 +28,6 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName) {
     typedef cst_bfs_iterator<cst_t> iterator;
     iterator begin = iterator(&cst, cst.root());
     iterator end = iterator(&cst, cst.root(), true, true);
-
-    int str_length = 0;
 
     string nodeInfo;
 
@@ -102,61 +53,65 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName) {
         nodeInfo += e.rbToString(cst.rb(*it));                  //Rb
 
 
-        str_length = (int)cst.depth(*it);
+        int allstring_length = (int)cst.depth(*it); //Lunghezza dell suffisso dalla radice al nodo interessato
+        int parent_strLength = (int)cst.depth(cst.parent(*it));
 
-
-
-        //TODO DA STAMPARE SOLO IL RAMO E NON TUTTA LA STRINGA
         string edge;
 
         if ((cst.node_depth(*it) == 0) ||
-            (cst.node_depth(*it) == 1 && str_length == 1 && (cst.lb(*it) == cst.rb(*it)))) {
-            edge = "-";
+            (cst.node_depth(*it) == 1 && allstring_length == 1 && (cst.lb(*it) == cst.rb(*it)))) {
+            edge = "$$$";
         } else {
 
             if (cst.lb(*it) == cst.rb(*it)) {
                 //leaf
                 edge = "";
 
-                for (int i = 1; i < str_length - 1; i++) {
+                for (int i = parent_strLength + 1; i < allstring_length; i++) {
                     edge += cst.edge(*it, i);
                 }
 
-                edge += "#";
-                edge += "#";
+                edge += "$";
 
             } else {
                 //internal node
                 edge = "";
 
-                for (int i = 1; i <= str_length; i++) {
+                for (int i = parent_strLength + 1; i <= allstring_length; i++) {
                     edge += cst.edge(*it, i);
                 }
             }
         }
 
-//        std::cout << "NodeDepth: " << cst.node_depth(*it) << " Depth: " << cst.depth(*it) << "-[" << cst.lb(*it) << "-"
-//                  << cst.rb(*it) << "]" << std::endl;
 
+        nodeInfo += e.getEdgeLength(edge.size());  //Number of character into the edge
+        nodeInfo += e.edgeToString(&edge);
+////
+////        std::cout << "NodeDepth: " << cst.node_depth(*it) << " Depth: " << cst.depth(*it) << "-[" << cst.lb(*it) << "-"
+////                  << cst.rb(*it) << "]" << "\nAll String length: " << allstring_length << " parent length: " << parent_strLength << "\nEdge: " << edge <<"\nEdge coded: " << e.edgeToString(&edge) << std::endl;
+////        //todo decommentare quando saro elaborare le stringhe del edge dall'SVG
+//
+//////        for (int k = 0; k < edge.length(); k++) {
+//////            nodeInfo += std::bitset<bitRb>(charEncoding(edge[k], charCoding, inputLine)).to_string();
+//////            std::cout << charEncoding(edge[k], charCoding, inputLine) << std::endl; //
+//////        }
+////
+////        std::cout << "NodeInfo.sie(): " << nodeInfo.size() << std::endl; //
+////        std::cout << "\n" << nodeInfo << std::endl;
+//
+        int len = nodeInfo.size() / 16;
+        if (nodeInfo.size() % 16 != 0) len++;
+        string length =  std::bitset<16>(len).to_string();
 
-        //TODO DEVO STAMPARE PRIMA IL NUMERO DI CARATTERI DELL'EDGE COSI POI IN LETTURA SO QUANTI LEGGERNE
-//        nodeInfo += std::bitset<bitRb>(edge.length()).to_string();
+        string pi = length+nodeInfo;
 
-        //todo togliere gli hashtag o tenerne conto di default
-
-        //todo decommentare quando saro elaborare le stringhe del edge dall'SVG
-//        for (int k = 0; k < edge.length(); k++) {
-//            nodeInfo += std::bitset<bitRb>(charEncoding(edge[k], charCoding, inputLine)).to_string();
-////            std::cout << charEncoding(edge[k], charCoding, inputLine) << std::endl; //
-//        }
-
-        printBinFile(nodeInfo, bin_out);
+        printBinFile(pi, bin_out);
     }
 
     bin_out.close();
 };
 
-void printBinFile(string &s, std::ofstream &bin_out) {
+void TreeParser::printBinFile(string &s, std::ofstream &bin_out) {
 
     BitIo<16> bio;
     int counter = s.length() / 16;
@@ -181,11 +136,10 @@ void printBinFile(string &s, std::ofstream &bin_out) {
     }
 
     bin_out << bio;
-
 };
 
 
-string charEncoding(char &c, vector <string> &a, string &inputLine){
+string TreeParser::charEncoding(char &c, vector <string> &a, string &inputLine){
 
     for (int i = 0; i < inputLine.size(); i++) {
         char temp = inputLine[i];
