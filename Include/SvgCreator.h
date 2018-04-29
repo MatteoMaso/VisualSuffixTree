@@ -1,54 +1,22 @@
 //
-// Created by root on 4/16/18.
+// Created by root on 4/29/18.
 //
 
 #ifndef VISUALSUFFIXTREE_SVGCREATOR_H
 #define VISUALSUFFIXTREE_SVGCREATOR_H
 
-using namespace std;
+#include "BitIo.h"
 
-class SvgCreator {
+class SvgCreator{
 
 public:
     SvgCreator(char *inputFileName, char *outputFile);
 
-    string partitioner(string s, int from, int to){
+    void openFile(std::ifstream *bin_in, char *inputFileName, BitIo<16> *bio);
 
-        string a = "";
+    string readNextNodeInfo(BitIo<16> *bio);
 
-        for (int i = from; i <= to; ++i) {
-            a += s[i];
-        }
-
-        return a;
-    }
-
-    string getHeader(string fileName) {
-        {
-
-            string txt;
-            string temp;
-            ifstream file;
-            file.open(fileName);
-
-            if (file.is_open()) {
-//        std::cout << "File open" << std::endl;
-
-                while (!file.eof()) {
-                    getline(file, temp);
-                    txt += temp + "\n";
-                }
-
-            } else {
-                std::cout << "I'm not able to read the header!" << std::endl;
-            }
-
-            file.close();
-            return txt;
-        }
-    }
-
+    string getHeader(string fileName);
 };
-
 
 #endif //VISUALSUFFIXTREE_SVGCREATOR_H

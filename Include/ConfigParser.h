@@ -1,22 +1,17 @@
 //
-// Created by root on 4/27/18.
+// Created by root on 4/29/18.
 //
 #include <string>
 
-#ifndef VISUALSUFFIXTREE_CONFIGPARSER_H
-#define VISUALSUFFIXTREE_CONFIGPARSER_H
+#ifndef VISUALSUFFIXTREE_CONDIFPARSER_H
+#define VISUALSUFFIXTREE_CONDIFPARSER_H
 
 using namespace std;
 
 class ConfigParser {
 
 public:
-    //Gli passo il path in cui trovare il file di configurazione
     ConfigParser(string configFileName, map<string, string> *configParameter);
-
-private:
-
 };
 
-
-#endif //VISUALSUFFIXTREE_CONFIGPARSER_H
+#endif //VISUALSUFFIXTREE_CONDIFPARSER_H
