@@ -14,7 +14,7 @@
 
 using namespace std;
 
-SvgCreator::SvgCreator(char *inputFileName, char *outputFile) {
+SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string> *configParameter) {
 
     //READ BINARY FILE
     std::ifstream bin_in(inputFileName, std::ios::binary);
@@ -22,9 +22,9 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile) {
     openFile(&bin_in,inputFileName, &bio2);
 
 
-    //HUMAN CONFIGURATIONS
-    map<string, string> configParameter;
-    ConfigParser cfPars("./Settings/config.cfg", &configParameter); //Initialize the configurations Parameter
+//    //HUMAN CONFIGURATIONS
+//    map<string, string> configParameter;
+//    ConfigParser cfPars("./Settings/config.cfg", &configParameter); //Initialize the configurations Parameter
 
     //PARAMETER CONFIGURATION
     Header header = Header();

@@ -14,10 +14,14 @@ const int bitDepth = 16;
 const int bitNodeDepth = 16;
 const int bitLb = 16;
 const int bitRb = 16;
+const int bitLabel = 16;
+const int bitFatherLabel = 16;
+
 const int bitEdgeLength = 16;
 const int bitEdgeCharacterEncoding = 16;
 
-NodeInfo::NodeInfo(NodeInfoStructure * nodeInfoStructure) {
+
+NodeInfo::NodeInfo(NodeInfoStructure *nodeInfoStructure) {
     //Save the address oh the structure to avoid multiple copies
     this->infoStructure = nodeInfoStructure;
 
@@ -31,6 +35,8 @@ string NodeInfo::getNodeField() {
     temp.append(nodeDepth);
     temp.append(lb);
     temp.append(rb);
+    temp.append(label);
+    temp.append(fatherLabel);
     temp.append(edgeLength);
 //    temp.append(edgeCharacterEncoding); questo non serve metterlo va solo nell'header
 
@@ -44,14 +50,14 @@ bool NodeInfo::setNodeField(string *nodeField) {
     setNodeDepth(stoi(partitioner(nodeField, 16, 31), nullptr, 2));
     setLb(stoi(partitioner(nodeField, 32, 47), nullptr, 2));
     setRb(stoi(partitioner(nodeField, 48, 63), nullptr, 2));
-    setEdgeLength(stoi(partitioner(nodeField, 64, 79), nullptr, 2));
+    setLabel(stoi(partitioner(nodeField, 64, 79), nullptr, 2));
+    setFatherLabel(stoi(partitioner(nodeField, 80, 95), nullptr, 2));
+    setEdgeLength(stoi(partitioner(nodeField, 96, 111), nullptr, 2));
 
-    int edgeFrom = 80;
-    int edgeTo = 80 + getEdgeCharacterEncoding()*getEdgeLength() -1;
+    int edgeFrom = 112;
+    int edgeTo = edgeFrom + getEdgeCharacterEncoding() * getEdgeLength() - 1;
     edge = partitioner(nodeField, edgeFrom, edgeTo);
     setBinaryEdge(&edge);
-
-    //todo add edge e lunghezza edge
     //todo implement il resto
 }
 
@@ -69,6 +75,14 @@ void NodeInfo::setLb(unsigned long n) {
 
 void NodeInfo::setRb(unsigned long n) {
     rb = std::bitset<bitRb>(n).to_string();
+}
+
+void NodeInfo::setLabel(unsigned long n) {
+    label = std::bitset<bitLabel>(n).to_string();
+}
+
+void NodeInfo::setFatherLabel(unsigned long n) {
+    fatherLabel = std::bitset<bitFatherLabel>(n).to_string();
 }
 
 void NodeInfo::setEdgeLength(unsigned long n) {
@@ -91,7 +105,6 @@ void NodeInfo::setEdge(string *s) {
 void NodeInfo::setEdgeCharacterEncoding(unsigned long n) {
     edgeCharacterEncoding = std::bitset<bitEdgeCharacterEncoding>(n).to_string();
 }
-
 
 
 int NodeInfo::getDepth() {
@@ -124,8 +137,8 @@ string NodeInfo::getEdgeDecoded() {
     string edge = "";
     for (int j = 0; j < stoi(edgeLength, nullptr, 2); j++) {
         character = "";
-        for (int i = 0+j*bitChar; i < ((j+1)*bitChar); i++) {
-            character+=this->edge[i];
+        for (int i = 0 + j * bitChar; i < ((j + 1) * bitChar); i++) {
+            character += this->edge[i];
         }
         edge += decodeCharacter(&character, &codification, &alphabet);
     }
@@ -135,11 +148,13 @@ string NodeInfo::getEdgeDecoded() {
 
 string NodeInfo::print() {
     string s;
-    s.append("\nNodeDepth:   " + to_string(getNodeDepth()));
-    s.append("\nDepth:       " + to_string(getDepth()));
-    s.append("\nLb-Rb:       [" + to_string(getLb()) + "-" + to_string(getRb()) + "]");
-    s.append("\nEdge Length: "+to_string(getEdgeLength()));
-    s.append("\nEdge:        "+getEdgeDecoded());
+    s.append("\nLabel:            " + to_string(getLabel()));
+    s.append("\nFather's Label:   " + to_string(getFatherLabel()));
+    s.append("\nNodeDepth:        " + to_string(getNodeDepth()));
+    s.append("\nDepth:            " + to_string(getDepth()));
+    s.append("\nLb-Rb:            [" + to_string(getLb()) + "-" + to_string(getRb()) + "]");
+    s.append("\nEdge Length:      " + to_string(getEdgeLength()));
+    s.append("\nEdge:             " + getEdgeDecoded());
     //todo to complete
 
     return s;
@@ -155,34 +170,42 @@ string NodeInfo::partitioner(string *s, int from, int to) {
     return a;
 }
 
-string NodeInfo::encodeCharacter(string *s, vector <string> *codification, vector <string> *alphabet) {
+string NodeInfo::encodeCharacter(string *s, vector<string> *codification, vector<string> *alphabet) {
 
     for (int i = 0; i < alphabet->size(); i++) {
-        string  a = alphabet->at(i);
-        if (a.compare(*s) == 0){
+        string a = alphabet->at(i);
+        if (a.compare(*s) == 0) {
             return codification->at(i);
         }
     }
 
-    std::cout << "Errore in charEncoding, carattere: "<< s << " non trovato!" << std::endl; //
+    std::cout << "Errore in charEncoding, carattere: " << s << " non trovato!" << std::endl; //
     exit(12);
 }
 
 string NodeInfo::decodeCharacter(string *s, vector<string> *codification, vector<string> *alphabet) {
 
     for (int i = 0; i < alphabet->size(); i++) {
-        string  a = codification->at(i);
-        if (a.compare(*s) == 0){
+        string a = codification->at(i);
+        if (a.compare(*s) == 0) {
             return alphabet->at(i);
         }
     }
 
-    std::cout << "Errore in charDecoding, carattere: "<< s << " non trovato!" << std::endl; //
+    std::cout << "Errore in charDecoding, carattere: " << s << " non trovato!" << std::endl; //
     exit(12);
 }
 
 void NodeInfo::setBinaryEdge(string *s) {
     edge = *s;
+}
+
+int NodeInfo::getLabel() {
+    return stoi(label, nullptr, 2);
+}
+
+int NodeInfo::getFatherLabel() {
+    return stoi(fatherLabel, nullptr, 2);
 }
 
 

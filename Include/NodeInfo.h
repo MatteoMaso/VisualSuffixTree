@@ -11,12 +11,6 @@ using namespace std;
 
 class NodeInfo {
 
-//const int bitDepth = 16;
-//const int bitNodeDepth = 16;
-//const int bitLb = 16;
-//const int bitRb = 16;
-//const int bitEdgeLength = 16;
-//const int bitEdgeCharacterEncoding = 16;
 public:
 
     NodeInfo(NodeInfoStructure *nodeInfoStructure);
@@ -33,6 +27,10 @@ public:
 
     void setRb(unsigned long n);
 
+    void setLabel(unsigned long n);
+
+    void setFatherLabel(unsigned long n);
+
     void setEdgeLength(unsigned long n);
 
 //codifica l'edge da stringa a binario
@@ -47,6 +45,10 @@ public:
     int getLb();
 
     int getRb();
+
+    int getLabel();
+
+    int getFatherLabel();
 
     int getEdgeLength();
 
@@ -71,11 +73,14 @@ public:
     string nodeDepth;
     string lb;
     string rb;
+    string label;
+    string fatherLabel;
     string edgeLength;
     string edge;
     string edgeCharacterEncoding;
 
     vector <string> alphabet = {"a", "c", "g", "t", "$","-"};
+//    vector <string> alphabet = {"a", "b", "n", "t", "$","-"};
     vector <string> codification = {"100", "010", "001", "110", "101", "011"};
 
 };

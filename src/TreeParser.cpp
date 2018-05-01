@@ -19,11 +19,9 @@ using namespace sdsl;
 typedef cst_sct3<> cst_t;
 
 
-TreeParser::TreeParser(char *inputFileName, char *outputFileName) {
+TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, string> *configParameter) {
 
-    //HUMAN CONFIGURATIONS
-    map<string, string> configParameter;
-    ConfigParser cfPars("./Settings/config.cfg", &configParameter); //Initialize the configurations Parameter
+
 
 
     //SUFFIX TREE STRUCTURE
@@ -59,18 +57,16 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName) {
         nodeInfoObj.setLb(cst.lb(*it));
         nodeInfoObj.setRb(cst.rb(*it));
 
+        nodeInfoObj.setLabel(cst.id(*it));
+        nodeInfoObj.setFatherLabel(cst.id(cst.parent(*it)));
 
         string new_edge = getEdge(&cst, &it);
         nodeInfoObj.setEdge(&new_edge);
 
 
+//        std::cout << "\n\n\nNodeDepth: " << cst.node_depth(*it) << " Depth: " << cst.depth(*it) << "-[" << cst.lb(*it) << "-"
+//                  << cst.rb(*it) << "]" << std::endl;//<< "\nAll String length: " << allstring_length << " parent length: " << parent_strLength << "\nEdge: " << edge <<"\nEdge coded: " << e.edgeToString(&edge) << std::endl;
 //
-//        nodeInfo += e.getEdgeLength(edge.size());  //Number of character into the edge
-//        nodeInfo += e.edgeToString(&edge);
-//////
-        std::cout << "\n\n\nNodeDepth: " << cst.node_depth(*it) << " Depth: " << cst.depth(*it) << "-[" << cst.lb(*it) << "-"
-                  << cst.rb(*it) << "]" << std::endl;//<< "\nAll String length: " << allstring_length << " parent length: " << parent_strLength << "\nEdge: " << edge <<"\nEdge coded: " << e.edgeToString(&edge) << std::endl;
-
 
         std::cout << nodeInfo << std::endl;
 
