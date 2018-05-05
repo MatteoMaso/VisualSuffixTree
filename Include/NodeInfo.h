@@ -15,8 +15,7 @@ public:
 
     NodeInfo(NodeInfoStructure *nodeInfoStructure);
 
-    string getNodeField();
-
+    //SETTER
     bool setNodeField(string *nodeField);
 
     void setDepth(unsigned long n);
@@ -38,6 +37,15 @@ public:
 
     void setEdgeCharacterEncoding(unsigned long n);
 
+    void setNumberOfChildren(int n);
+
+    void setChildrenId(vector <int> * childrenId);
+
+
+    //GETTER
+
+    string getNodeField();
+
     int getDepth();
 
     int getNodeDepth();
@@ -56,7 +64,6 @@ public:
 
     string getEdgeDecoded();
 
-    string print();
 
     string partitioner(string *s, int from, int to);
 
@@ -66,8 +73,14 @@ public:
 
     void setBinaryEdge(string *s);
 
+    int getNumbrOfChildren();
+
+    vector<int> getChildrenId();
+
     NodeInfoStructure *infoStructure;
 
+    //UTILS
+    string print();
 
     string depth;
     string nodeDepth;
@@ -78,10 +91,16 @@ public:
     string edgeLength;
     string edge;
     string edgeCharacterEncoding;
+    string numberOfChildren;
+    vector<int> childrenId;
 
-    vector <string> alphabet = {"a", "c", "g", "t", "$","-"};
-//    vector <string> alphabet = {"a", "b", "n", "t", "$","-"};
-    vector <string> codification = {"100", "010", "001", "110", "101", "011"};
+//    vector <string> alphabet = {"a", "c", "g", "t", "$","-"};
+////    vector <string> alphabet = {"a", "b", "n", "t", "$","-"};
+//    vector <string> codification = {"100", "010", "001", "110", "101", "011"};
+
+private:
+    string childrenToEncodedString(vector<int> v);
+    void setChildren(string * childrenString);
 
 };
 

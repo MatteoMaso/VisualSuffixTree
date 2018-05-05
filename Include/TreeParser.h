@@ -19,11 +19,7 @@ public:
 
     void printBinFile(string &s, std::ofstream &bin_out);
 
-    string charEncoding(char &c, vector<string> &a, string &inputLine);
-
-
     void printNode(NodeInfo *nodeInfo, std::ofstream *bin_out);
-
 
     string getEdge(cst_t *cst, iterator1 *it);
 

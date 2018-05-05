@@ -22,8 +22,6 @@ typedef cst_sct3<> cst_t;
 TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, string> *configParameter) {
 
 
-
-
     //SUFFIX TREE STRUCTURE
     cst_t cst;                              //declare the suffix tree
     construct(cst, inputFileName, 1);       //initialize the suffix tree
@@ -37,7 +35,7 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
 
 
     int parameter[20] = {16,16,16,16,16,16,16,16};
-    NodeInfoStructure nodeInfoStructure(parameter);
+    NodeInfoStructure nodeInfoStructure(parameter, configParameter);
 
     Header header(&nodeInfoStructure);
     string headerString = header.getString();
@@ -49,6 +47,7 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
 
     string nodeInfo;
     NodeInfo nodeInfoObj(&nodeInfoStructure);
+
 
     for (iterator it = begin; it != end; ++it) {
 
@@ -63,12 +62,20 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
         string new_edge = getEdge(&cst, &it);
         nodeInfoObj.setEdge(&new_edge);
 
+        //SET CHILDREN ID //todo controllare in caso di foglie cosa succede
+        vector<int> childrenID; //support structure
+        for (auto& child: cst.children(*it)) {
+            childrenID.push_back(cst.id(child));
+        }
+        nodeInfoObj.setChildrenId(&childrenID);
+
+
 
 //        std::cout << "\n\n\nNodeDepth: " << cst.node_depth(*it) << " Depth: " << cst.depth(*it) << "-[" << cst.lb(*it) << "-"
 //                  << cst.rb(*it) << "]" << std::endl;//<< "\nAll String length: " << allstring_length << " parent length: " << parent_strLength << "\nEdge: " << edge <<"\nEdge coded: " << e.edgeToString(&edge) << std::endl;
 //
 
-        std::cout << nodeInfo << std::endl;
+        std::cout << nodeInfoObj.print() << std::endl;
 
         //PRINT THE NODE INFO INTO BINARY FILE
         printNode(&nodeInfoObj, &bin_out);
@@ -107,21 +114,6 @@ void TreeParser::printBinFile(string &s, std::ofstream &bin_out) {
     bin_out << bio;
 };
 
-
-string TreeParser::charEncoding(char &c, vector <string> &a, string &inputLine){
-
-    for (int i = 0; i < inputLine.size(); i++) {
-        char temp = inputLine[i];
-        if ( c == temp ){
-            return a[i];
-        }
-    }
-
-
-    std::cout << "Errore in charEncoding, carattere: "<< c << " non trovato!" << std::endl; //
-    exit(1);
-
-}
 
 void TreeParser::printNode(NodeInfo *nodeInfo, std::ofstream *bin_out) {
 

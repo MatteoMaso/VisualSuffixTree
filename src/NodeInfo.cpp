@@ -20,6 +20,9 @@ const int bitFatherLabel = 16;
 const int bitEdgeLength = 16;
 const int bitEdgeCharacterEncoding = 16;
 
+const int bitNumberOfChildren = 16;
+const int bitChildrenId = 16; //se lo metto variabile devo cambiare sotto
+
 
 NodeInfo::NodeInfo(NodeInfoStructure *nodeInfoStructure) {
     //Save the address oh the structure to avoid multiple copies
@@ -40,7 +43,13 @@ string NodeInfo::getNodeField() {
     temp.append(edgeLength);
 //    temp.append(edgeCharacterEncoding); questo non serve metterlo va solo nell'header
 
+    temp.append(numberOfChildren);
+
     temp.append(edge);
+    if (this->getNumbrOfChildren() > 0) {
+        temp.append(childrenToEncodedString(childrenId));
+    }
+
     return temp;
 }
 
@@ -53,12 +62,21 @@ bool NodeInfo::setNodeField(string *nodeField) {
     setLabel(stoi(partitioner(nodeField, 64, 79), nullptr, 2));
     setFatherLabel(stoi(partitioner(nodeField, 80, 95), nullptr, 2));
     setEdgeLength(stoi(partitioner(nodeField, 96, 111), nullptr, 2));
+    setNumberOfChildren(stoi(partitioner(nodeField, 112, 127), nullptr, 2));
 
-    int edgeFrom = 112;
+
+    int edgeFrom = 128;     //Dopo l'ultimo parametro
     int edgeTo = edgeFrom + getEdgeCharacterEncoding() * getEdgeLength() - 1;
     edge = partitioner(nodeField, edgeFrom, edgeTo);
     setBinaryEdge(&edge);
-    //todo implement il resto
+
+
+    int childrenFrom = edgeTo + 1;
+    int childrenTo = childrenFrom + 16 * getNumbrOfChildren() - 1;
+    string t = partitioner(nodeField, childrenFrom, childrenTo);
+    setChildren(&t);
+
+
 }
 
 void NodeInfo::setDepth(unsigned long n) {
@@ -97,7 +115,8 @@ void NodeInfo::setEdge(string *s) {
     for (int i = 0; i < s->size(); i++) {
         character = "";
         character += s->at(i);
-        edge += encodeCharacter(&character, &codification, &alphabet);
+//        edge += encodeCharacter(&character, &codification, &alphabet);
+        edge += encodeCharacter(&character, &(infoStructure->codification), &(infoStructure->alphabet));
     }
     this->edge = edge;
 }
@@ -140,7 +159,7 @@ string NodeInfo::getEdgeDecoded() {
         for (int i = 0 + j * bitChar; i < ((j + 1) * bitChar); i++) {
             character += this->edge[i];
         }
-        edge += decodeCharacter(&character, &codification, &alphabet);
+        edge += decodeCharacter(&character, &(infoStructure->codification), &(infoStructure->alphabet));
     }
 
     return edge;
@@ -155,6 +174,12 @@ string NodeInfo::print() {
     s.append("\nLb-Rb:            [" + to_string(getLb()) + "-" + to_string(getRb()) + "]");
     s.append("\nEdge Length:      " + to_string(getEdgeLength()));
     s.append("\nEdge:             " + getEdgeDecoded());
+    s.append("\n#Children:         " + to_string(getNumbrOfChildren()));
+
+    for (auto i : getChildrenId()) {
+        s.append("\nChildrens:    " + to_string(i));
+    }
+
     //todo to complete
 
     return s;
@@ -170,7 +195,7 @@ string NodeInfo::partitioner(string *s, int from, int to) {
     return a;
 }
 
-string NodeInfo::encodeCharacter(string *s, vector<string> *codification, vector<string> *alphabet) {
+string NodeInfo::encodeCharacter(string * s, vector<string> * codification, vector<string> * alphabet) {
 
     for (int i = 0; i < alphabet->size(); i++) {
         string a = alphabet->at(i);
@@ -179,7 +204,7 @@ string NodeInfo::encodeCharacter(string *s, vector<string> *codification, vector
         }
     }
 
-    std::cout << "Errore in charEncoding, carattere: " << s << " non trovato!" << std::endl; //
+    std::cout << "Errore in charEncoding, carattere: " << *s << " non trovato!" << std::endl; //
     exit(12);
 }
 
@@ -206,6 +231,50 @@ int NodeInfo::getLabel() {
 
 int NodeInfo::getFatherLabel() {
     return stoi(fatherLabel, nullptr, 2);
+}
+
+void NodeInfo::setNumberOfChildren(int n) {
+    numberOfChildren = std::bitset<bitNumberOfChildren>(n).to_string();
+}
+
+void NodeInfo::setChildren(string *childrenString) {
+    string id;
+    childrenId.clear();
+    for (int i = 0; i < childrenString->size() / 16; ++i) {
+        id = "";
+        for (int j = 0 + i * 16; j < ((i + 1) * 16); j++) {
+            id += childrenString->at(j);
+        }
+        childrenId.push_back(stoi(id, nullptr, 2));
+    }
+}
+
+void NodeInfo::setChildrenId(vector<int> *childrenId) {
+
+    setNumberOfChildren(childrenId->size());
+    this->childrenId.clear();
+    for (auto i : *childrenId) {
+        this->childrenId.push_back(i);
+    }
+}
+
+int NodeInfo::getNumbrOfChildren() {
+    return stoi(numberOfChildren, nullptr, 2);
+}
+
+vector<int> NodeInfo::getChildrenId() {
+    return this->childrenId;
+}
+
+string NodeInfo::childrenToEncodedString(vector<int> v) {
+
+    string tmp = "";
+
+    for (auto i : v) {
+        tmp.append(std::bitset<bitChildrenId>(i).to_string());
+    }
+
+    return tmp;
 }
 
 

@@ -31,7 +31,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
     header.readHeader(&bio2);
 
     //After reading header create the NodeInfoStructure
-    NodeInfoStructure nodeStructure = NodeInfoStructure();
+    NodeInfoStructure nodeStructure = NodeInfoStructure(configParameter);
     nodeStructure.setField(header.getNodeInfoStructure());
 
 
@@ -77,7 +77,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
         y = y0 + (a * H);
         w = (c - b) + 1;
 
-        std::cout << "\nBit Nodedepth: " << a << " [" << b << "-" << c << "]\n" << "Edge\t" << edge << std::endl;
+//        std::cout << "\nBit Nodedepth: " << a << " [" << b << "-" << c << "]\n" << "Edge\t" << edge << std::endl;
 
         string temp = "\n<g class=\"func_g\" onmouseover=\"s(this)\" onmouseout=\"c()\" onclick=\"zoom(this)\">\n""<title>";
         temp += edge;

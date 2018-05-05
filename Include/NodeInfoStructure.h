@@ -3,6 +3,8 @@
 //
 #include <string>
 #include <bitset>
+#include <map>
+#include <vector>
 
 
 #ifndef VISUALSUFFIXTREE_NODEINFOSTRUCTURE_H
@@ -13,10 +15,10 @@ using namespace std;
 class NodeInfoStructure{
 
 public:
-    NodeInfoStructure(int parameter1[]);
+    NodeInfoStructure(int parameter1[], map<string, string> *configParameter);
 
     //For encoder
-    NodeInfoStructure();
+    NodeInfoStructure(map<string, string> *configParameter);
 
     string getString();
 
@@ -34,7 +36,12 @@ public:
 
     const int PARAMETER_NUMBER = 7;
 
-    NodeInfoStructure * nodeInfoStructure;
+    vector <string> alphabet; // = {"a", "c", "g", "t", "$","-"};
+    vector <string> codification; // = {"100", "010", "001", "110", "101", "011"};
+
+private:
+
+    void setAlphabet(string alphabetString);
 
 };
 
