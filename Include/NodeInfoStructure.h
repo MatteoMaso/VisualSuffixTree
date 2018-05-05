@@ -5,6 +5,7 @@
 #include <bitset>
 #include <map>
 #include <vector>
+#include "ConfigParser.h"
 
 
 #ifndef VISUALSUFFIXTREE_NODEINFOSTRUCTURE_H
@@ -36,8 +37,8 @@ public:
 
     const int PARAMETER_NUMBER = 7;
 
-    vector <string> alphabet; // = {"a", "c", "g", "t", "$","-"};
-    vector <string> codification; // = {"100", "010", "001", "110", "101", "011"};
+    vector <string> alphabet;
+    vector <string> codification;
 
 private:
 

@@ -94,10 +94,6 @@ public:
     string numberOfChildren;
     vector<int> childrenId;
 
-//    vector <string> alphabet = {"a", "c", "g", "t", "$","-"};
-////    vector <string> alphabet = {"a", "b", "n", "t", "$","-"};
-//    vector <string> codification = {"100", "010", "001", "110", "101", "011"};
-
 private:
     string childrenToEncodedString(vector<int> v);
     void setChildren(string * childrenString);

@@ -31,5 +31,4 @@ ConfigParser::ConfigParser(string configFileName, map<string, string> *configPar
         std::cout << "Unable to open config file." << '\n';
         exit(-1);
     }
-
 }

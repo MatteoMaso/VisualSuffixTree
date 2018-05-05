@@ -6,6 +6,7 @@
 #define VISUALSUFFIXTREE_SVGCREATOR_H
 
 #include "BitIo.h"
+#include "ConfigParser.h"
 
 class SvgCreator{
 

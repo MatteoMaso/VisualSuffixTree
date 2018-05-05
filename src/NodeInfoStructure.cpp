@@ -6,6 +6,8 @@
 #include "../Include/NodeInfoStructure.h"
 #include <math.h>       /* log10 */
 #include <sstream>
+#include "../Include/ConfigParser.h"
+
 
 //For decoder
 NodeInfoStructure::NodeInfoStructure(int parameter1[], map<string, string> *configParameter) {
@@ -56,9 +58,9 @@ void NodeInfoStructure::setAlphabet(string alphabetString) {
         exit(-1);
     }
 
-    int numberOfElement = (alphabetString.length() / 2) +1;
+    int numberOfElement = (alphabetString.length() / 2) + 1;
 
-    int numberOfBit = log10(numberOfElement)/log10(2) +  0.999999999;
+    int numberOfBit = log10(numberOfElement) / log10(2) + 0.999999999;
     if (numberOfBit == 0) numberOfBit++;
 
     stringstream ss(alphabetString);
@@ -67,23 +69,31 @@ void NodeInfoStructure::setAlphabet(string alphabetString) {
         this->alphabet.push_back(s);
     }
 
-    //todo risolvere il passaggio dei bit
+    switch (numberOfBit) {
+        case 1:
+            for (int i = 0; i < numberOfElement; i++) { this->codification.push_back(std::bitset<1>(i).to_string()); }
+            break;
 
-    for (int i = 0; i < numberOfElement; i++) {
-        this->codification.push_back(std::bitset<3>(i).to_string());
+        case 2:
+            for (int i = 0; i < numberOfElement; i++) { this->codification.push_back(std::bitset<2>(i).to_string()); }
+            break;
+
+        case 3:
+            for (int i = 0; i < numberOfElement; i++) { this->codification.push_back(std::bitset<3>(i).to_string()); }
+            break;
+
+        case 4:
+            for (int i = 0; i < numberOfElement; i++) { this->codification.push_back(std::bitset<4>(i).to_string()); }
+            break;
+
+        case 5:
+            for (int i = 0; i < numberOfElement; i++) { this->codification.push_back(std::bitset<5>(i).to_string()); }
+            break;
+
+        default:
+            for (int i = 0; i < numberOfElement; i++) { this->codification.push_back(std::bitset<16>(i).to_string()); }
+            break;
     }
-
-//    temp += std::bitset<16>(parameter[i]).to_string();
-//
-//    if (numberOfElement <= 2){
-//
-//    } else if ( numberOfElement > 2 && numberOfElement <= 4){
-//
-//    } else if ( numberOfElement > 4 && numberOfElement <= 8){
-//
-//    } else {
-//        std::cout << "todo implement more character" << std::endl;
-////        exit(15);
-//    }
-
 }
+
+

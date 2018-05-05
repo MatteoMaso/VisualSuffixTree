@@ -180,8 +180,6 @@ string NodeInfo::print() {
         s.append("\nChildrens:    " + to_string(i));
     }
 
-    //todo to complete
-
     return s;
 }
 
