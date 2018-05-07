@@ -41,7 +41,9 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
 
     //PARAMETER THAT I NEED
-    int a, b, c;
+
+    int a, b, c, count;
+    string l;
     int x, y, i, j, z, x0, y0, H, w;
     string edge = "";
 
@@ -69,6 +71,19 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
         a = nodeInfoObj.getNodeDepth();
         b = nodeInfoObj.getLb();
         c = nodeInfoObj.getRb();
+        l = nodeInfoObj.fatherLabel;
+
+        while(!bio2.empty()){
+
+            if (nodeInfoObj.getNodeDepth() == a && nodeInfoObj.fatherLabel== l){
+
+                count++;
+                }
+        }
+
+
+
+
 
         edge = nodeInfoObj.getEdgeDecoded();
 
