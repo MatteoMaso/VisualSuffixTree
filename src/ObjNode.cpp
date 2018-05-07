@@ -11,5 +11,49 @@
 using namespace std;
 
 ObjNode::ObjNode() {
-    //todo
+     objNodeDepth = 0;
+     objNodeX = 0;
+     objNodeY = 0;
+     objNodeWid = 0;
+     numberOfChildren = 0;
+}
+
+int ObjNode::getObjNodeDepth(){
+    return objNodeDepth;
+}
+
+void ObjNode::setObjNodeDepth(int objNodeDepth) {
+    this->objNodeDepth = objNodeDepth;
+}
+
+int ObjNode::getObjNodeX(){
+    return objNodeX;
+}
+
+void ObjNode::setObjNodeX(int objNodeX) {
+    this->objNodeX = objNodeX;
+}
+
+int ObjNode::getObjNodeY(){
+    return objNodeY;
+}
+
+void ObjNode::setObjNodeY(int objNodeY) {
+    this->objNodeY = objNodeY;
+}
+
+int ObjNode::getObjNodeWid(){
+    return objNodeWid;
+}
+
+void ObjNode::setObjNodeWid(int objNodeWid) {
+    this->objNodeWid = objNodeWid;
+}
+
+int ObjNode::getNumberOfChildren(){
+    return numberOfChildren;
+}
+
+void ObjNode::setNumberOfChildren(int numberOfChildren) {
+    this->numberOfChildren = numberOfChildren;
 }

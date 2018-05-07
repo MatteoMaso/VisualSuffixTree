@@ -13,9 +13,28 @@ class ObjNode{
 public:
     ObjNode();
 
-    ObjNode(int objNodeDepth);
+    int getObjNodeDepth();
+
+    void setObjNodeDepth(int objNodeDepth);
+
+    int getObjNodeX();
+
+    void setObjNodeX(int objNodeX);
+
+    int getObjNodeY();
+
+    void setObjNodeY(int objNodeY);
+
+    int getObjNodeWid();
+
+    void setObjNodeWid(int objNodeWid);
+
+    int getNumberOfChildren();
+
+    void setNumberOfChildren(int numberOfChildren);
 
 
+private:
     int objNodeDepth;
     int objNodeX;
     int objNodeY;

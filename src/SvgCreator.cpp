@@ -72,10 +72,10 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
         l = nodeInfoObj.getLabel();
 
         ObjNode objNode = ObjNode();
-        objNode.objNodeDepth = a;
+        objNode.setObjNodeDepth(a);
 
         //Prende il numero di figli del padre che sono uguali al numero di fratelli escluso se stesso
-        count = hashmap[nodeInfoObj.getFatherLabel()].numberOfChildren -1;
+        count = hashmap[nodeInfoObj.getFatherLabel()].getNumberOfChildren() -1;
 
 //        while(!bio2.empty()){ //QUI RESTA IN LOOP :(
 //
@@ -86,16 +86,17 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 //        }
 
         //count è il numero di fratelli
-        sons = count +1;
+        sons = count + 1;
         //se non sto valutando il padre mi trovo le coordinate di del padre deò nodo
         if(a != 0){
             ObjNode fatherObj = hashmap[fl];
 //            fatherObj = hashmap.find(fl)->second;
-            int xF = fatherObj.objNodeX;
-            int yF = fatherObj.objNodeY;
-            int  wF = fatherObj.objNodeWid;
+            int xF = fatherObj.getObjNodeX();
+            int yF = fatherObj.getObjNodeY();
+            int  wF = fatherObj.getObjNodeWid();
             x = xF;
             y = yF + H;
+            //todo !!!!!!!!! qui divide per zero quando sons = 0
             w =  wF/sons;
         }
 
@@ -115,10 +116,10 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
         H = 15;
 
 
-        objNode.objNodeX = x;
-        objNode.objNodeY = y;
-        objNode.objNodeWid = w;
-        objNode.numberOfChildren = nodeInfoObj.getNumbrOfChildren(); //Setta il numero di figli
+        objNode.setObjNodeX(x);
+        objNode.setObjNodeY(y);
+        objNode.setObjNodeWid(w);
+        objNode.setNumberOfChildren(nodeInfoObj.getNumbrOfChildren()); //Setta il numero di figli
 
         pair<int, ObjNode> element = {l, objNode};
         hashmap.insert(element);
