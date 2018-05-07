@@ -10,7 +10,7 @@
 #include "../Include/NodeInfoStructure.h"
 #include "../Include/Header.h"
 #include "../Include/NodeInfo.h"
-
+#include "../Include/ObjNode.h"
 
 using namespace std;
 
@@ -42,8 +42,11 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
     //PARAMETER THAT I NEED
 
-    int a, b, c, count;
-    string l;
+    map<string, ObjNode> hashmap;
+    int a, b, c, sons;
+    int count = 0;
+    int defW = 1000; //larghezza del rettangolo
+    string fl, l;
     int x, y, i, j, z, x0, y0, H, w;
     string edge = "";
 
@@ -71,26 +74,57 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
         a = nodeInfoObj.getNodeDepth();
         b = nodeInfoObj.getLb();
         c = nodeInfoObj.getRb();
-        l = nodeInfoObj.fatherLabel;
+        fl = nodeInfoObj.fatherLabel;
+        l = nodeInfoObj.label;
+
+        ObjNode objNode = ObjNode();
+        objNode.objNodeDepth = a;
 
         while(!bio2.empty()){
 
-            if (nodeInfoObj.getNodeDepth() == a && nodeInfoObj.fatherLabel== l){
+            if (a != 0 && nodeInfoObj.getNodeDepth() == a && nodeInfoObj.fatherLabel== fl){
 
                 count++;
                 }
         }
 
+        //count è il numero di fratelli
+        sons = count +1;
+        //se non sto valutando il padre mi trovo le coordinate di del padre deò nodo
+        if(a != 0){
+            ObjNode fatherObj = ObjNode();
+            fatherObj = hashmap.find(fl)->second;
+            int xF = fatherObj.objNodeX;
+            int yF = fatherObj.objNodeY;
+            int  wF = fatherObj.objNodeWid;
+            x = xF;
+            y = yF + H;
+            w =  wF/sons;
+        }
+
+        else{
+            x = x0 + b;
+            y = y0 + (a * H);
+            w = defW;
+        }
 
 
 
 
         edge = nodeInfoObj.getEdgeDecoded();
 
-        x = x0 + b;
+
+
         H = 15;
-        y = y0 + (a * H);
-        w = (c - b) + 1;
+
+
+        objNode.objNodeX = x;
+        objNode.objNodeY = y;
+        objNode.objNodeWid = w;
+
+        pair<string, ObjNode> element = {l, objNode};
+        hashmap.insert(element);
+
 
 //        std::cout << "\nBit Nodedepth: " << a << " [" << b << "-" << c << "]\n" << "Edge\t" << edge << std::endl;
 
