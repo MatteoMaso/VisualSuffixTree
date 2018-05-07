@@ -69,6 +69,7 @@ void NodeInfoStructure::setAlphabet(string alphabetString) {
         this->alphabet.push_back(s);
     }
 
+
     switch (numberOfBit) {
         case 1:
             for (int i = 0; i < numberOfElement; i++) { this->codification.push_back(std::bitset<1>(i).to_string()); }

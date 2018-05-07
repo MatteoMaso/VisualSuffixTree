@@ -12,6 +12,7 @@
 #include "../Include/Header.h"
 #include "../Include/NodeInfo.h"
 
+#define VERBOSE 1
 
 using namespace std;
 using namespace sdsl;
@@ -34,7 +35,7 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
     std::ofstream bin_out(outputFileName, std::ios::out | std::ios::binary);
 
 
-    int parameter[20] = {16,16,16,16,16,16,16,16};
+    int parameter[20] = {16, 16, 16, 16, 16, 16, 16, 16};
     NodeInfoStructure nodeInfoStructure(parameter, configParameter);
 
     Header header(&nodeInfoStructure);
@@ -62,20 +63,22 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
         string new_edge = getEdge(&cst, &it);
         nodeInfoObj.setEdge(&new_edge);
 
-        //SET CHILDREN ID //todo controllare in caso di foglie cosa succede
+        //SET CHILDREN ID
         vector<int> childrenID; //support structure
-        for (auto& child: cst.children(*it)) {
+        for (auto &child: cst.children(*it)) {
             childrenID.push_back(cst.id(child));
         }
         nodeInfoObj.setChildrenId(&childrenID);
 
 
-
-//        std::cout << "\n\n\nNodeDepth: " << cst.node_depth(*it) << " Depth: " << cst.depth(*it) << "-[" << cst.lb(*it) << "-"
-//                  << cst.rb(*it) << "]" << std::endl;//<< "\nAll String length: " << allstring_length << " parent length: " << parent_strLength << "\nEdge: " << edge <<"\nEdge coded: " << e.edgeToString(&edge) << std::endl;
-//
+#if VERBOSE == 1
+        std::cout << "\n\n\nNodeDepth: " << cst.node_depth(*it) << " Depth: " << cst.depth(*it) << "-[" << cst.lb(*it)
+                  << "-"
+                  << cst.rb(*it) << "]"
+                  << std::endl;//<< "\nAll String length: " << allstring_length << " parent length: " << parent_strLength << "\nEdge: " << edge <<"\nEdge coded: " << e.edgeToString(&edge) << std::endl;
 
         std::cout << nodeInfoObj.print() << std::endl;
+#endif
 
         //PRINT THE NODE INFO INTO BINARY FILE
         printNode(&nodeInfoObj, &bin_out);
@@ -86,13 +89,12 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
 };
 
 
-
 void TreeParser::printBinFile(string &s, std::ofstream &bin_out) {
 
     BitIo<16> bio;
     int counter = s.length() / 16;
 
-    if ((s.length() % 16) != 0){
+    if ((s.length() % 16) != 0) {
         counter++;
     }
 
@@ -100,8 +102,8 @@ void TreeParser::printBinFile(string &s, std::ofstream &bin_out) {
 
         string temp;
 
-        for (int k = 0 + j*16; k <= 15 + j*16; k++) {
-            if (k >=  s.length()) {
+        for (int k = 0 + j * 16; k <= 15 + j * 16; k++) {
+            if (k >= s.length()) {
                 temp += "0";
             } else {
                 temp += s[k];
@@ -120,9 +122,12 @@ void TreeParser::printNode(NodeInfo *nodeInfo, std::ofstream *bin_out) {
     string nodeInfoFromObj = nodeInfo->getNodeField();
     int nodeInfoLength = nodeInfoFromObj.size() / 16;
     if (nodeInfoFromObj.size() % 16 != 0) nodeInfoLength++;
-    string length =  std::bitset<16>(nodeInfoLength).to_string();
-    string completeString = length+nodeInfoFromObj;
+    string length = std::bitset<16>(nodeInfoLength).to_string();
+    string completeString = length + nodeInfoFromObj;
+
+#if VERBOSE == 1
     std::cout << completeString << std::endl;
+#endif
 
     printBinFile(completeString, *bin_out);
 
@@ -131,8 +136,8 @@ void TreeParser::printNode(NodeInfo *nodeInfo, std::ofstream *bin_out) {
 
 string TreeParser::getEdge(cst_t *cst, iterator1 *it) {
 
-    int allstring_length = (int)cst->depth(**it); //Lunghezza dell suffisso dalla radice al nodo interessato
-    int parent_strLength = (int)cst->depth(cst->parent(**it));
+    int allstring_length = (int) cst->depth(**it); //Lunghezza dell suffisso dalla radice al nodo interessato
+    int parent_strLength = (int) cst->depth(cst->parent(**it));
 
     string edge;
 

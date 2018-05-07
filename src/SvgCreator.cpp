@@ -21,11 +21,6 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
     BitIo<16> bio2;
     openFile(&bin_in,inputFileName, &bio2);
 
-
-//    //HUMAN CONFIGURATIONS
-//    map<string, string> configParameter;
-//    ConfigParser cfPars("./Settings/config.cfg", &configParameter); //Initialize the configurations Parameter
-
     //PARAMETER CONFIGURATION
     Header header = Header();
     header.readHeader(&bio2);
@@ -41,12 +36,11 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
 
     //PARAMETER THAT I NEED
-
-    map<string, ObjNode> hashmap;
+    map<int, ObjNode> hashmap;
     int a, b, c, sons;
     int count = 0;
     int defW = 1000; //larghezza del rettangolo
-    string fl, l;
+    int fl, l;
     int x, y, i, j, z, x0, y0, H, w;
     string edge = "";
 
@@ -74,26 +68,29 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
         a = nodeInfoObj.getNodeDepth();
         b = nodeInfoObj.getLb();
         c = nodeInfoObj.getRb();
-        fl = nodeInfoObj.fatherLabel;
-        l = nodeInfoObj.label;
+        fl = nodeInfoObj.getFatherLabel();
+        l = nodeInfoObj.getLabel();
 
         ObjNode objNode = ObjNode();
         objNode.objNodeDepth = a;
 
-        while(!bio2.empty()){
+        //Prende il numero di figli del padre che sono uguali al numero di fratelli escluso se stesso
+        count = hashmap[nodeInfoObj.getFatherLabel()].numberOfChildren -1;
 
-            if (a != 0 && nodeInfoObj.getNodeDepth() == a && nodeInfoObj.fatherLabel== fl){
-
-                count++;
-                }
-        }
+//        while(!bio2.empty()){ //QUI RESTA IN LOOP :(
+//
+//            if (a != 0 && nodeInfoObj.getNodeDepth() == a && nodeInfoObj.fatherLabel== fl){
+//
+//                count++;
+//                }
+//        }
 
         //count è il numero di fratelli
         sons = count +1;
         //se non sto valutando il padre mi trovo le coordinate di del padre deò nodo
         if(a != 0){
-            ObjNode fatherObj = ObjNode();
-            fatherObj = hashmap.find(fl)->second;
+            ObjNode fatherObj = hashmap[fl];
+//            fatherObj = hashmap.find(fl)->second;
             int xF = fatherObj.objNodeX;
             int yF = fatherObj.objNodeY;
             int  wF = fatherObj.objNodeWid;
@@ -121,8 +118,9 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
         objNode.objNodeX = x;
         objNode.objNodeY = y;
         objNode.objNodeWid = w;
+        objNode.numberOfChildren = nodeInfoObj.getNumbrOfChildren(); //Setta il numero di figli
 
-        pair<string, ObjNode> element = {l, objNode};
+        pair<int, ObjNode> element = {l, objNode};
         hashmap.insert(element);
 
 

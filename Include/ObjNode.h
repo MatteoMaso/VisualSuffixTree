@@ -2,7 +2,6 @@
 // Created by alessia on 07/05/18.
 //
 #include <string>
-#include "NodeInfoStructure.h"
 
 #ifndef VISUALSUFFIXTREE_OBJNODE_H
 #define VISUALSUFFIXTREE_OBJNODE_H
@@ -14,11 +13,14 @@ class ObjNode{
 public:
     ObjNode();
 
+    ObjNode(int objNodeDepth);
+
 
     int objNodeDepth;
     int objNodeX;
     int objNodeY;
     int objNodeWid;
+    int numberOfChildren;
     //int ovjNodeHeigth; per ora li facciamo tutti alla stessa altezza
 
 

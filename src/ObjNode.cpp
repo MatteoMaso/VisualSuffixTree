@@ -6,15 +6,10 @@
 #include <iostream>
 #include <bitset>
 
-#include "../Include/objNode.h"
-#include "../Include/NodeInfoStructure.h"
+#include "../Include/ObjNode.h"
 
 using namespace std;
 
 ObjNode::ObjNode() {
     //todo
-    //header usato nel svg
 }
-
-
-//Passo lo stream del file a cui deve andare a leggere l'header
