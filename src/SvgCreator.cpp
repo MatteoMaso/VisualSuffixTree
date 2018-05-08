@@ -37,7 +37,9 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
     //PARAMETER THAT I NEED
     map<int, ObjNode> hashmap;
-    int a, b, c, sons;
+
+    int a, b, c;
+    int sons= 1;
     int count = 0;
     int defW = 1000; //larghezza del rettangolo
     int fl, l;
@@ -71,26 +73,36 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
         fl = nodeInfoObj.getFatherLabel();
         l = nodeInfoObj.getLabel();
 
-        ObjNode objNode = ObjNode();
-        objNode.setObjNodeDepth(a);
+        ObjNode l = ObjNode();
+        l.setObjNodeDepth(a);
+
+        //dovrei prendermi l'oggetto del padre forse è più fattibile ciclare due volte una votla per creare gli oggetti e l'altra per analizzarli!
+
+
 
         //Prende il numero di figli del padre che sono uguali al numero di fratelli escluso se stesso
-        count = hashmap[nodeInfoObj.getFatherLabel()].getNumberOfChildren() -1;
+        count = hashmap[nodeInfoObj.getFatherLabel()].getNumberOfChildren() - 1;
 
-//        while(!bio2.empty()){ //QUI RESTA IN LOOP :(
+
+        //creo un array dei figli e li ordino in senso crescente della loro label
+
+        //        while(!bio2.empty()){ //QUI RESTA IN LOOP :(
+//                   while(int  i<= count){
+//                          if (a != 0 && nodeInfoObj.getNodeDepth() == a && nodeInfoObj.fatherLabel== fl){
 //
-//            if (a != 0 && nodeInfoObj.getNodeDepth() == a && nodeInfoObj.fatherLabel== fl){
-//
-//                count++;
-//                }
+//                              bros[i] = nodeInfoObj.getLabel();
+//                               i++;
+//              }
 //        }
+
 
         //count è il numero di fratelli
         sons = count + 1;
-        //se non sto valutando il padre mi trovo le coordinate di del padre deò nodo
+        //se non sto valutando il padre mi trovo le coordinate di del padre del nodo
         if(a != 0){
             ObjNode fatherObj = hashmap[fl];
 //            fatherObj = hashmap.find(fl)->second;
+
             int xF = fatherObj.getObjNodeX();
             int yF = fatherObj.getObjNodeY();
             int  wF = fatherObj.getObjNodeWid();

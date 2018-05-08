@@ -57,3 +57,7 @@ int ObjNode::getNumberOfChildren(){
 void ObjNode::setNumberOfChildren(int numberOfChildren) {
     this->numberOfChildren = numberOfChildren;
 }
+
+int ObjNode::getSonsCount() {
+    return sonsCount;
+}

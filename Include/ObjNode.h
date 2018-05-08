@@ -33,6 +33,8 @@ public:
 
     void setNumberOfChildren(int numberOfChildren);
 
+    int getSonsCount();
+
 
 private:
     int objNodeDepth;
@@ -40,6 +42,7 @@ private:
     int objNodeY;
     int objNodeWid;
     int numberOfChildren;
+    int sonsCount = 0;
     //int ovjNodeHeigth; per ora li facciamo tutti alla stessa altezza
 
 
