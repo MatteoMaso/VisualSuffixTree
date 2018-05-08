@@ -39,16 +39,18 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
     map<int, ObjNode> hashmap;
 
     int a, b, c;
-    int sons= 1;
+    int sons;
+    int H = 15;//dovrà poi essere messa nel config e decisa dall'utente
+    int rectWidth = 1000; //dovrà poi essere messa nel config e decisa dall'utente
     int count = 0;
     int defW = 1000; //larghezza del rettangolo
     int fl, l;
-    int x, y, i, j, z, x0, y0, H, w;
+    int x, y, i, j, z, x0, y0, w;
     string edge = "";
 
     x0 = 10;
     y0 = 40;
-    H = 15;
+
 
 
     int nodeInfoLength = 0;
@@ -58,10 +60,12 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
     std::cout << "node info length" << nodeInfoLength << std::endl;
 
     NodeInfo nodeInfoObj(&nodeStructure);
+
     while (!bio2.empty()) {
 
         //READ AN OTHER NODE
         nodeInfo = readNextNodeInfo(&bio2);
+
         nodeInfoObj.setNodeField(&nodeInfo);
 
         std::cout << nodeInfoObj.print() << std::endl;
@@ -70,74 +74,22 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
         a = nodeInfoObj.getNodeDepth();
         b = nodeInfoObj.getLb();
         c = nodeInfoObj.getRb();
-        fl = nodeInfoObj.getFatherLabel();
-        l = nodeInfoObj.getLabel();
-
-        ObjNode l = ObjNode();
-        l.setObjNodeDepth(a);
-
-        //dovrei prendermi l'oggetto del padre forse è più fattibile ciclare due volte una votla per creare gli oggetti e l'altra per analizzarli!
 
 
 
-        //Prende il numero di figli del padre che sono uguali al numero di fratelli escluso se stesso
-        count = hashmap[nodeInfoObj.getFatherLabel()].getNumberOfChildren() - 1;
 
-
-        //creo un array dei figli e li ordino in senso crescente della loro label
-
-        //        while(!bio2.empty()){ //QUI RESTA IN LOOP :(
-//                   while(int  i<= count){
-//                          if (a != 0 && nodeInfoObj.getNodeDepth() == a && nodeInfoObj.fatherLabel== fl){
-//
-//                              bros[i] = nodeInfoObj.getLabel();
-//                               i++;
-//              }
-//        }
-
-
-        //count è il numero di fratelli
-        sons = count + 1;
-        //se non sto valutando il padre mi trovo le coordinate di del padre del nodo
-        if(a != 0){
-            ObjNode fatherObj = hashmap[fl];
-//            fatherObj = hashmap.find(fl)->second;
-
-            int xF = fatherObj.getObjNodeX();
-            int yF = fatherObj.getObjNodeY();
-            int  wF = fatherObj.getObjNodeWid();
-            x = xF;
-            y = yF + H;
-            //todo !!!!!!!!! qui divide per zero quando sons = 0
-            w =  wF/sons;
+        //se è la radice la disegno grande come il rettangolo
+        if(a==0){
+            w = rectWidth;
+            x = x0;
+            y = y0;
+        } else{ //altrimenti scalo la larghezza per la larghezza del suffix interval
+            w = rectWidth/(c-a+1);
+            x = x0 +b;
+            y = y0 +(a*H);
         }
 
-        else{
-            x = x0 + b;
-            y = y0 + (a * H);
-            w = defW;
-        }
-
-
-
-
-        edge = nodeInfoObj.getEdgeDecoded();
-
-
-
-        H = 15;
-
-
-        objNode.setObjNodeX(x);
-        objNode.setObjNodeY(y);
-        objNode.setObjNodeWid(w);
-        objNode.setNumberOfChildren(nodeInfoObj.getNumbrOfChildren()); //Setta il numero di figli
-
-        pair<int, ObjNode> element = {l, objNode};
-        hashmap.insert(element);
-
-
-//        std::cout << "\nBit Nodedepth: " << a << " [" << b << "-" << c << "]\n" << "Edge\t" << edge << std::endl;
+        std::cout << "\nBit Nodedepth: " << a << " [" << b << "-" << c << "]\n" << "Edge\t" << edge << std::endl;
 
         string temp = "\n<g class=\"func_g\" onmouseover=\"s(this)\" onmouseout=\"c()\" onclick=\"zoom(this)\">\n""<title>";
         temp += edge;
@@ -155,14 +107,117 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
         svg_out << str;
     }
 
+        bin_in.close();     //Close the input file
+        svg_out.close();    //chiudo il file on output*/
+    }
 
-    char svgEnd[] = {"</svg>"};  //Close the SVG File
-    svg_out << svgEnd;
 
 
-    bin_in.close();     //Close the input file
-    svg_out.close();    //chiudo il file on output*/
-}
+//    while (!bio2.empty()) {
+//
+//        //READ AN OTHER NODE
+//        nodeInfo = readNextNodeInfo(&bio2);
+//        nodeInfoObj.setNodeField(&nodeInfo);
+//
+//        std::cout << nodeInfoObj.print() << std::endl;
+//
+//
+//        a = nodeInfoObj.getNodeDepth();
+//        b = nodeInfoObj.getLb();
+//        c = nodeInfoObj.getRb();
+//        fl = nodeInfoObj.getFatherLabel();
+//        l = nodeInfoObj.getLabel();
+//
+//        ObjNode objNode = ObjNode();
+//        objNode.setObjNodeDepth(a);
+//
+//        //dovrei prendermi l'oggetto del padre forse è più fattibile ciclare due volte una votla per creare gli oggetti e l'altra per analizzarli!k
+//
+//
+//
+//        //Prende il numero di figli del padre che sono uguali al numero di fratelli escluso se stesso
+//        count = hashmap[nodeInfoObj.getFatherLabel()].getNumberOfChildren() - 1;
+//
+//
+//        //creo un array dei figli e li ordino in senso crescente della loro label
+//
+//        //        while(!bio2.empty()){ //QUI RESTA IN LOOP :(
+////                   while(int  i<= count){
+////                          if (a != 0 && nodeInfoObj.getNodeDepth() == a && nodeInfoObj.fatherLabel== fl){
+////
+////                              bros[i] = nodeInfoObj.getLabel();
+////                               i++;
+////              }
+////        }
+//
+//
+//        //count è il numero di fratelli
+//        sons = count + 1;
+//        //se non sto valutando il padre mi trovo le coordinate di del padre del nodo
+//        if(a != 0){
+//            ObjNode fatherObj = hashmap[fl];
+////            fatherObj = hashmap.find(fl)->second;
+//
+//            int xF = fatherObj.getObjNodeX();
+//            int yF = fatherObj.getObjNodeY();
+//            int  wF = fatherObj.getObjNodeWid();
+//            x = xF;
+//            y = yF + H;
+//            //todo !!!!!!!!! qui divide per zero quando sons = 0
+//            w =  wF/sons;
+//        }
+//
+//        else{
+//            x = x0 + b;
+//            y = y0 + (a * H);
+//            w = defW;
+//        }
+//
+//
+//
+//
+//        edge = nodeInfoObj.getEdgeDecoded();
+//
+//
+//
+//        H = 15;
+//
+//
+//        objNode.setObjNodeX(x);
+//        objNode.setObjNodeY(y);
+//        objNode.setObjNodeWid(w);
+//        objNode.setNumberOfChildren(nodeInfoObj.getNumbrOfChildren()); //Setta il numero di figli
+//
+//        pair<int, ObjNode> element = {l, objNode};
+//        hashmap.insert(element);
+//
+//
+////        std::cout << "\nBit Nodedepth: " << a << " [" << b << "-" << c << "]\n" << "Edge\t" << edge << std::endl;
+//
+//        string temp = "\n<g class=\"func_g\" onmouseover=\"s(this)\" onmouseout=\"c()\" onclick=\"zoom(this)\">\n""<title>";
+//        temp += edge;
+//        temp += "</title><rect x=\"";
+//        temp += to_string(x);
+//        temp += "\" y=\"";
+//        temp += to_string(y);
+//        temp += "\" width=\"";
+//        temp += to_string(w);
+//        temp += "\" ""height=\"15.0\" fill=\"rgb(225,0,0)\" rx=\"2\" ry=\"2\" />\n""</g>";
+//
+//        char str[temp.length()];
+//        strcpy(str, temp.c_str());
+//
+//        svg_out << str;
+//    }
+//
+//
+//    char svgEnd[] = {"</svg>"};  //Close the SVG File
+//    svg_out << svgEnd;
+//
+//
+//    bin_in.close();     //Close the input file
+//    svg_out.close();    //chiudo il file on output*/
+//}
 
 
 
