@@ -10,16 +10,44 @@
 
 
 //For decoder
-NodeInfoStructure::NodeInfoStructure(int parameter1[], map<string, string> *configParameter) {
+NodeInfoStructure::NodeInfoStructure(int parameter[], map<string, string> *configParameter) {
+
+    //NUMBER OF BIT FOR EACH FIELD REPRESENTATION
+    //il decoder deve settare questi da config parameter penso
+    bitDepth = stoi(configParameter->at("bitDepth"));
+    bitNodeDepth = stoi(configParameter->at("bitNodeDepth"));
+    bitLb = stoi(configParameter->at("bitLb"));
+    bitRb = stoi(configParameter->at("bitRb"));
+    bitLabel = stoi(configParameter->at("bitLabel"));
+    bitFatherLabel = stoi(configParameter->at("bitFatherLabel"));
+    bitEdgeLength = stoi(configParameter->at("bitEdgeLength"));
+    bitEdgeCharacterEncoding = stoi(configParameter->at("bitEdgeCharacterEncoding"));
+    bitNumberOfChildren = stoi(configParameter->at("bitNumberOfChildren"));
+    bitChildrenId = stoi(configParameter->at("bitChildrenId")); //se lo metto variabile devo cambiare sotto
+
     for (int i = 0; i < PARAMETER_NUMBER; i++) {
-        parameter[i] = parameter1[i];
+        this->parameter[i] = parameter[i];
     }
 
     setAlphabet(configParameter->at("ALPHABET"));
 }
 
-//FOr encoder
+//For encoder
 NodeInfoStructure::NodeInfoStructure(map<string, string> *configParameter) {
+
+    //Dovrei leggerli dall'header
+    //todo
+    bitDepth=16;
+    bitNodeDepth=16;
+    bitLb=16;
+    bitRb=16;
+    bitLabel=16;
+    bitFatherLabel=16;
+    bitEdgeLength=16;
+    bitEdgeCharacterEncoding=16;
+    bitNumberOfChildren=16;
+    bitChildrenId=16;
+
 
     parameter[INDEX_DEPTH] = 16;
     parameter[INDEX_NODEDEPTH] = 16;

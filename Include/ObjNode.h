@@ -35,6 +35,8 @@ public:
 
     int getSonsCount();
 
+    int incCounter();
+
 
 private:
     int objNodeDepth;

@@ -7,24 +7,11 @@
 #include <iostream>
 #include <string>
 #include "../Include/NodeInfo.h"
+#include "../Include/Utils.h"
 
 using namespace std;
 
-const int bitDepth = 16;
-const int bitNodeDepth = 16;
-const int bitLb = 16;
-const int bitRb = 16;
-const int bitLabel = 16;
-const int bitFatherLabel = 16;
-
-const int bitEdgeLength = 16;
-const int bitEdgeCharacterEncoding = 16;
-
-const int bitNumberOfChildren = 16;
-const int bitChildrenId = 16; //se lo metto variabile devo cambiare sotto
-
-
-NodeInfo::NodeInfo(NodeInfoStructure *nodeInfoStructure) {
+NodeInfo::NodeInfo(NodeInfoStructure * nodeInfoStructure) {
     //Save the address oh the structure to avoid multiple copies
     this->infoStructure = nodeInfoStructure;
 
@@ -80,49 +67,50 @@ bool NodeInfo::setNodeField(string *nodeField) {
 }
 
 void NodeInfo::setDepth(unsigned long n) {
-    depth = std::bitset<bitDepth>(n).to_string();
+//    depth = std::bitset<bitDepth>(n).to_string();
+    depth = toBinFormat(infoStructure->bitDepth, n);
 }
 
 void NodeInfo::setNodeDepth(unsigned long n) {
-    nodeDepth = std::bitset<bitNodeDepth>(n).to_string();
+    nodeDepth = toBinFormat(infoStructure->bitNodeDepth, n);
 }
 
 void NodeInfo::setLb(unsigned long n) {
-    lb = std::bitset<bitLb>(n).to_string();
+    lb = toBinFormat(infoStructure->bitLb, n);
 }
 
 void NodeInfo::setRb(unsigned long n) {
-    rb = std::bitset<bitRb>(n).to_string();
+    rb = toBinFormat(infoStructure->bitRb, n);
 }
 
 void NodeInfo::setLabel(unsigned long n) {
-    label = std::bitset<bitLabel>(n).to_string();
+    label = toBinFormat(infoStructure->bitLabel, n);
 }
 
 void NodeInfo::setFatherLabel(unsigned long n) {
-    fatherLabel = std::bitset<bitFatherLabel>(n).to_string();
+    fatherLabel = toBinFormat(infoStructure->bitFatherLabel, n);
 }
 
 void NodeInfo::setEdgeLength(unsigned long n) {
-    edgeLength = std::bitset<bitEdgeLength>(n).to_string();
+    edgeLength = toBinFormat(infoStructure->bitEdgeLength, n);
 }
 
 //codifica l'edge da stringa a binario
 void NodeInfo::setEdge(string *s) {
-    edgeLength = std::bitset<bitEdgeLength>(s->size()).to_string();
+    edgeLength = toBinFormat(infoStructure->bitEdgeLength, s->size());
+//    edgeLength = std::bitset<bitEdgeLength>(s->size()).to_string();
     string character;
     string edge = "";
     for (int i = 0; i < s->size(); i++) {
         character = "";
         character += s->at(i);
-//        edge += encodeCharacter(&character, &codification, &alphabet);
         edge += encodeCharacter(&character, &(infoStructure->codification), &(infoStructure->alphabet));
     }
     this->edge = edge;
 }
 
 void NodeInfo::setEdgeCharacterEncoding(unsigned long n) {
-    edgeCharacterEncoding = std::bitset<bitEdgeCharacterEncoding>(n).to_string();
+    edgeCharacterEncoding = toBinFormat(infoStructure->bitEdgeCharacterEncoding, n);
 }
 
 
@@ -232,7 +220,7 @@ int NodeInfo::getFatherLabel() {
 }
 
 void NodeInfo::setNumberOfChildren(int n) {
-    numberOfChildren = std::bitset<bitNumberOfChildren>(n).to_string();
+    numberOfChildren = toBinFormat(infoStructure->bitNumberOfChildren, n);
 }
 
 void NodeInfo::setChildren(string *childrenString) {
@@ -269,7 +257,7 @@ string NodeInfo::childrenToEncodedString(vector<int> v) {
     string tmp = "";
 
     for (auto i : v) {
-        tmp.append(std::bitset<bitChildrenId>(i).to_string());
+        tmp.append(toBinFormat(infoStructure->bitChildrenId, i));
     }
 
     return tmp;

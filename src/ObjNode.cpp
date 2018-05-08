@@ -16,6 +16,7 @@ ObjNode::ObjNode() {
      objNodeY = 0;
      objNodeWid = 0;
      numberOfChildren = 0;
+     sonsCount = 0;
 }
 
 int ObjNode::getObjNodeDepth(){
@@ -56,6 +57,10 @@ int ObjNode::getNumberOfChildren(){
 
 void ObjNode::setNumberOfChildren(int numberOfChildren) {
     this->numberOfChildren = numberOfChildren;
+}
+
+int ObjNode::incCounter(){
+    this->sonsCount++;
 }
 
 int ObjNode::getSonsCount() {

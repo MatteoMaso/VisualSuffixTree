@@ -16,6 +16,18 @@ using namespace std;
 class NodeInfoStructure{
 
 public:
+
+    int bitDepth;
+    int bitNodeDepth;
+    int bitLb;
+    int bitRb;
+    int bitLabel;
+    int bitFatherLabel;
+    int bitEdgeLength;
+    int bitEdgeCharacterEncoding;
+    int bitNumberOfChildren;
+    int bitChildrenId; //se lo metto variabile devo cambiare sotto
+
     NodeInfoStructure(int parameter1[], map<string, string> *configParameter);
 
     //For encoder
