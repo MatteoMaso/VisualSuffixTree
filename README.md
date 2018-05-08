@@ -10,7 +10,7 @@ link_directories(<SDSL_lib_dir>)
 ```
 Finally, build the project from its root path:
 ```
-cmake CMakeList.txt
+cmake CMakeLists.txt
 make
 ```
 
