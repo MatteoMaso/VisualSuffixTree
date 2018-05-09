@@ -8,11 +8,10 @@
 #include "../Include/TreeParser.h"
 #include "../Include/BitIo.h"
 #include "../Include/ConfigParser.h"
-#include "../Include/NodeInfoStructure.h"
 #include "../Include/Header.h"
 #include "../Include/NodeInfo.h"
 
-#define VERBOSE 1
+#define VERBOSE 0
 
 using namespace std;
 using namespace sdsl;
@@ -22,7 +21,6 @@ typedef cst_sct3<> cst_t;
 
 TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, string> *configParameter) {
 
-
     //SUFFIX TREE STRUCTURE
     cst_t cst;                              //declare the suffix tree
     construct(cst, inputFileName, 1);       //initialize the suffix tree
@@ -30,25 +28,19 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
     iterator begin = iterator(&cst, cst.root());
     iterator end = iterator(&cst, cst.root(), true, true);
 
-
     //PREPARE THE OUTPUT FILE AND PARAMETER
     std::ofstream bin_out(outputFileName, std::ios::out | std::ios::binary);
 
-
-    int parameter[20] = {16, 16, 16, 16, 16, 16, 16, 16};
-    NodeInfoStructure nodeInfoStructure(parameter, configParameter);
+    NodeInfoStructure nodeInfoStructure(configParameter);
 
     Header header(&nodeInfoStructure);
     string headerString = header.getString();
     printBinFile(headerString, bin_out);        //Print the header into binary file
 
-
-
     BitIo<16> bio;
 
     string nodeInfo;
     NodeInfo nodeInfoObj(&nodeInfoStructure);
-
 
     for (iterator it = begin; it != end; ++it) {
 
@@ -57,18 +49,27 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
         nodeInfoObj.setLb(cst.lb(*it));
         nodeInfoObj.setRb(cst.rb(*it));
 
-        nodeInfoObj.setLabel(cst.id(*it));
-        nodeInfoObj.setFatherLabel(cst.id(cst.parent(*it)));
-
-        string new_edge = getEdge(&cst, &it);
-        nodeInfoObj.setEdge(&new_edge);
-
-        //SET CHILDREN ID
-        vector<int> childrenID; //support structure
-        for (auto &child: cst.children(*it)) {
-            childrenID.push_back(cst.id(child));
+        if (nodeInfoStructure.OPT_LABEL){
+            nodeInfoObj.setLabel(cst.id(*it));
         }
-        nodeInfoObj.setChildrenId(&childrenID);
+
+        if (nodeInfoStructure.OPT_FATHERLABLE){
+            nodeInfoObj.setFatherLabel(cst.id(cst.parent(*it)));
+        }
+
+        if( nodeInfoStructure.OPT_EDGEINFO){
+            string new_edge = getEdge(&cst, &it);
+            nodeInfoObj.setEdge(&new_edge);
+        }
+
+        if ( nodeInfoStructure.OPT_CHILDREN_INFO){
+            //SET CHILDREN ID
+            vector<int> childrenID; //support structure
+            for (auto &child: cst.children(*it)) {
+                childrenID.push_back(cst.id(child));
+            }
+            nodeInfoObj.setChildrenId(&childrenID);
+        }
 
 
 #if VERBOSE == 1

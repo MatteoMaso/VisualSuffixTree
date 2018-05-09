@@ -3,6 +3,7 @@
 //
 #include <string>
 #include "NodeInfoStructure.h"
+//#include "NodeInfoStructure.h"
 
 #ifndef VISUALSUFFIXTREE_NODEINFO_H
 #define VISUALSUFFIXTREE_NODEINFO_H

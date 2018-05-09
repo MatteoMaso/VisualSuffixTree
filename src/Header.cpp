@@ -11,7 +11,6 @@
 using namespace std;
 
 Header::Header() {
-    //todo
     //header usato nel svg
 }
 

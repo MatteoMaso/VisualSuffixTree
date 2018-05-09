@@ -24,7 +24,7 @@ ConfigParser::ConfigParser(string configFileName, map<string, string> *configPar
             string value = line.substr(delimiterPos + 1);
             pair<string, string> element = {name, value};
             configParameter->insert(element);
-            std::cout << name << " " << value << '\n';
+//            std::cout << name << " " << value << '\n';
         }
         cFile.close();
     } else {

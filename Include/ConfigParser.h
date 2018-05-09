@@ -10,7 +10,7 @@
 using namespace std;
 class ConfigParser {
 public:
-    ConfigParser(string configFileName, map<string, string> *configParameter);
+    ConfigParser(string configFileName, map<string, string> * configParameter);
 };
 
 #endif //VISUALSUFFIXTREE_CONDIFPARSER_H
