@@ -17,7 +17,13 @@ public:
 
     string readNextNodeInfo(BitIo<16> *bio);
 
+private:
+
     string getHeader(string fileName);
+
+    string getWindowsConfigurations(int width, int heigth);
+
+    string createSvgHeader(int width, int heigth);
 };
 
 #endif //VISUALSUFFIXTREE_SVGCREATOR_H

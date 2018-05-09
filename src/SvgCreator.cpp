@@ -19,38 +19,35 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
     //READ BINARY FILE
     std::ifstream bin_in(inputFileName, std::ios::binary);
     BitIo<16> bio2;
-    openFile(&bin_in,inputFileName, &bio2);
+    openFile(&bin_in, inputFileName, &bio2);
 
     //PARAMETER CONFIGURATION
     Header header = Header();
     header.readHeader(&bio2);
 
     //After reading header create the NodeInfoStructure
-    NodeInfoStructure nodeStructure = NodeInfoStructure(configParameter);
-    nodeStructure.setField(header.getNodeInfoStructure());
-
+    NodeInfoStructure nodeStructure = NodeInfoStructure(header.getNodeInfoStructure(), configParameter);
 
     //BEGIN SVG CREATOR
     std::ofstream svg_out(outputFile, std::ios::out | std::ios::binary);
-    svg_out << getHeader("headerSvg.txt"); //Insert the header SVG into the file
-
+    svg_out << createSvgHeader(stoi(configParameter->at("WINDOW_WIDTH")), stoi(configParameter->at("WINDOW_HEIGHT")));
 
     //PARAMETER THAT I NEED
     map<int, ObjNode> hashmap;
 
-    int a, b, c;
+    float a, b, c;
     int sons;
     int H = 15;//dovrà poi essere messa nel config e decisa dall'utente
-    int rectWidth = 1000; //dovrà poi essere messa nel config e decisa dall'utente
+    float rectWidth = stoi(configParameter->at("WINDOW_WIDTH")) - 20 ; //dovrà poi essere messa nel config e decisa dall'utente
     int count = 0;
-    int defW = 1000; //larghezza del rettangolo
+    int defW = 500; //larghezza del rettangolo
     int fl, l;
-    int x, y, i, j, z, x0, y0, w;
+    float i, j, z, x0, y0, w;
+    double x, y;
     string edge = "";
 
     x0 = 10;
-    y0 = 40;
-
+    y0 = stoi(configParameter->at("WINDOW_HEIGHT")) - 40;
 
 
     int nodeInfoLength = 0;
@@ -61,6 +58,8 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
     NodeInfo nodeInfoObj(&nodeStructure);
 
+    float scaleUnit = 0;
+
     while (!bio2.empty()) {
 
         //READ AN OTHER NODE
@@ -68,31 +67,36 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
         nodeInfoObj.setNodeField(&nodeInfo);
 
-        std::cout << nodeInfoObj.print() << std::endl;
+//        std::cout << nodeInfoObj.print() << std::endl;
 
 
         a = nodeInfoObj.getNodeDepth();
         b = nodeInfoObj.getLb();
         c = nodeInfoObj.getRb();
 
-
+//        edge = nodeInfoObj.getEdgeDecoded();
 
 
         //se è la radice la disegno grande come il rettangolo
-        if(a==0){
+        if (a == 0) {
             w = rectWidth;
             x = x0;
             y = y0;
-        } else{ //altrimenti scalo la larghezza per la larghezza del suffix interval
-            w = rectWidth/(c-a+1);
-            x = x0 +b;
-            y = y0 +(a*H);
+            scaleUnit = rectWidth / c;
+        } else { //altrimenti scalo la larghezza per la larghezza del suffix interval
+            if ((c - b) == 0){
+                w = 0;
+            } else{
+                w = scaleUnit * (c-b);
+            }
+            x = x0 + b*scaleUnit;
+            y = y0 - (a * H) - a*0.7;
         }
 
-        std::cout << "\nBit Nodedepth: " << a << " [" << b << "-" << c << "]\n" << "Edge\t" << edge << std::endl;
+//        std::cout << "\nBit Nodedepth: " << a << " [" << b << "-" << c << "]\n" << "Edge\t" << edge << std::endl;
 
         string temp = "\n<g class=\"func_g\" onmouseover=\"s(this)\" onmouseout=\"c()\" onclick=\"zoom(this)\">\n""<title>";
-        temp += edge;
+        temp += to_string(nodeInfoObj.getLabel());
         temp += "</title><rect x=\"";
         temp += to_string(x);
         temp += "\" y=\"";
@@ -107,9 +111,13 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
         svg_out << str;
     }
 
-        bin_in.close();     //Close the input file
-        svg_out.close();    //chiudo il file on output*/
-    }
+    char svgEnd[] = {"</svg>"};  //Close the SVG File
+    svg_out << svgEnd;
+
+
+    bin_in.close();     //Close the input file
+    svg_out.close();    //chiudo il file on output*/
+}
 
 
 
@@ -163,7 +171,6 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 //            int  wF = fatherObj.getObjNodeWid();
 //            x = xF;
 //            y = yF + H;
-//            //todo !!!!!!!!! qui divide per zero quando sons = 0
 //            w =  wF/sons;
 //        }
 //
@@ -247,7 +254,7 @@ string SvgCreator::readNextNodeInfo(BitIo<16> *bio) {
 
     string nodeInfo = "";
 
-    int e =  stoi((*bio).pop_front().to_string(), nullptr, 2);
+    int e = stoi((*bio).pop_front().to_string(), nullptr, 2);
 
     for (int i = 0; i < e; i++) {
         nodeInfo += (*bio).pop_front().to_string();
@@ -279,4 +286,30 @@ string SvgCreator::getHeader(string fileName) {
         file.close();
         return txt;
     }
+}
+
+string SvgCreator::getWindowsConfigurations(int width, int heigth) {
+
+    string temp = "<rect x=\"0.0\" y=\"0\" width=\"" + to_string(width) + "\" height=\"" + to_string(heigth) + "\" fill=\"url(#background)\"/>";
+    temp += "<text text-anchor=\"middle\" x=\"500\" y=\"24\" font-size=\"17\" font-family=\"Verdana\" fill=\"rgb(0,0,0)\">Flame Graph</text>\n"
+            "<text text-anchor=\"\" x=\"10.00\" y=\"24\" font-size=\"12\" font-family=\"Verdana\" fill=\"rgb(0,0,0)\" id=\"unzoom\" onclick=\"unzoom()\" style=\"opacity: 0; cursor: pointer;\">Reset Zoom</text>\n"
+            "<text text-anchor=\"\" x=\"890.00\" y=\"24\" font-size=\"12\" font-family=\"Verdana\" fill=\"rgb(0,0,0)\" id=\"search\" onmouseover=\"searchover()\" onmouseout=\"searchout()\" onclick=\"search_prompt()\" style=\"opacity: 0.1; cursor: pointer;\">Search</text>\n"
+            "<text text-anchor=\"\" x=\"1090.00\" y=\"1249\" font-size=\"12\" font-family=\"Verdana\" fill=\"rgb(0,0,0)\" id=\"matched\"> </text>\n"
+            "\n"
+            "<text text-anchor=\"\" x=\"10\" y=\"609\" font-size=\"12\" font-family=\"Verdana\" fill=\"rgb(0,0,0)\" id=\"details\"> </text>";
+
+    return temp;
+
+
+}
+
+string SvgCreator::createSvgHeader(int width, int heigth) {
+
+    string temp = "<svg version=\"1.1\" width=\"" + to_string(width) + "\" height=\"" +to_string(heigth) + "\" onload=\"init(evt)\" viewBox=\"0 0 ";
+    temp += to_string(width) + " " + to_string(heigth) + "\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">";
+    temp += getHeader("headerSvg.txt"); //Insert the header SVG into the file
+
+    temp += getWindowsConfigurations(width, heigth);
+
+    return temp;
 }
