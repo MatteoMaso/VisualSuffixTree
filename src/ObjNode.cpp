@@ -27,27 +27,27 @@ void ObjNode::setObjNodeDepth(int objNodeDepth) {
     this->objNodeDepth = objNodeDepth;
 }
 
-int ObjNode::getObjNodeX(){
+double ObjNode::getObjNodeX(){
     return objNodeX;
 }
 
-void ObjNode::setObjNodeX(int objNodeX) {
+void ObjNode::setObjNodeX(double objNodeX) {
     this->objNodeX = objNodeX;
 }
 
-int ObjNode::getObjNodeY(){
+double ObjNode::getObjNodeY(){
     return objNodeY;
 }
 
-void ObjNode::setObjNodeY(int objNodeY) {
+void ObjNode::setObjNodeY(double objNodeY) {
     this->objNodeY = objNodeY;
 }
 
-int ObjNode::getObjNodeWid(){
+float ObjNode::getObjNodeWid(){
     return objNodeWid;
 }
 
-void ObjNode::setObjNodeWid(int objNodeWid) {
+void ObjNode::setObjNodeWid(float objNodeWid) {
     this->objNodeWid = objNodeWid;
 }
 
