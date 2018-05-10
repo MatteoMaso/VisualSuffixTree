@@ -39,7 +39,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
     int sons;
     int H = 15;//dovrà poi essere messa nel config e decisa dall'utente
     float rectWidth = stoi(configParameter->at("WINDOW_WIDTH")) - 20 ; //dovrà poi essere messa nel config e decisa dall'utente
-    int count = 0;
+    int count = 1;
     int defW = 500; //larghezza del rettangolo
     int fl, l;
     float i, j, z, x0, y0, w;
@@ -58,151 +58,46 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
     NodeInfo nodeInfoObj(&nodeStructure);
 
+
     float scaleUnit = 0;
-
-    while (!bio2.empty()) {
-
-        //READ AN OTHER NODE
-        nodeInfo = readNextNodeInfo(&bio2);
-
-        nodeInfoObj.setNodeField(&nodeInfo);
-
-//        std::cout << nodeInfoObj.print() << std::endl;
-
-
-        a = nodeInfoObj.getNodeDepth();
-        b = nodeInfoObj.getLb();
-        c = nodeInfoObj.getRb();
-
-//        edge = nodeInfoObj.getEdgeDecoded();
-
-
-        //se è la radice la disegno grande come il rettangolo
-        if (a == 0) {
-            w = rectWidth;
-            x = x0;
-            y = y0;
-            scaleUnit = rectWidth / c;
-        } else { //altrimenti scalo la larghezza per la larghezza del suffix interval
-            if ((c - b) == 0){
-                w = 0;
-            } else{
-                w = scaleUnit * (c-b);
-            }
-            x = x0 + b*scaleUnit;
-            y = y0 - (a * H) - a*0.7;
-        }
-
-//        std::cout << "\nBit Nodedepth: " << a << " [" << b << "-" << c << "]\n" << "Edge\t" << edge << std::endl;
-
-        string temp = "\n<g class=\"func_g\" onmouseover=\"s(this)\" onmouseout=\"c()\" onclick=\"zoom(this)\">\n""<title>";
-        temp += to_string(nodeInfoObj.getLabel());
-        temp += "</title><rect x=\"";
-        temp += to_string(x);
-        temp += "\" y=\"";
-        temp += to_string(y);
-        temp += "\" width=\"";
-        temp += to_string(w);
-        temp += "\" ""height=\"15.0\" fill=\"rgb(225,0,0)\" rx=\"2\" ry=\"2\" />\n""</g>";
-
-        char str[temp.length()];
-        strcpy(str, temp.c_str());
-
-        svg_out << str;
-    }
-
-    char svgEnd[] = {"</svg>"};  //Close the SVG File
-    svg_out << svgEnd;
-
-
-    bin_in.close();     //Close the input file
-    svg_out.close();    //chiudo il file on output*/
-}
-
-
-
+//stampa l'svg con il primo metodo
 //    while (!bio2.empty()) {
 //
 //        //READ AN OTHER NODE
 //        nodeInfo = readNextNodeInfo(&bio2);
+//
 //        nodeInfoObj.setNodeField(&nodeInfo);
 //
-//        std::cout << nodeInfoObj.print() << std::endl;
+////        std::cout << nodeInfoObj.print() << std::endl;
 //
 //
 //        a = nodeInfoObj.getNodeDepth();
 //        b = nodeInfoObj.getLb();
 //        c = nodeInfoObj.getRb();
-//        fl = nodeInfoObj.getFatherLabel();
-//        l = nodeInfoObj.getLabel();
 //
-//        ObjNode objNode = ObjNode();
-//        objNode.setObjNodeDepth(a);
-//
-//        //dovrei prendermi l'oggetto del padre forse è più fattibile ciclare due volte una votla per creare gli oggetti e l'altra per analizzarli!k
+////        edge = nodeInfoObj.getEdgeDecoded();
 //
 //
-//
-//        //Prende il numero di figli del padre che sono uguali al numero di fratelli escluso se stesso
-//        count = hashmap[nodeInfoObj.getFatherLabel()].getNumberOfChildren() - 1;
-//
-//
-//        //creo un array dei figli e li ordino in senso crescente della loro label
-//
-//        //        while(!bio2.empty()){ //QUI RESTA IN LOOP :(
-////                   while(int  i<= count){
-////                          if (a != 0 && nodeInfoObj.getNodeDepth() == a && nodeInfoObj.fatherLabel== fl){
-////
-////                              bros[i] = nodeInfoObj.getLabel();
-////                               i++;
-////              }
-////        }
-//
-//
-//        //count è il numero di fratelli
-//        sons = count + 1;
-//        //se non sto valutando il padre mi trovo le coordinate di del padre del nodo
-//        if(a != 0){
-//            ObjNode fatherObj = hashmap[fl];
-////            fatherObj = hashmap.find(fl)->second;
-//
-//            int xF = fatherObj.getObjNodeX();
-//            int yF = fatherObj.getObjNodeY();
-//            int  wF = fatherObj.getObjNodeWid();
-//            x = xF;
-//            y = yF + H;
-//            w =  wF/sons;
+//        //se è la radice la disegno grande come il rettangolo
+//        if (a == 0) {
+//            w = rectWidth;
+//            x = x0;
+//            y = y0;
+//            scaleUnit = rectWidth / c;
+//        } else { //altrimenti scalo la larghezza per la larghezza del suffix interval
+//            if ((c - b) == 0){
+//                w = 0;
+//            } else{
+//                w = scaleUnit * (c-b);
+//            }
+//            x = x0 + b*scaleUnit;
+//            y = y0 - (a * H) - a*0.7;
 //        }
-//
-//        else{
-//            x = x0 + b;
-//            y = y0 + (a * H);
-//            w = defW;
-//        }
-//
-//
-//
-//
-//        edge = nodeInfoObj.getEdgeDecoded();
-//
-//
-//
-//        H = 15;
-//
-//
-//        objNode.setObjNodeX(x);
-//        objNode.setObjNodeY(y);
-//        objNode.setObjNodeWid(w);
-//        objNode.setNumberOfChildren(nodeInfoObj.getNumbrOfChildren()); //Setta il numero di figli
-//
-//        pair<int, ObjNode> element = {l, objNode};
-//        hashmap.insert(element);
-//
 //
 ////        std::cout << "\nBit Nodedepth: " << a << " [" << b << "-" << c << "]\n" << "Edge\t" << edge << std::endl;
 //
 //        string temp = "\n<g class=\"func_g\" onmouseover=\"s(this)\" onmouseout=\"c()\" onclick=\"zoom(this)\">\n""<title>";
-//        temp += edge;
+//        temp += to_string(nodeInfoObj.getLabel());
 //        temp += "</title><rect x=\"";
 //        temp += to_string(x);
 //        temp += "\" y=\"";
@@ -217,7 +112,6 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 //        svg_out << str;
 //    }
 //
-//
 //    char svgEnd[] = {"</svg>"};  //Close the SVG File
 //    svg_out << svgEnd;
 //
@@ -225,6 +119,99 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 //    bin_in.close();     //Close the input file
 //    svg_out.close();    //chiudo il file on output*/
 //}
+//fin qui
+
+
+
+    while (!bio2.empty()) {
+
+        //READ AN OTHER NODE
+        nodeInfo = readNextNodeInfo(&bio2);
+        nodeInfoObj.setNodeField(&nodeInfo);
+
+        std::cout << nodeInfoObj.print() << std::endl;
+
+
+        a = nodeInfoObj.getNodeDepth();
+        b = nodeInfoObj.getLb();
+        c = nodeInfoObj.getRb();
+        fl = nodeInfoObj.getFatherLabel();
+        l = nodeInfoObj.getLabel();
+
+
+
+        ObjNode objNode = ObjNode();
+        objNode.setObjNodeDepth(a);
+        if(a == 0){
+            count = 1; // c'è solo la root
+        } else{
+        count = hashmap[fl].getNumberOfChildren()+1;// numero di figli del padre del nodo che sto valutando compreso se stesso
+        }
+
+
+
+        if (a == 0) {
+            w = rectWidth;
+            x = x0;
+            y = y0;
+            objNode.setObjNodeWid(w);
+            objNode.setObjNodeX(x);
+            objNode.setObjNodeY(y);
+            pair<int, ObjNode> element = {l, objNode};
+            hashmap.insert(element);
+       } else { //altrimenti scalo la larghezza per la larghezza del suffix interval
+
+            hashmap[fl].incCounter();
+            int actSons = hashmap[fl].getSonsCount();
+            int fatWid = hashmap[fl].getObjNodeWid();
+            int fatX = hashmap[fl].getObjNodeX();
+            int fatY = hashmap[fl].getObjNodeY();
+            if ((c == b)){
+                w = 0;
+
+            } else if (c != b){
+                w = fatWid/count;
+            }
+            x = fatX + (actSons*w);
+            y = fatY + H;
+
+            objNode.setObjNodeWid(w);
+            objNode.setObjNodeY(y);
+            objNode.setObjNodeX(x);
+
+            //settati tutti i parametri inserisco l'oggetto nodo nella mappa
+            pair<int, ObjNode> element = {l, objNode};
+            hashmap.insert(element);
+
+        }
+
+
+//        std::cout << "\nBit Nodedepth: " << a << " [" << b << "-" << c << "]\n" << "Edge\t" << edge << std::endl;
+
+        string temp = "\n<g class=\"func_g\" onmouseover=\"s(this)\" onmouseout=\"c()\" onclick=\"zoom(this)\">\n""<title>";
+        temp += edge;
+        temp += "</title><rect x=\"";
+        temp += to_string(x);
+        temp += "\" y=\"";
+        temp += to_string(y);
+        temp += "\" width=\"";
+        temp += to_string(w);
+        temp += "\" ""height=\"15.0\" fill=\"rgb(225,0,0)\" rx=\"2\" ry=\"2\" />\n""</g>";
+
+        char str[temp.length()];
+        strcpy(str, temp.c_str());
+
+        svg_out << str;
+    }
+
+
+    char svgEnd[] = {"</svg>"};  //Close the SVG File
+    svg_out << svgEnd;
+
+
+    bin_in.close();     //Close the input file
+    svg_out.close();    //chiudo il file on output*/
+}
 
 
 

@@ -17,17 +17,17 @@ public:
 
     void setObjNodeDepth(int objNodeDepth);
 
-    int getObjNodeX();
+    double getObjNodeX();
 
-    void setObjNodeX(int objNodeX);
+    void setObjNodeX(double objNodeX);
 
-    int getObjNodeY();
+    double getObjNodeY();
 
-    void setObjNodeY(int objNodeY);
+    void setObjNodeY(double objNodeY);
 
-    int getObjNodeWid();
+    float getObjNodeWid();
 
-    void setObjNodeWid(int objNodeWid);
+    void setObjNodeWid(float objNodeWid);
 
     int getNumberOfChildren();
 
@@ -35,14 +35,14 @@ public:
 
     int getSonsCount();
 
-    int incCounter();
+    void incCounter();
 
 
 private:
     int objNodeDepth;
-    int objNodeX;
-    int objNodeY;
-    int objNodeWid;
+    double objNodeX;
+    double objNodeY;
+    float objNodeWid;
     int numberOfChildren;
     int sonsCount = 0;
     //int ovjNodeHeigth; per ora li facciamo tutti alla stessa altezza
