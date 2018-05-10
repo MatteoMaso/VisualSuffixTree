@@ -35,7 +35,7 @@ public:
 
     int getSonsCount();
 
-    int incCounter();
+    void incCounter();
 
 
 private:

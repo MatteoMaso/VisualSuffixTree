@@ -11,7 +11,7 @@
 #include "../Include/Header.h"
 #include "../Include/NodeInfo.h"
 
-#define VERBOSE 0
+#define VERBOSE 1
 
 using namespace std;
 using namespace sdsl;

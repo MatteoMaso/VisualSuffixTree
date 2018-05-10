@@ -59,7 +59,9 @@ void ObjNode::setNumberOfChildren(int numberOfChildren) {
     this->numberOfChildren = numberOfChildren;
 }
 
-int ObjNode::incCounter(){
+
+
+void ObjNode::incCounter(){
     this->sonsCount++;
 }
 
