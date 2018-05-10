@@ -47,7 +47,7 @@ float ObjNode::getObjNodeWid(){
     return objNodeWid;
 }
 
-void ObjNode::setObjNodeWid(float objNodeWid) {
+void ObjNode::setObjNodeWid(double objNodeWid) {
     this->objNodeWid = objNodeWid;
 }
 

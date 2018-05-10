@@ -11,6 +11,9 @@
 #include "../Include/Header.h"
 #include "../Include/NodeInfo.h"
 #include "../Include/ObjNode.h"
+#include "../Include/SvgUtils.h"
+
+
 
 using namespace std;
 
@@ -28,196 +31,165 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
     //After reading header create the NodeInfoStructure
     NodeInfoStructure nodeStructure = NodeInfoStructure(header.getNodeInfoStructure(), configParameter);
 
+    if (!checkConfigParameter(configParameter, &nodeStructure)){
+        exit(-1);
+    }
+
     //BEGIN SVG CREATOR
     std::ofstream svg_out(outputFile, std::ios::out | std::ios::binary);
-    svg_out << createSvgHeader(stoi(configParameter->at("WINDOW_WIDTH")), stoi(configParameter->at("WINDOW_HEIGHT")));
+
+    svg_out << SvgUtils::createSvgHeader(stoi(configParameter->at("WINDOW_WIDTH")), stoi(configParameter->at("WINDOW_HEIGHT")));
 
     //PARAMETER THAT I NEED
-    map<int, ObjNode> hashmap;
+    map<int, ObjNode> hashmap; //Useful only when we represent the dimension of the child equel to the dim of the brother
 
-    float a, b, c;
-    int sons;
-    int H = 15;//dovrà poi essere messa nel config e decisa dall'utente
-    float rectWidth = stoi(configParameter->at("WINDOW_WIDTH")) - 20 ; //dovrà poi essere messa nel config e decisa dall'utente
+    float nodeDepth, lb, rb;
+    double H = stoi(configParameter->at("BASIC_BLOCK_HEIGHT")); //dovrà poi essere messa nel config e decisa dall'utente
+    int rectWidth = stoi(configParameter->at("WINDOW_WIDTH")) - 20;
+    double rootNodeWidth = rectWidth;
     int count = 1;
-    int defW = 500; //larghezza del rettangolo
-    int fl, l;
-    float i, j, z, x0, y0, w;
+
+    int fatherLabel, label;
+    float x0, y0, w;
     double x, y;
     string edge = "";
 
-    x0 = 10;
-    y0 = stoi(configParameter->at("WINDOW_HEIGHT")) - 40;
+    if (stoi(configParameter->at("SVG_FROM_TOP")) == 1){
+        //the root is on the top
+        x0 = 10;
+        y0 = 40;
 
-
-    int nodeInfoLength = 0;
+    } else {
+        //the root is in the bottom
+        x0 = 10;
+        y0 = stoi(configParameter->at("WINDOW_HEIGHT")) - 40;
+    }
 
     string nodeInfo = "";
-
-    std::cout << "node info length" << nodeInfoLength << std::endl;
-
     NodeInfo nodeInfoObj(&nodeStructure);
 
-
     float scaleUnit = 0;
-//stampa l'svg con il primo metodo
-//    while (!bio2.empty()) {
-//
-//        //READ AN OTHER NODE
-//        nodeInfo = readNextNodeInfo(&bio2);
-//
-//        nodeInfoObj.setNodeField(&nodeInfo);
-//
-////        std::cout << nodeInfoObj.print() << std::endl;
-//
-//
-//        a = nodeInfoObj.getNodeDepth();
-//        b = nodeInfoObj.getLb();
-//        c = nodeInfoObj.getRb();
-//
-////        edge = nodeInfoObj.getEdgeDecoded();
-//
-//
-//        //se è la radice la disegno grande come il rettangolo
-//        if (a == 0) {
-//            w = rectWidth;
-//            x = x0;
-//            y = y0;
-//            scaleUnit = rectWidth / c;
-//        } else { //altrimenti scalo la larghezza per la larghezza del suffix interval
-//            if ((c - b) == 0){
-//                w = 0;
-//            } else{
-//                w = scaleUnit * (c-b);
-//            }
-//            x = x0 + b*scaleUnit;
-//            y = y0 - (a * H) - a*0.7;
-//        }
-//
-////        std::cout << "\nBit Nodedepth: " << a << " [" << b << "-" << c << "]\n" << "Edge\t" << edge << std::endl;
-//
-//        string temp = "\n<g class=\"func_g\" onmouseover=\"s(this)\" onmouseout=\"c()\" onclick=\"zoom(this)\">\n""<title>";
-//        temp += to_string(nodeInfoObj.getLabel());
-//        temp += "</title><rect x=\"";
-//        temp += to_string(x);
-//        temp += "\" y=\"";
-//        temp += to_string(y);
-//        temp += "\" width=\"";
-//        temp += to_string(w);
-//        temp += "\" ""height=\"15.0\" fill=\"rgb(225,0,0)\" rx=\"2\" ry=\"2\" />\n""</g>";
-//
-//        char str[temp.length()];
-//        strcpy(str, temp.c_str());
-//
-//        svg_out << str;
-//    }
-//
-//    char svgEnd[] = {"</svg>"};  //Close the SVG File
-//    svg_out << svgEnd;
-//
-//
-//    bin_in.close();     //Close the input file
-//    svg_out.close();    //chiudo il file on output*/
-//}
-//fin qui
-
-
 
     while (!bio2.empty()) {
 
-        //READ AN OTHER NODE
+        //READ AN OTHER NODE AND PUT THE INFOMATION INSIDE THE nodeInfoObj
         nodeInfo = readNextNodeInfo(&bio2);
         nodeInfoObj.setNodeField(&nodeInfo);
 
         std::cout << nodeInfoObj.print() << std::endl;
 
-
-        a = nodeInfoObj.getNodeDepth();
-        b = nodeInfoObj.getLb();
-        c = nodeInfoObj.getRb();
-        fl = nodeInfoObj.getFatherLabel();
-        l = nodeInfoObj.getLabel();
+        //ACQUIRE THE DEFAULT PARAMETERS
+        nodeDepth = nodeInfoObj.getNodeDepth();
+        lb = nodeInfoObj.getLb();
+        rb = nodeInfoObj.getRb();
 
 
+        if (stoi(configParameter->at("TYPE_CHILDREN_DISTRIBUTION")) == 1) {
+            //means each children have the same dimension of their brother
+            fatherLabel = nodeInfoObj.getFatherLabel();
+            label = nodeInfoObj.getLabel();
 
-        ObjNode objNode = ObjNode();
-        objNode.setObjNodeDepth(a);
-        if(a == 0){
-            count = 1; // c'è solo la root
-        } else{
-        count = hashmap[fl].getNumberOfChildren()+1;// numero di figli del padre del nodo che sto valutando compreso se stesso
+            ObjNode objNode = ObjNode();
+            objNode.setObjNodeDepth(nodeDepth);
+            if (nodeDepth == 0) {
+                count = 1; // c'è solo la root
+            } else {
+                count = hashmap[fatherLabel].getNumberOfChildren() + 1;// numero di figli del padre del nodo che sto valutando compreso se stesso
+            }
+
+
+            if (nodeDepth == 0) {
+                w = rootNodeWidth;
+                x = x0;
+                y = y0;
+                objNode.setObjNodeWid(w);
+                objNode.setObjNodeX(x);
+                objNode.setObjNodeY(y);
+                objNode.setNumberOfChildren(nodeInfoObj.getNumbrOfChildren());
+                pair<int, ObjNode> element = {label, objNode};
+                hashmap.insert(element);
+            } else { //altrimenti scalo la larghezza per la larghezza del suffix interval
+
+                hashmap[fatherLabel].incCounter();
+                int actSons = hashmap[fatherLabel].getSonsCount();
+                int fatWid = hashmap[fatherLabel].getObjNodeWid();
+                int fatX = hashmap[fatherLabel].getObjNodeX();
+                int fatY = hashmap[fatherLabel].getObjNodeY();
+                if ((rb == lb)) {
+                    w = 0;
+
+                } else if (rb != lb) {
+                    w = fatWid / count;
+                }
+
+                x = fatX + (actSons * w);
+                if (stoi(configParameter->at("SVG_FROM_TOP")) == 1){
+                    y = fatY + H + 1;
+                } else {
+                    y = fatY - H - 1;
+                }
+
+                objNode.setObjNodeWid(w);
+                objNode.setObjNodeY(y);
+                objNode.setObjNodeX(x);
+                objNode.setNumberOfChildren(nodeInfoObj.getNumbrOfChildren());
+
+
+                //settati tutti i parametri inserisco l'oggetto nodo nella mappa
+                pair<int, ObjNode> element = {label, objNode};
+                hashmap.insert(element);
+
+            }
+
+        } else if (stoi(configParameter->at("TYPE_CHILDREN_DISTRIBUTION")) == 2) {
+            //means thedimensions of a node is proportional with the depth
+
+            if (nodeDepth == 0) {  //se è la radice la disegno grande come il rettangolo
+                w = rootNodeWidth;
+                x = x0;
+                y = y0;
+                scaleUnit = rootNodeWidth / rb;
+            } else { //altrimenti scalo la larghezza per la larghezza del suffix interval
+                if ((rb - lb) == 0) {
+                    w = 0;
+                } else {
+                    w = scaleUnit * (rb - lb);
+                }
+                x = x0 + lb * scaleUnit;
+                if (stoi(configParameter->at("SVG_FROM_TOP")) == 1){
+                    y = y0 + (nodeDepth * H) + nodeDepth * 0.7;
+                } else {
+                    y = y0 - (nodeDepth * H) - nodeDepth * 0.7;
+                }
+
+            }
+
+        } else {
+            std::cout << "Error not valid TYPE_CHILDREN_DISTRIBUTION" << std::endl;
+            exit(-1);
         }
 
 
-
-        if (a == 0) {
-            w = rectWidth;
-            x = x0;
-            y = y0;
-            objNode.setObjNodeWid(w);
-            objNode.setObjNodeX(x);
-            objNode.setObjNodeY(y);
-            pair<int, ObjNode> element = {l, objNode};
-            hashmap.insert(element);
-       } else { //altrimenti scalo la larghezza per la larghezza del suffix interval
-
-            hashmap[fl].incCounter();
-            int actSons = hashmap[fl].getSonsCount();
-            int fatWid = hashmap[fl].getObjNodeWid();
-            int fatX = hashmap[fl].getObjNodeX();
-            int fatY = hashmap[fl].getObjNodeY();
-            if ((c == b)){
-                w = 0;
-
-            } else if (c != b){
-                w = fatWid/count;
-            }
-            x = fatX + (actSons*w);
-            y = fatY + H;
-
-            objNode.setObjNodeWid(w);
-            objNode.setObjNodeY(y);
-            objNode.setObjNodeX(x);
-
-            //settati tutti i parametri inserisco l'oggetto nodo nella mappa
-            pair<int, ObjNode> element = {l, objNode};
-            hashmap.insert(element);
-
+        if ( stoi(configParameter->at("SHOW_EDGE_INFO")) == 1){
+            //add edge info
+            edge = nodeInfoObj.getEdgeDecoded();
         }
 
 
 //        std::cout << "\nBit Nodedepth: " << a << " [" << b << "-" << c << "]\n" << "Edge\t" << edge << std::endl;
 
-        string temp = "\n<g class=\"func_g\" onmouseover=\"s(this)\" onmouseout=\"c()\" onclick=\"zoom(this)\">\n""<title>";
-        temp += edge;
-        temp += "</title><rect x=\"";
-        temp += to_string(x);
-        temp += "\" y=\"";
-        temp += to_string(y);
-        temp += "\" width=\"";
-        temp += to_string(w);
-        temp += "\" ""height=\"15.0\" fill=\"rgb(225,0,0)\" rx=\"2\" ry=\"2\" />\n""</g>";
-
-        char str[temp.length()];
-        strcpy(str, temp.c_str());
-
-        svg_out << str;
+        SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H);
     }
-
 
     char svgEnd[] = {"</svg>"};  //Close the SVG File
     svg_out << svgEnd;
-
 
     bin_in.close();     //Close the input file
     svg_out.close();    //chiudo il file on output*/
 }
 
 
-
-
 void SvgCreator::openFile(std::ifstream *bin_in, char *inputFileName, BitIo<16> *bio) {
-//    std::ifstream bin_in(inputFileName, std::ios::binary);
     if (!(*bin_in).is_open()) {
         std::cout << "I'm not able to open file: " << inputFileName
                   << " probably you must create the file test.bin inside Output with "
@@ -225,7 +197,6 @@ void SvgCreator::openFile(std::ifstream *bin_in, char *inputFileName, BitIo<16> 
         exit(7);
     }
     *bin_in >> *bio;
-
 
     //Check that the node property file generate with the first program must contain informations
     if ((*bio).size() == 8) {
@@ -250,53 +221,40 @@ string SvgCreator::readNextNodeInfo(BitIo<16> *bio) {
     return nodeInfo;
 }
 
-string SvgCreator::getHeader(string fileName) {
-    {
+bool SvgCreator::checkConfigParameter(map<string, string> *configParameter, NodeInfoStructure * nodeInfoStructure) {
 
-        string txt;
-        string temp;
-        ifstream file;
-        file.open(fileName);
-
-        if (file.is_open()) {
-//        std::cout << "File open" << std::endl;
-
-            while (!file.eof()) {
-                getline(file, temp);
-                txt += temp + "\n";
-            }
-
-        } else {
-            std::cout << "I'm not able to read the header!" << std::endl;
-        }
-
-        file.close();
-        return txt;
+    //If I want to use the same dimension for each brother
+    int TYPE_CHILDREN_DISTRIBUTION = stoi(configParameter->at("TYPE_CHILDREN_DISTRIBUTION"));
+    if ( TYPE_CHILDREN_DISTRIBUTION == 1 || TYPE_CHILDREN_DISTRIBUTION == 2){
+        //ok
+    } else {
+        TYPE_CHILDREN_DISTRIBUTION =2;
     }
+
+    if ( TYPE_CHILDREN_DISTRIBUTION == 1){
+        //I need the children, lable and father label available
+        if (!( nodeInfoStructure->OPT_CHILDREN_INFO && nodeInfoStructure->OPT_FATHERLABLE && nodeInfoStructure->OPT_LABEL )){
+            std::cout << "if you chose TYPE_CHILDREN_DISTRIBUTION=1 you need: \n    OPT_LABEL=1\n"
+                         "    OPT_FATHERLABLE=1\n"
+                         "    OPT_CHILDREN_INFO=1 \n Or you can chose TYPE_CHILDREN_DISTRIBUTION=2" << std::endl;
+            return false;
+        }
+    }
+
+    //CHECK EDGE AVAILABILITY
+    if ( stoi(configParameter->at("SHOW_EDGE_INFO")) == 1){
+        //show edge info if available
+        if ( nodeInfoStructure->OPT_EDGEINFO){
+            //ok
+        } else {
+            //the edge info is not available
+            std::cout << "The edge info isn't available" << std::endl;
+            configParameter->at("SHOW_EDGE_INFO") = "0";
+        }
+    } else {
+        //ok
+    }
+
+    return true;
 }
 
-string SvgCreator::getWindowsConfigurations(int width, int heigth) {
-
-    string temp = "<rect x=\"0.0\" y=\"0\" width=\"" + to_string(width) + "\" height=\"" + to_string(heigth) + "\" fill=\"url(#background)\"/>";
-    temp += "<text text-anchor=\"middle\" x=\"500\" y=\"24\" font-size=\"17\" font-family=\"Verdana\" fill=\"rgb(0,0,0)\">Flame Graph</text>\n"
-            "<text text-anchor=\"\" x=\"10.00\" y=\"24\" font-size=\"12\" font-family=\"Verdana\" fill=\"rgb(0,0,0)\" id=\"unzoom\" onclick=\"unzoom()\" style=\"opacity: 0; cursor: pointer;\">Reset Zoom</text>\n"
-            "<text text-anchor=\"\" x=\"890.00\" y=\"24\" font-size=\"12\" font-family=\"Verdana\" fill=\"rgb(0,0,0)\" id=\"search\" onmouseover=\"searchover()\" onmouseout=\"searchout()\" onclick=\"search_prompt()\" style=\"opacity: 0.1; cursor: pointer;\">Search</text>\n"
-            "<text text-anchor=\"\" x=\"1090.00\" y=\"1249\" font-size=\"12\" font-family=\"Verdana\" fill=\"rgb(0,0,0)\" id=\"matched\"> </text>\n"
-            "\n"
-            "<text text-anchor=\"\" x=\"10\" y=\"609\" font-size=\"12\" font-family=\"Verdana\" fill=\"rgb(0,0,0)\" id=\"details\"> </text>";
-
-    return temp;
-
-
-}
-
-string SvgCreator::createSvgHeader(int width, int heigth) {
-
-    string temp = "<svg version=\"1.1\" width=\"" + to_string(width) + "\" height=\"" +to_string(heigth) + "\" onload=\"init(evt)\" viewBox=\"0 0 ";
-    temp += to_string(width) + " " + to_string(heigth) + "\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">";
-    temp += getHeader("headerSvg.txt"); //Insert the header SVG into the file
-
-    temp += getWindowsConfigurations(width, heigth);
-
-    return temp;
-}

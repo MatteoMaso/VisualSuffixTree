@@ -27,7 +27,7 @@ public:
 
     float getObjNodeWid();
 
-    void setObjNodeWid(float objNodeWid);
+    void setObjNodeWid(double objNodeWid);
 
     int getNumberOfChildren();
 

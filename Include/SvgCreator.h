@@ -7,6 +7,8 @@
 
 #include "BitIo.h"
 #include "ConfigParser.h"
+#include "SvgUtils.h"
+#include "NodeInfoStructure.h"
 
 class SvgCreator{
 
@@ -19,11 +21,7 @@ public:
 
 private:
 
-    string getHeader(string fileName);
-
-    string getWindowsConfigurations(int width, int heigth);
-
-    string createSvgHeader(int width, int heigth);
+    bool checkConfigParameter(map<string, string> *configParameter, NodeInfoStructure * nodeInfoStructure);
 };
 
 #endif //VISUALSUFFIXTREE_SVGCREATOR_H
