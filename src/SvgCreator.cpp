@@ -39,7 +39,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
     int sons;
     int H = 15;//dovrà poi essere messa nel config e decisa dall'utente
     float rectWidth = stoi(configParameter->at("WINDOW_WIDTH")) - 20 ; //dovrà poi essere messa nel config e decisa dall'utente
-    int count = 0;
+    int count = 1;
     int defW = 500; //larghezza del rettangolo
     int fl, l;
     float i, j, z, x0, y0, w;
@@ -57,6 +57,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
     std::cout << "node info length" << nodeInfoLength << std::endl;
 
     NodeInfo nodeInfoObj(&nodeStructure);
+
 
     float scaleUnit = 0;
 //stampa l'svg con il primo metodo
@@ -121,6 +122,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 //fin qui
 
 
+
     while (!bio2.empty()) {
 
         //READ AN OTHER NODE
@@ -136,8 +138,15 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
         fl = nodeInfoObj.getFatherLabel();
         l = nodeInfoObj.getLabel();
 
+
+
         ObjNode objNode = ObjNode();
         objNode.setObjNodeDepth(a);
+        if(a == 0){
+            count = 1; // c'è solo la root
+        } else{
+        count = hashmap[fl].getNumberOfChildren()+1;// numero di figli del padre del nodo che sto valutando compreso se stesso
+        }
 
 
 
@@ -152,16 +161,15 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
             hashmap.insert(element);
        } else { //altrimenti scalo la larghezza per la larghezza del suffix interval
 
-            count = hashmap[nodeInfoObj.getFatherLabel()].getNumberOfChildren(); // numero di figli del padre del nodo che sto valutando compreso se stesso
             hashmap[fl].incCounter();
-            int actSons = hashmap[fl].getNumberOfChildren();
+            int actSons = hashmap[fl].getSonsCount();
             int fatWid = hashmap[fl].getObjNodeWid();
             int fatX = hashmap[fl].getObjNodeX();
             int fatY = hashmap[fl].getObjNodeY();
-            if ((c - b) == 0){
+            if ((c == b)){
                 w = 0;
 
-            } else{
+            } else if (c != b){
                 w = fatWid/count;
             }
             x = fatX + (actSons*w);
