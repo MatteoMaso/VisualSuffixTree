@@ -23,6 +23,9 @@ public:
 
     string getEdge(cst_t *cst, iterator1 *it);
 
+private:
+
+    bool checkNumberOfBit(int nBit, NodeInfoStructure *nodeInfoStructure);
 };
 
 #endif //VISUALSUFFIXTREE_TREEPARSER_H

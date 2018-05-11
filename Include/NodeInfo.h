@@ -78,7 +78,7 @@ public:
 
     vector<int> getChildrenId();
 
-    NodeInfoStructure *infoStructure;
+    NodeInfoStructure * infoStructure;
 
     //UTILS
     string print();

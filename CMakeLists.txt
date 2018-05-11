@@ -11,6 +11,6 @@ link_directories(/opt/sdsl/lib)
 
 set(SOURCE_FILE main.cpp)
 
-add_executable(VisualSuffixTree main.cpp src/SvgCreator.cpp Include/SvgCreator.h src/TreeParser.cpp Include/TreeParser.h  src/ConfigParser.cpp Include/ConfigParser.h src/NodeInfoStructure.cpp Include/NodeInfoStructure.h src/NodeInfo.cpp Include/NodeInfo.h src/Header.cpp Include/Header.h Include/Header.h Include/TreeParser.h Include/SvgCreator.h Include/NodeInfo.h Include/NodeInfoStructure.h Include/ConfigParser.h Include/BitIo.h Include/ObjNode.h src/ObjNode.cpp Include/Utils.h Include/SvgUtils.h)
+add_executable(VisualSuffixTree main.cpp src/SvgCreator.cpp Include/SvgCreator.h src/TreeParser.cpp Include/TreeParser.h  src/ConfigParser.cpp Include/ConfigParser.h src/NodeInfoStructure.cpp Include/NodeInfoStructure.h src/NodeInfo.cpp Include/NodeInfo.h src/Header.cpp Include/Header.h Include/Header.h Include/TreeParser.h Include/SvgCreator.h Include/NodeInfo.h Include/NodeInfoStructure.h Include/ConfigParser.h Include/BitIo.h Include/ObjNode.h src/ObjNode.cpp Include/Utils.h Include/SvgUtils.h src/SvgObject/StatusBar.cpp Include/SvgObject/StatusBar.h)
 
 target_link_libraries(VisualSuffixTree sdsl divsufsort divsufsort64)

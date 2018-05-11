@@ -10,9 +10,13 @@
 #include "SvgUtils.h"
 #include "NodeInfoStructure.h"
 
+
 class SvgCreator{
 
 public:
+
+
+
     SvgCreator(char *inputFileName, char *outputFile, map<string, string> *configParameter);
 
     void openFile(std::ifstream *bin_in, char *inputFileName, BitIo<16> *bio);

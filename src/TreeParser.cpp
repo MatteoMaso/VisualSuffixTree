@@ -11,7 +11,7 @@
 #include "../Include/Header.h"
 #include "../Include/NodeInfo.h"
 
-#define VERBOSE 1
+#define VERBOSE 0
 
 using namespace std;
 using namespace sdsl;
@@ -41,6 +41,14 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
 
     string nodeInfo;
     NodeInfo nodeInfoObj(&nodeInfoStructure);
+
+    //Check se il numero di bit sono sufficienti per rappresentare le informazione
+    long p = cst.rb(*begin);
+    int nBit = log10(p)/log10(2);
+    if ( !checkNumberOfBit(nBit, &nodeInfoStructure)){
+        exit(-1);
+    }
+
 
     for (iterator it = begin; it != end; ++it) {
 
@@ -169,4 +177,19 @@ string TreeParser::getEdge(cst_t *cst, iterator1 *it) {
 
     return edge;
 
+}
+
+bool TreeParser::checkNumberOfBit(int nBit, NodeInfoStructure * nodeInfoStructure){
+    if (
+            nodeInfoStructure->getBitDepth() <= nBit ||
+            nodeInfoStructure->getBitNodeDepth() <= nBit ||
+            nodeInfoStructure->getBitRb() <= nBit ||
+            nodeInfoStructure->getBitLb() <= nBit ){
+        std::cout << "You need at least " << nBit + 1<< " for depth, nodedepth, lb, rb, label, fatherLabel" << std::endl;
+        return false;
+    }
+
+    //todo add check label and father label
+
+    return true;
 }
