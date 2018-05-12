@@ -14,7 +14,6 @@
 #include "../Include/SvgUtils.h"
 
 
-
 using namespace std;
 
 SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string> *configParameter) {
@@ -55,50 +54,9 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
     int fatherLabel, label;
     int frequency;
     float x0, y0, w;
-    double x, y;
+    float x, y;
     string edge = "";
 
-    int defW = 500; //larghezza del rettangolo
-    int fl, l;
-    int color =  stoi(configParameter->at("COLOR"));
-    string svgColor = "(0,0,0)"; //default nero
-    x0 = 10;
-    y0 = stoi(configParameter->at("WINDOW_HEIGHT")) - 40;
-
-    //setto le impostazioni del colore dei rettangoli per l'svg
-    if(color == 1){
-        svgColor = "(0,255,255)";
-    } else if (color == 2){
-        svgColor = "(0,0,0)";
-    }else if (color == 3){
-        svgColor = "(0,0,255)";
-    }else if (color == 4){
-        svgColor = "(255,0,255)";
-    }else if (color == 5){
-        svgColor = "(128,128,128)";
-    }else if (color == 6){
-        svgColor = "(0,128,0)";
-    }else if (color == 7){
-        svgColor = "(0,255,0)";
-    }else if (color == 8){
-        svgColor = "(128,0,0)";
-    }else if (color == 9){
-        svgColor = "(0,0,128)";
-    }else if (color == 10){
-        svgColor = "(128,128,0)";
-    }else if (color == 11){
-        svgColor = "(128,0,128)";
-    }else if (color == 12){
-        svgColor = "(255,0,0)";
-    }else if (color == 13){
-        svgColor = "(192,192,192)";
-    }else if (color == 14){
-        svgColor = "(0,128,128)";
-    }else if (color == 15){
-        svgColor = "(255,255,255)";
-    }else if (color == 16){
-        svgColor = "(255,255,0)";
-    }
 
 
 
@@ -118,59 +76,28 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
     float scaleUnit = 0;
 
-    string defaultColor = "RGB";
+//    string defaultColor = "RGB";
     RgbColor rgbColor;
     RgbColor blenchedRgbColor;
     HsvColor hsvColor;
     HsvColor blenchedHsvColor;
 
-    //COLOR PARAMETER
-    if( configParameter->at("BASIC_COLOR").compare("RGB") == 0){
-        defaultColor = "RGB";
-        rgbColor.r = stoi(configParameter->at("BASIC_COLOR_VAL_1"));
-        rgbColor.g = stoi(configParameter->at("BASIC_COLOR_VAL_2"));
-        rgbColor.b = stoi(configParameter->at("BASIC_COLOR_VAL_3"));
-
-        hsvColor = SvgUtils::RgbToHsv(rgbColor);
-    } else if ( configParameter->at("BASIC_COLOR").compare("HSV") == 0){
-        string defaultColor = "HSV";
-
-        hsvColor.h = stoi(configParameter->at("BASIC_COLOR_VAL_1"));
-        hsvColor.s = 100;//stoi(configParameter->at("BASIC_COLOR_VAL_2"));
-        hsvColor.v = stoi(configParameter->at("BASIC_COLOR_VAL_3"));
-        rgbColor = SvgUtils::HsvToRgb(hsvColor);
-
-    } else {
-        //default
-    }
-
-    blenchedHsvColor = hsvColor;
-    blenchedHsvColor.s = 50;
-    blenchedRgbColor = SvgUtils::HsvToRgb(blenchedHsvColor);
+    colorSetter(&rgbColor, &blenchedRgbColor, &hsvColor, &blenchedHsvColor, configParameter);
 
 
     while (!bio2.empty()) {
 
         //READ AN OTHER NODE AND PUT THE INFOMATION INSIDE THE nodeInfoObj
         nodeInfo = readNextNodeInfo(&bio2);
-
-//stampa l'svg con il primo metodo
-    while (!bio2.empty()) {
-
-        //READ AN OTHER NODE
-        nodeInfo = readNextNodeInfo(&bio2);
-
-
         nodeInfoObj.setNodeField(&nodeInfo);
 
 //        std::cout << nodeInfoObj.print() << std::endl;
-
 
         //ACQUIRE THE DEFAULT PARAMETERS
         nodeDepth = nodeInfoObj.getNodeDepth();
         lb = nodeInfoObj.getLb();
         rb = nodeInfoObj.getRb();
-        frequency = rb -lb;
+        frequency = rb - lb;
 
         if (stoi(configParameter->at("TYPE_NODE_DIMENSION")) == 1) {
             //means each children have the same dimension of their brother
@@ -264,17 +191,17 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
             edge = nodeInfoObj.getEdgeDecoded();
         }
 
-        if (stoi(configParameter->at("BASIC_FREQUENCY_COLOR_TYPE")) == 1 ){
+        if (stoi(configParameter->at("BASIC_FREQUENCY_COLOR_TYPE")) == 1) {
             //the frequency is representing with a gradient color
             blenchedHsvColor.v = 100;
-            blenchedHsvColor.s = (100 * frequency)/maxSuffixArrayLength + 40;
+            blenchedHsvColor.s = (100 * frequency) / maxSuffixArrayLength + 40;
 
             SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, SvgUtils::HsvToRgb(blenchedHsvColor));
 
-        } else if ( stoi(configParameter->at("BASIC_FREQUENCY_COLOR_TYPE")) == 2){
+        } else if (stoi(configParameter->at("BASIC_FREQUENCY_COLOR_TYPE")) == 2) {
             //the node with a frequency lower than a setted thresold are bleached.
 
-            if (frequency >= stoi(configParameter->at("BASIC_THRESHOLD_FOR_GRADIENT"))){
+            if (frequency >= stoi(configParameter->at("BASIC_THRESHOLD_FOR_GRADIENT"))) {
                 //colore pieno
                 SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, rgbColor);
             } else {
@@ -287,157 +214,14 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
         }
 
-
-        nodeDepth = nodeInfoObj.getNodeDepth();
-        lb = nodeInfoObj.getLb();
-        rb = nodeInfoObj.getRb();
-
-//        edge = nodeInfoObj.getEdgeDecoded();
-
-
-        //se è la radice la disegno grande come il rettangolo
-        if (nodeDepth == 0) {
-            w = rectWidth;
-            x = x0;
-            y = y0;
-            scaleUnit = rectWidth / rb;
-        } else { //altrimenti scalo la larghezza per la larghezza del suffix interval
-            if ((rb - lb) == 0){
-                w = 0;
-            } else{
-                w = scaleUnit * (rb-lb);
-            }
-            x = x0 + lb*scaleUnit;
-            y = y0 - (nodeDepth * H) - nodeDepth*0.7;
-        }
-
-//        std::cout << "\nBit Nodedepth: " << a << " [" << b << "-" << c << "]\n" << "Edge\t" << edge << std::endl;
-
-        string temp = "\n<g class=\"func_g\" onmouseover=\"s(this)\" onmouseout=\"c()\" onclick=\"zoom(this)\">\n""<title>";
-        temp += to_string(nodeInfoObj.getLabel());
-        temp += "</title><rect x=\"";
-        temp += to_string(x);
-        temp += "\" y=\"";
-        temp += to_string(y);
-        temp += "\" width=\"";
-        temp += to_string(w);
-        temp += "\" ""height=\"15.0\" fill=\"rgb";
-        temp += svgColor;
-        temp += "\" rx=\"2\" ry=\"2\" />\n""</g>";
-
-        char str[temp.length()];
-        strcpy(str, temp.c_str());
-
-        svg_out << str;
-
     }
 
     char svgEnd[] = {"</svg>"};  //Close the SVG File
     svg_out << svgEnd;
 
-
     bin_in.close();     //Close the input file
     svg_out.close();    //chiudo il file on output*/
 }
-
-    bin_in.close();     //Close the input file
-    svg_out.close();    //chiudo il file on output*/
-}
-//fin qui
-
-
-//MODALITÀ DI RAPPRESENTAZIONE ALTERNATIVA CON FIGLI SOTTO AI PADRI
-//    while (!bio2.empty()) {
-//
-//        //READ AN OTHER NODE
-//        nodeInfo = readNextNodeInfo(&bio2);
-//        nodeInfoObj.setNodeField(&nodeInfo);
-//
-//        std::cout << nodeInfoObj.print() << std::endl;
-//
-//
-//        a = nodeInfoObj.getNodeDepth();
-//        b = nodeInfoObj.getLb();
-//        c = nodeInfoObj.getRb();
-//        fl = nodeInfoObj.getFatherLabel();
-//        l = nodeInfoObj.getLabel();
-//
-//
-//
-//        ObjNode objNode = ObjNode();
-//        objNode.setObjNodeDepth(a);
-//        if(a == 0){
-//            count = 1; // c'è solo la root
-//        } else{
-//        count = hashmap[fl].getNumberOfChildren()+1;// numero di figli del padre del nodo che sto valutando compreso se stesso
-//        }
-//
-//
-//
-//        if (a == 0) {
-//            w = rectWidth;
-//            x = x0;
-//            y = y0;
-//            objNode.setObjNodeWid(w);
-//            objNode.setObjNodeX(x);
-//            objNode.setObjNodeY(y);
-//            objNode.setNumberOfChildren(nodeInfoObj.getNumbrOfChildren());
-//            pair<int, ObjNode> element = {l, objNode};
-//            hashmap.insert(element);
-//       } else { //altrimenti scalo la larghezza per la larghezza del suffix interval
-//
-//            hashmap[fl].incCounter();
-//            int actSons = hashmap[fl].getSonsCount();
-//            int fatWid = hashmap[fl].getObjNodeWid();
-//            int fatX = hashmap[fl].getObjNodeX();
-//            int fatY = hashmap[fl].getObjNodeY();
-//            if ((c == b)){
-//                w = 0;
-//
-//            } else if (c != b){
-//                w = fatWid/count;
-//            }
-//            x = fatX + (actSons*w);
-//            y = fatY - H - a*0.7;
-//
-//            objNode.setObjNodeWid(w);
-//            objNode.setObjNodeY(y);
-//            objNode.setObjNodeX(x);
-//            objNode.setNumberOfChildren(nodeInfoObj.getNumbrOfChildren());
-//
-//            //settati tutti i parametri inserisco l'oggetto nodo nella mappa
-//            pair<int, ObjNode> element = {l, objNode};
-//            hashmap.insert(element);
-//
-//        }
-//
-//
-////        std::cout << "\nBit Nodedepth: " << a << " [" << b << "-" << c << "]\n" << "Edge\t" << edge << std::endl;
-//
-//        string temp = "\n<g class=\"func_g\" onmouseover=\"s(this)\" onmouseout=\"c()\" onclick=\"zoom(this)\">\n""<title>";
-//        temp += edge;
-//        temp += "</title><rect x=\"";
-//        temp += to_string(x);
-//        temp += "\" y=\"";
-//        temp += to_string(y);
-//        temp += "\" width=\"";
-//        temp += to_string(w);
-//        temp += "\" ""height=\"15.0\" fill=\"rgb(225,0,0)\" rx=\"2\" ry=\"2\" />\n""</g>";
-//
-//        char str[temp.length()];
-//        strcpy(str, temp.c_str());
-//
-//        svg_out << str;
-//    }
-//
-//
-//    char svgEnd[] = {"</svg>"};  //Close the SVG File
-//    svg_out << svgEnd;
-//
-//
-//    bin_in.close();     //Close the input file
-//    svg_out.close();    //chiudo il file on output*/
-//}
 
 
 

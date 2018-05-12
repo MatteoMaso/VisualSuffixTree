@@ -25,6 +25,126 @@ public:
 
 private:
 
+    void colorSetter(RgbColor *rgbColor, RgbColor *blenchedRgbColor, HsvColor *hsvColor,HsvColor *blenchedHsvColor, map<string, string> *configParameter){
+
+        //COLOR PARAMETER
+        if (configParameter->at("BASIC_COLOR").compare("RGB") == 0) {
+
+            rgbColor->r = stoi(configParameter->at("BASIC_COLOR_VAL_1"));
+            rgbColor->g = stoi(configParameter->at("BASIC_COLOR_VAL_2"));
+            rgbColor->b = stoi(configParameter->at("BASIC_COLOR_VAL_3"));
+
+            *hsvColor = SvgUtils::RgbToHsv(*rgbColor);
+        } else if (configParameter->at("BASIC_COLOR").compare("HSV") == 0) {
+            string defaultColor = "HSV";
+
+            hsvColor->h = stoi(configParameter->at("BASIC_COLOR_VAL_1"));
+            hsvColor->s = 100;//stoi(configParameter->at("BASIC_COLOR_VAL_2"));
+            hsvColor->v = stoi(configParameter->at("BASIC_COLOR_VAL_3"));
+            *rgbColor = SvgUtils::HsvToRgb(*hsvColor);
+
+        } else {
+
+            int color = stoi(configParameter->at("BASIC_COLOR"));
+//            string svgColor = "(0,0,0)"; //default nero
+
+            //setto le impostazioni del colore dei rettangoli per l'svg
+            if (color == 1) {
+//                svgColor = "(0,255,255)";
+                rgbColor->r = 0;
+                rgbColor->g = 255;
+                rgbColor->b = 255;
+            } else if (color == 2) {
+//                svgColor = "(0,0,0)";
+                rgbColor->r = 0;
+                rgbColor->g = 0;
+                rgbColor->b = 0;
+            } else if (color == 3) {
+//                svgColor = "(0,0,255)";
+                rgbColor->r = 0;
+                rgbColor->g = 0;
+                rgbColor->b = 255;
+            } else if (color == 4) {
+//                svgColor = "(255,0,255)";
+                rgbColor->r = 255;
+                rgbColor->g = 0;
+                rgbColor->b = 255;
+            } else if (color == 5) {
+//                svgColor = "(128,128,128)";
+                rgbColor->r = 128;
+                rgbColor->g = 128;
+                rgbColor->b = 128;
+            } else if (color == 6) {
+//                svgColor = "(0,128,0)";
+                rgbColor->r = 0;
+                rgbColor->g = 128;
+                rgbColor->b = 0;
+            } else if (color == 7) {
+//                svgColor = "(0,255,0)";
+                rgbColor->r = 0;
+                rgbColor->g = 255;
+                rgbColor->b = 0;
+            } else if (color == 8) {
+//                svgColor = "(128,0,0)";
+                rgbColor->r = 128;
+                rgbColor->g = 0;
+                rgbColor->b = 0;
+            } else if (color == 9) {
+//                svgColor = "(0,0,128)";
+                rgbColor->r = 0;
+                rgbColor->g = 0;
+                rgbColor->b = 128;
+            } else if (color == 10) {
+//                svgColor = "(128,128,0)";
+                rgbColor->r = 128;
+                rgbColor->g = 128;
+                rgbColor->b = 0;
+            } else if (color == 11) {
+//                svgColor = "(128,0,128)";
+                rgbColor->r = 128;
+                rgbColor->g = 0;
+                rgbColor->b = 128;
+            } else if (color == 12) {
+//                svgColor = "(255,0,0)";
+                rgbColor->r = 255;
+                rgbColor->g = 0;
+                rgbColor->b = 0;
+            } else if (color == 13) {
+//                svgColor = "(192,192,192)";
+                rgbColor->r = 192;
+                rgbColor->g = 192;
+                rgbColor->b = 192;
+            } else if (color == 14) {
+//                svgColor = "(0,128,128)";
+                rgbColor->r = 0;
+                rgbColor->g = 128;
+                rgbColor->b = 128;
+            } else if (color == 15) {
+//                svgColor = "(0,255,255)";
+                rgbColor->r = 0;
+                rgbColor->g = 255;
+                rgbColor->b = 255;
+            } else if (color == 16) {
+//                svgColor = "(255,255,0)";
+                rgbColor->r = 255;
+                rgbColor->g = 255;
+                rgbColor->b = 0;
+            } else{
+                //default
+                rgbColor->r = 255;
+                rgbColor->g = 255;
+                rgbColor->b = 0;
+            }
+
+            *hsvColor = SvgUtils::RgbToHsv(*rgbColor);
+
+        }
+
+        *blenchedHsvColor = *hsvColor;
+        blenchedHsvColor->s = 50;
+        *blenchedRgbColor = SvgUtils::HsvToRgb(*blenchedHsvColor);
+    }
+
     bool checkConfigParameter(map<string, string> *configParameter, NodeInfoStructure * nodeInfoStructure);
 };
 
