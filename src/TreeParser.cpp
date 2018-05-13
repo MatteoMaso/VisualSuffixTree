@@ -11,8 +11,6 @@
 #include "../Include/Header.h"
 #include "../Include/NodeInfo.h"
 
-#define VERBOSE 0
-
 using namespace std;
 using namespace sdsl;
 
@@ -27,6 +25,9 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
     typedef cst_bfs_iterator<cst_t> iterator;
     iterator begin = iterator(&cst, cst.root());
     iterator end = iterator(&cst, cst.root(), true, true);
+
+    //SET VERBOSE
+    bool VERBOSE = (stoi(configParameter->at("VERBOSE"))) == 1;
 
     //PREPARE THE OUTPUT FILE AND PARAMETER
     std::ofstream bin_out(outputFileName, std::ios::out | std::ios::binary);
@@ -80,14 +81,15 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
         }
 
 
-#if VERBOSE == 1
-        std::cout << "\n\n\nNodeDepth: " << cst.node_depth(*it) << " Depth: " << cst.depth(*it) << "-[" << cst.lb(*it)
-                  << "-"
-                  << cst.rb(*it) << "]"
-                  << std::endl;//<< "\nAll String length: " << allstring_length << " parent length: " << parent_strLength << "\nEdge: " << edge <<"\nEdge coded: " << e.edgeToString(&edge) << std::endl;
+        if (VERBOSE) {
+            std::cout << "\n\n\nNodeDepth: " << cst.node_depth(*it) << " Depth: " << cst.depth(*it) << "-["
+                      << cst.lb(*it)
+                      << "-"
+                      << cst.rb(*it) << "]"
+                      << std::endl;//<< "\nAll String length: " << allstring_length << " parent length: " << parent_strLength << "\nEdge: " << edge <<"\nEdge coded: " << e.edgeToString(&edge) << std::endl;
 
-        std::cout << nodeInfoObj.print() << std::endl;
-#endif
+            std::cout << nodeInfoObj.print() << std::endl;
+        }
 
         //PRINT THE NODE INFO INTO BINARY FILE
         printNode(&nodeInfoObj, &bin_out);

@@ -34,6 +34,8 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
         exit(-1);
     }
 
+    bool VERBOSE = (stoi(configParameter->at("VERBOSE"))) == 1;
+
     //BEGIN SVG CREATOR
     std::ofstream svg_out(outputFile, std::ios::out | std::ios::binary);
 
@@ -91,7 +93,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
         nodeInfo = readNextNodeInfo(&bio2);
         nodeInfoObj.setNodeField(&nodeInfo);
 
-//        std::cout << nodeInfoObj.print() << std::endl;
+        if (VERBOSE) std::cout << nodeInfoObj.print() << std::endl;
 
         //ACQUIRE THE DEFAULT PARAMETERS
         nodeDepth = nodeInfoObj.getNodeDepth();
@@ -165,7 +167,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                 x = x0;
                 y = y0;
                 scaleUnit = rootNodeWidth / rb;
-            } else { //altrimenti scalo la larghezza per la larghezza del suffix interval
+            } else {    //altrimenti scalo la larghezza per la larghezza del suffix interval
                 if ((frequency) == 0) {
                     w = 0;
                 } else {
@@ -236,9 +238,7 @@ void SvgCreator::openFile(std::ifstream *bin_in, char *inputFileName, BitIo<16> 
 
     //Check that the node property file generate with the first program must contain informations
     if ((*bio).size() == 8) {
-        std::cout
-                << "The node property file generated with the first program is empty, probably you have passed a bad string path"
-                << std::endl;
+        printf("The node property file generated with the first program is empty, probably you have passed a bad string path");
         exit(8);
     }
 
@@ -271,9 +271,10 @@ bool SvgCreator::checkConfigParameter(map<string, string> *configParameter, Node
         //I need the children, lable and father label available
         if (!(nodeInfoStructure->OPT_CHILDREN_INFO && nodeInfoStructure->OPT_FATHERLABLE &&
               nodeInfoStructure->OPT_LABEL)) {
-            std::cout << "if you chose TYPE_NODE_DIMENSION=1 you need: \n    OPT_LABEL=1\n"
-                         "    OPT_FATHERLABLE=1\n"
-                         "    OPT_CHILDREN_INFO=1 \n Or you can chose TYPE_NODE_DIMENSION=2" << std::endl;
+
+            printf("if you chose TYPE_NODE_DIMENSION=1 you need: \n OPT_LABEL=1\n"
+                         " OPT_FATHERLABLE=1\n"
+                         " OPT_CHILDREN_INFO=1 \n Or you can chose TYPE_NODE_DIMENSION=2");
             return false;
         }
     }
@@ -285,7 +286,7 @@ bool SvgCreator::checkConfigParameter(map<string, string> *configParameter, Node
             //ok
         } else {
             //the edge info is not available
-            std::cout << "The edge info isn't available" << std::endl;
+            printf("The edge info isn't available");
             configParameter->at("SHOW_EDGE_INFO") = "0";
         }
     } else {
