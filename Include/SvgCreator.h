@@ -9,6 +9,7 @@
 #include "ConfigParser.h"
 #include "SvgUtils.h"
 #include "NodeInfoStructure.h"
+#include "ObjNode.h"
 
 
 class SvgCreator{
@@ -24,6 +25,31 @@ public:
     string readNextNodeInfo(BitIo<16> *bio);
 
 private:
+
+    map<int, ObjNode> hashmap; //Useful only when we represent the dimension of the child equel to the dim of the brother
+    int H; //the height of the block
+    double x0, y0, w, x, y, rectWidth, rootNodeWidth;
+    int count, fatherLabel, label, frequency, maxSuffixArrayLength, lb, rb, nodeDepth;
+    string edge = "";
+    double scaleUnit = 0;
+    string nodeInfo;
+    bool SVG_FROM_TOP;
+
+
+    void setPositionTYPE_NODE_DIMENSION2(){
+        if ((frequency) == 0) {
+            w = 0;
+        } else {
+            w = scaleUnit * (frequency);
+        }
+        x = x0 + lb * scaleUnit;
+
+        if (SVG_FROM_TOP) {
+            y = y0 + (nodeDepth * H) + nodeDepth * 0.7;
+        } else {
+            y = y0 - (nodeDepth * H) - nodeDepth * 0.7;
+        }
+    }
 
     void colorSetter(RgbColor *rgbColor, RgbColor *blenchedRgbColor, HsvColor *hsvColor,HsvColor *blenchedHsvColor, map<string, string> *configParameter){
 

@@ -30,9 +30,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
     //After reading header create the NodeInfoStructure
     NodeInfoStructure nodeStructure = NodeInfoStructure(header.getNodeInfoStructure(), configParameter);
 
-    if (!checkConfigParameter(configParameter, &nodeStructure)) {
-        exit(-1);
-    }
+    if (!checkConfigParameter(configParameter, &nodeStructure)) exit(-1);
 
     bool VERBOSE = (stoi(configParameter->at("VERBOSE"))) == 1;
 
@@ -43,50 +41,31 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                                          stoi(configParameter->at("WINDOW_HEIGHT")));
 
     //PARAMETER THAT I NEED
-    map<int, ObjNode> hashmap; //Useful only when we represent the dimension of the child equel to the dim of the brother
-
-    float nodeDepth, lb, rb;
-    double H = stoi(configParameter->at("BASIC_BLOCK_HEIGHT")); //dovrà poi essere messa nel config e decisa dall'utente
-    float rectWidth = stoi(configParameter->at("WINDOW_WIDTH")) - 20;
-    float rootNodeWidth = rectWidth;
-    int count = 1;
-
-    int maxSuffixArrayLength;
-
-    int fatherLabel, label;
-    int frequency;
-    float x0, y0, w;
-    float x, y;
-    string edge = "";
+    SVG_FROM_TOP = stoi(configParameter->at("SVG_FROM_TOP")) == 1;
 
 
+    RgbColor rgbColor, blenchedRgbColor;    //RGB COLOR
+    HsvColor hsvColor, blenchedHsvColor;    //HSV COLOR
 
 
-    if (stoi(configParameter->at("SVG_FROM_TOP")) == 1) {
-        //the root is on the top
+    //INITIALIZE PARAMETER
+    H = stoi(configParameter->at("BASIC_BLOCK_HEIGHT")); //dovrà poi essere messa nel config e decisa dall'utente
+    rectWidth = stoi(configParameter->at("WINDOW_WIDTH")) - 20;
+    rootNodeWidth = rectWidth;
+    //Initialize color
+    colorSetter(&rgbColor, &blenchedRgbColor, &hsvColor, &blenchedHsvColor, configParameter);
+
+    //Starting point of tree
+    if (stoi(configParameter->at("SVG_FROM_TOP")) == 1) { //the root is on the top
         x0 = 10;
         y0 = 40;
-
-    } else {
-        //the root is in the bottom
+    } else { //the root is in the bottom
         x0 = 10;
         y0 = stoi(configParameter->at("WINDOW_HEIGHT")) - 40;
     }
 
-    string nodeInfo = "";
+
     NodeInfo nodeInfoObj(&nodeStructure);
-
-    float scaleUnit = 0;
-
-//    string defaultColor = "RGB";
-    RgbColor rgbColor;
-    RgbColor blenchedRgbColor;
-    HsvColor hsvColor;
-    HsvColor blenchedHsvColor;
-
-    colorSetter(&rgbColor, &blenchedRgbColor, &hsvColor, &blenchedHsvColor, configParameter);
-
-
     while (!bio2.empty()) {
 
         //READ AN OTHER NODE AND PUT THE INFOMATION INSIDE THE nodeInfoObj
@@ -111,10 +90,8 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
             if (nodeDepth == 0) {
                 count = 1; // c'è solo la root
             } else {
-                count = hashmap[fatherLabel].getNumberOfChildren() +
-                        1;// numero di figli del padre del nodo che sto valutando compreso se stesso
+                count = hashmap[fatherLabel].getNumberOfChildren() + 1;// numero di figli del padre del nodo che sto valutando compreso se stesso
             }
-
 
             if (nodeDepth == 0) {
                 w = rootNodeWidth;
@@ -130,13 +107,14 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
                 hashmap[fatherLabel].incCounter();
                 int actSons = hashmap[fatherLabel].getSonsCount();
-                int fatWid = hashmap[fatherLabel].getObjNodeWid();
-                int fatX = hashmap[fatherLabel].getObjNodeX();
-                int fatY = hashmap[fatherLabel].getObjNodeY();
+                float fatWid = hashmap[fatherLabel].getObjNodeWid();
+                double fatX = hashmap[fatherLabel].getObjNodeX();
+                double fatY = hashmap[fatherLabel].getObjNodeY();
                 if ((rb == lb)) {
                     w = 0;
 
-                } else if (rb != lb) {
+                } else {
+                    //(rb != lb)
                     w = fatWid / count;
                 }
 
@@ -159,31 +137,20 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
             }
 
         } else if (stoi(configParameter->at("TYPE_NODE_DIMENSION")) == 2) {
-            //means thedimensions of a node is proportional with the depth
-
-            if (nodeDepth == 0) {  //se è la radice la disegno grande come il rettangolo
+            //means the dimensions of a node is proportional with the depth
+            if (nodeDepth == 0) {  //Root is large as the windows minus a border
                 w = rootNodeWidth;
                 maxSuffixArrayLength = rb;
                 x = x0;
                 y = y0;
                 scaleUnit = rootNodeWidth / rb;
-            } else {    //altrimenti scalo la larghezza per la larghezza del suffix interval
-                if ((frequency) == 0) {
-                    w = 0;
-                } else {
-                    w = scaleUnit * (frequency);
-                }
-                x = x0 + lb * scaleUnit;
-                if (stoi(configParameter->at("SVG_FROM_TOP")) == 1) {
-                    y = y0 + (nodeDepth * H) + nodeDepth * 0.7;
-                } else {
-                    y = y0 - (nodeDepth * H) - nodeDepth * 0.7;
-                }
-
+            } else {
+                //altrimenti scalo la larghezza per la larghezza del suffix interval
+                setPositionTYPE_NODE_DIMENSION2();
             }
 
         } else {
-            std::cout << "Error not valid TYPE_NODE_DIMENSION" << std::endl;
+            printf("Error not valid TYPE_NODE_DIMENSION");
             exit(-1);
         }
 
@@ -203,17 +170,14 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
         } else if (stoi(configParameter->at("BASIC_FREQUENCY_COLOR_TYPE")) == 2) {
             //the node with a frequency lower than a setted thresold are bleached.
 
-            if (frequency >= stoi(configParameter->at("BASIC_THRESHOLD_FOR_GRADIENT"))) {
-                //colore pieno
+            if (frequency >= stoi(configParameter->at("BASIC_THRESHOLD_FOR_GRADIENT"))) { //Full color
                 SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, rgbColor);
-            } else {
-                //sfumato
+            } else { //Blenched
                 SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, blenchedRgbColor);
             }
 
         } else {
             SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, rgbColor);
-
         }
 
     }
@@ -224,7 +188,6 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
     bin_in.close();     //Close the input file
     svg_out.close();    //chiudo il file on output*/
 }
-
 
 
 void SvgCreator::openFile(std::ifstream *bin_in, char *inputFileName, BitIo<16> *bio) {
@@ -273,8 +236,8 @@ bool SvgCreator::checkConfigParameter(map<string, string> *configParameter, Node
               nodeInfoStructure->OPT_LABEL)) {
 
             printf("if you chose TYPE_NODE_DIMENSION=1 you need: \n OPT_LABEL=1\n"
-                         " OPT_FATHERLABLE=1\n"
-                         " OPT_CHILDREN_INFO=1 \n Or you can chose TYPE_NODE_DIMENSION=2");
+                   " OPT_FATHERLABLE=1\n"
+                   " OPT_CHILDREN_INFO=1 \n Or you can chose TYPE_NODE_DIMENSION=2");
             return false;
         }
     }
