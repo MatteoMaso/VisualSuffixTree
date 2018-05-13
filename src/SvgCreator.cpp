@@ -76,6 +76,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
         //ACQUIRE THE DEFAULT PARAMETERS
         nodeDepth = nodeInfoObj.getNodeDepth();
+        depth = nodeInfoObj.getDepth();
         lb = nodeInfoObj.getLb();
         rb = nodeInfoObj.getRb();
         frequency = rb - lb;
@@ -154,12 +155,12 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
             exit(-1);
         }
 
-
+        //SETTINGS EDGE INFO
         if (stoi(configParameter->at("SHOW_EDGE_INFO")) == 1) {
-            //add edge info
             edge = nodeInfoObj.getEdgeDecoded();
         }
 
+        //SETTING COLOR
         if (stoi(configParameter->at("BASIC_FREQUENCY_COLOR_TYPE")) == 1) {
             //the frequency is representing with a gradient color
             blenchedHsvColor.v = 100;
@@ -169,8 +170,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
         } else if (stoi(configParameter->at("BASIC_FREQUENCY_COLOR_TYPE")) == 2) {
             //the node with a frequency lower than a setted thresold are bleached.
-
-            if (frequency >= stoi(configParameter->at("BASIC_THRESHOLD_FOR_GRADIENT"))) { //Full color
+            if ((frequency >= stoi(configParameter->at("BASIC_FREQUENCY_THRESHOLD"))) && (depth >= stoi(configParameter->at("BASIC_DEPTH_THRESHOLD")))) { //Full color
                 SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, rgbColor);
             } else { //Blenched
                 SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, blenchedRgbColor);

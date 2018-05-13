@@ -29,7 +29,7 @@ private:
     map<int, ObjNode> hashmap; //Useful only when we represent the dimension of the child equel to the dim of the brother
     int H; //the height of the block
     double x0, y0, w, x, y, rectWidth, rootNodeWidth;
-    int count, fatherLabel, label, frequency, maxSuffixArrayLength, lb, rb, nodeDepth;
+    int count, fatherLabel, label, frequency, maxSuffixArrayLength, lb, rb, nodeDepth, depth;
     string edge = "";
     double scaleUnit = 0;
     string nodeInfo;
