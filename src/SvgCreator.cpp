@@ -18,6 +18,7 @@ using namespace std;
 
 SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string> *configParameter) {
 
+    this->configParameter = configParameter;
     //READ BINARY FILE
     std::ifstream bin_in(inputFileName, std::ios::binary);
     BitIo<16> bio2;
@@ -81,6 +82,10 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
         lb = nodeInfoObj.getLb();
         rb = nodeInfoObj.getRb();
         frequency = rb - lb;
+//        if ( frequency < 25){
+//            continue;
+//        }
+
         ObjNode objNode = ObjNode(); //lo creo fuori dalle varie opzioni
         if (stoi(configParameter->at("TYPE_NODE_DIMENSION")) == 1) {
             //means each children have the same dimension of their brother
@@ -148,7 +153,6 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                 x = x0;
                 y = y0;
                 scaleUnit = rootNodeWidth / rb;
-
             } else {
                 //altrimenti scalo la larghezza per la larghezza del suffix interval
                 setPositionTYPE_NODE_DIMENSION2();
@@ -193,6 +197,8 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
     }
 
+
+    printStatusBar(&svg_out);
     char svgEnd[] = {"</svg>"};  //Close the SVG File
     svg_out << svgEnd;
 
@@ -233,6 +239,9 @@ string SvgCreator::readNextNodeInfo(BitIo<16> *bio) {
 
 bool SvgCreator::checkConfigParameter(map<string, string> *configParameter, NodeInfoStructure *nodeInfoStructure) {
 
+    string barInfo = "VISUALIZATION MODALITY:  " + configParameter->at("MODALITY");
+    statusBarInfo.push_back(barInfo);
+
     //If I want to use the same dimension for each brother
     int TYPE_NODE_DIMENSION = stoi(configParameter->at("TYPE_NODE_DIMENSION"));
     if (TYPE_NODE_DIMENSION == 1 || TYPE_NODE_DIMENSION == 2) {
@@ -269,3 +278,39 @@ bool SvgCreator::checkConfigParameter(map<string, string> *configParameter, Node
 
     return true;
 }
+
+void SvgCreator::printStatusBar(std::ofstream *svg_out) {
+
+    int font_size = 15;
+    int heigth = 40 + (font_size+5) * statusBarInfo.size();
+    int x = 20;
+    int width = stoi(configParameter->at("WINDOW_WIDTH")) - x*2;
+
+    int y = stoi(configParameter->at("WINDOW_HEIGHT")) - heigth -20;
+    string bar = "<rect x=\""+to_string(x)+"\" y=\""+to_string(y)+"\" rx=\"10\" ry=\"10\" width=\""+to_string(width)+"\" height=\""+to_string(heigth)+"\"\n"
+                 "  style=\"fill:white;stroke:black;stroke-width:5;opacity:1.0\" />";
+
+    int textX = x + 50;
+    int textY = y+40;
+
+
+
+    for (int i = 0; i < statusBarInfo.size(); i++) {
+        int y1 = textY + i * (font_size +5);
+        bar += "<text x=\""+to_string(textX)+"\" y=\""+to_string(y1)+"\" \n";
+        bar += "font-family=\"Verdana\" font-size=\""+to_string(font_size)+"\" fill=\"black\" >\n";
+        bar += statusBarInfo.at(i);
+        bar += "  </text>";
+    }
+
+
+
+    char str[bar.length()];
+    strcpy(str, bar.c_str());
+
+    *svg_out << str;
+
+}
+
+
+

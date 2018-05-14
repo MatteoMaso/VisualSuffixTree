@@ -26,6 +26,7 @@ public:
 
 private:
 
+    map<string, string> *configParameter;
     map<int, ObjNode> hashmap; //Useful only when we represent the dimension of the child equel to the dim of the brother
     int H; //the height of the block
     double x0, y0, w, x, y, rectWidth, rootNodeWidth;
@@ -36,6 +37,10 @@ private:
     bool SVG_FROM_TOP;
     int BASIC_KVALUE_KMER;
     bool BASIC_KMER;
+
+    vector<string> statusBarInfo = {"STATUS BAR"};
+
+    void printStatusBar(std::ofstream *svg_out);
 
     void setPositionTYPE_NODE_DIMENSION2(){
         if ((frequency) == 0) {
