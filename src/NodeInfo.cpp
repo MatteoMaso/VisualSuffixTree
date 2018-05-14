@@ -327,4 +327,3 @@ string NodeInfo::childrenToEncodedString(vector<int> v) {
     return tmp;
 }
 
-

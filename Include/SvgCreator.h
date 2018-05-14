@@ -34,7 +34,8 @@ private:
     double scaleUnit = 0;
     string nodeInfo;
     bool SVG_FROM_TOP;
-
+    int BASIC_KVALUE_KMER;
+    bool BASIC_KMER;
 
     void setPositionTYPE_NODE_DIMENSION2(){
         if ((frequency) == 0) {

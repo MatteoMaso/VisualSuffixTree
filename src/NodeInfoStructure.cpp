@@ -192,4 +192,3 @@ void NodeInfoStructure::setAlphabet(string alphabetString) {
     }
 }
 
-

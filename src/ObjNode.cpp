@@ -11,12 +11,12 @@
 using namespace std;
 
 ObjNode::ObjNode() {
-     objNodeDepth = 0;
-     objNodeX = 0;
-     objNodeY = 0;
-     objNodeWid = 0;
-     numberOfChildren = 0;
-     sonsCount = 0;
+    objNodeDepth = 0;
+    objNodeX = 0;
+    objNodeY = 0;
+    objNodeWid = 0;
+    numberOfChildren = 0;
+    sonsCount = 0;
 }
 
 int ObjNode::getObjNodeDepth(){

@@ -42,9 +42,10 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
     //PARAMETER THAT I NEED
     SVG_FROM_TOP = stoi(configParameter->at("SVG_FROM_TOP")) == 1;
+    BASIC_KVALUE_KMER =  stoi(configParameter->at("BASIC_KVALUE_KMER"));
+    BASIC_KMER = stoi(configParameter->at("BASIC_KMER")) == 1;
 
-
-    RgbColor rgbColor, blenchedRgbColor;    //RGB COLOR
+    RgbColor rgbColor, blenchedRgbColor;    //RGB COLOR rgbColor : colore pieno, blenchedRgbColor: colore sfumato settato dal config
     HsvColor hsvColor, blenchedHsvColor;    //HSV COLOR
 
 
@@ -80,13 +81,13 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
         lb = nodeInfoObj.getLb();
         rb = nodeInfoObj.getRb();
         frequency = rb - lb;
-
+        ObjNode objNode = ObjNode(); //lo creo fuori dalle varie opzioni
         if (stoi(configParameter->at("TYPE_NODE_DIMENSION")) == 1) {
             //means each children have the same dimension of their brother
             fatherLabel = nodeInfoObj.getFatherLabel();
             label = nodeInfoObj.getLabel();
 
-            ObjNode objNode = ObjNode();
+
             objNode.setObjNodeDepth(nodeDepth);
             if (nodeDepth == 0) {
                 count = 1; // c'è solo la root
@@ -102,6 +103,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                 objNode.setObjNodeX(x);
                 objNode.setObjNodeY(y);
                 objNode.setNumberOfChildren(nodeInfoObj.getNumbrOfChildren());
+                objNode.setObjNodeDepth(depth);
                 pair<int, ObjNode> element = {label, objNode};
                 hashmap.insert(element);
             } else { //altrimenti scalo la larghezza per la larghezza del suffix interval
@@ -130,6 +132,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                 objNode.setObjNodeY(y);
                 objNode.setObjNodeX(x);
                 objNode.setNumberOfChildren(nodeInfoObj.getNumbrOfChildren());
+                objNode.setObjNodeDepth(depth);
 
                 //settati tutti i parametri inserisco l'oggetto nodo nella mappa
                 pair<int, ObjNode> element = {label, objNode};
@@ -145,6 +148,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                 x = x0;
                 y = y0;
                 scaleUnit = rootNodeWidth / rb;
+
             } else {
                 //altrimenti scalo la larghezza per la larghezza del suffix interval
                 setPositionTYPE_NODE_DIMENSION2();
@@ -160,25 +164,32 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
             edge = nodeInfoObj.getEdgeDecoded();
         }
 
-        //SETTING COLOR
-        if (stoi(configParameter->at("BASIC_FREQUENCY_COLOR_TYPE")) == 1) {
-            //the frequency is representing with a gradient color
-            blenchedHsvColor.v = 100;
-            blenchedHsvColor.s = (100 * frequency) / maxSuffixArrayLength + 40;
-
-            SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, SvgUtils::HsvToRgb(blenchedHsvColor));
-
-        } else if (stoi(configParameter->at("BASIC_FREQUENCY_COLOR_TYPE")) == 2) {
-            //the node with a frequency lower than a setted thresold are bleached.
-            if ((frequency >= stoi(configParameter->at("BASIC_FREQUENCY_THRESHOLD"))) && (depth >= stoi(configParameter->at("BASIC_DEPTH_THRESHOLD")))) { //Full color
+        if(BASIC_KMER && stoi(configParameter->at("TYPE_NODE_DIMENSION")) == 1){
+            if (nodeInfoObj.getDepth()>= BASIC_KVALUE_KMER && hashmap[nodeInfoObj.getFatherLabel()].getObjNodeDepth()<BASIC_KVALUE_KMER) { //Full color
                 SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, rgbColor);
             } else { //Blenched
                 SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, blenchedRgbColor);
             }
-
-        } else {
-            SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, rgbColor);
         }
+        //SETTING COLOR
+//        if (stoi(configParameter->at("BASIC_FREQUENCY_COLOR_TYPE")) == 1) {
+//            //the frequency is representing with a gradient color
+//            blenchedHsvColor.v = 100;
+//            blenchedHsvColor.s = (100 * frequency) / maxSuffixArrayLength + 40;
+//
+//            SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, SvgUtils::HsvToRgb(blenchedHsvColor));
+//
+//        } else if (stoi(configParameter->at("BASIC_FREQUENCY_COLOR_TYPE")) == 2) {
+//            //the node with a frequency lower than a setted thresold are bleached.
+//            if ((frequency >= stoi(configParameter->at("BASIC_FREQUENCY_THRESHOLD"))) && (depth >= stoi(configParameter->at("BASIC_DEPTH_THRESHOLD")))) { //Full color
+//                SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, rgbColor);
+//            } else { //Blenched
+//                SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, blenchedRgbColor);
+//            }
+//
+//        } else {
+//            SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, rgbColor);
+//        }
 
     }
 
@@ -258,6 +269,3 @@ bool SvgCreator::checkConfigParameter(map<string, string> *configParameter, Node
 
     return true;
 }
-
-
-
