@@ -17,7 +17,7 @@ class NodeInfoStructure {
 
 public:
 
-    NodeInfoStructure(map<string, string> *configParameter);
+    NodeInfoStructure(map<string, string> *configParameter, char *inputFileName);
 
     //For encoder
     NodeInfoStructure(string headerInfo, map<string, string> *configParameter);
@@ -96,6 +96,9 @@ public:
     }
 
 private:
+    string getAlphabet(char *inputFileName);
+
+    long getStringLength(char * inputFileName);
 
     void setAlphabet(string alphabetString);
 

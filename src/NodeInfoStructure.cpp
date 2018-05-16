@@ -6,13 +6,17 @@
 #include <math.h>       /* log10 */
 #include <sstream>
 #include <map>
+#include <fstream>
 #include "../Include/ConfigParser.h"
 #include "../Include/NodeInfoStructure.h"
 
 
 //FOR ENCODER
-NodeInfoStructure::NodeInfoStructure(map<string, string> *configParameter) {
+NodeInfoStructure::NodeInfoStructure(map<string, string> *configParameter, char *inputFileName) {
 
+    long stringLength = getStringLength(inputFileName);
+    string alphabet = getAlphabet(inputFileName);
+    
     //NUMBER OF BIT FOR EACH FIELD REPRESENTATION
     //AQUIRE PARAMETER FROM CONFIG FILE
     this->parameter[INDEX_BIT_DEPTH] = stoi(configParameter->at("bitDepth"));
@@ -24,8 +28,8 @@ NodeInfoStructure::NodeInfoStructure(map<string, string> *configParameter) {
     this->parameter[INDEX_BIT_EDGELENGTH] = stoi(configParameter->at("bitEdgeLength"));
     this->parameter[INDEX_BIT_EDGECHARACTERENCODING] = stoi(configParameter->at("bitEdgeCharacterEncoding"));
     this->parameter[INDEX_BIT_NUMBEROFCHILDREN] = stoi(configParameter->at("bitNumberOfChildren"));
-    this->parameter[INDEX_BIT_CHILDRENID] = stoi(
-            configParameter->at("bitChildrenId")); //se lo metto variabile devo cambiare sotto
+    this->parameter[INDEX_BIT_CHILDRENID] = stoi(configParameter->at("bitChildrenId")); //se lo metto variabile devo cambiare sotto
+//    this->parameter[INDEX_BIT_STRINGLENGTH] = stringLength;
 
     //AQUIRE THE INFO THAT I WANT TO REPRESENT FROM THE CONFIG FILE
     //standard information:
@@ -61,7 +65,7 @@ NodeInfoStructure::NodeInfoStructure(map<string, string> *configParameter) {
         this->OPT_CHILDREN_INFO = false;
     }
 
-    setAlphabet(configParameter->at("ALPHABET"));
+    setAlphabet(alphabet);
 }
 
 //FOR DECODER
@@ -191,4 +195,68 @@ void NodeInfoStructure::setAlphabet(string alphabetString) {
             break;
     }
 }
+
+long NodeInfoStructure::getStringLength(char *inputFileName) {
+    string txt;
+    ifstream file(inputFileName);
+
+    if (file.is_open())
+        while (file.good())
+            getline(file, txt);
+    file.close();
+
+    return txt.length();
+}
+
+bool contains(vector<string> * character, string c){
+    for (int i = 0; i < character->size(); i++) {
+        string s = character->at(i);
+        if ( character->at(i).compare(c) == 0 ){
+            return true;
+        }
+    }
+
+    return false;
+}
+
+string NodeInfoStructure::getAlphabet(char *inputFileName) {
+
+    string txt;
+    ifstream file(inputFileName);
+
+    if (file.is_open())
+        while (file.good())
+            getline(file, txt);
+    file.close();
+    
+    vector<string> character = {};
+    string c;
+    for (int i = 0; i < txt.length(); i++) {
+        c = txt[i];
+        if ( !contains(&character, c) ){
+            character.push_back(c);
+        }
+    }
+
+    string alp = "$";
+
+    for (int j = 0; j < character.size(); j++) {
+        std::cout << character.at(j) <<std::endl;
+        string ca = string(character.at(j));
+        alp.append("," + character.at(j));
+//        alp += "," + ;
+    }
+    
+    return alp;
+}
+
+
+
+
+
+
+
+
+
+
 

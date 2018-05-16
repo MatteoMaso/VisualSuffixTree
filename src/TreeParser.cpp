@@ -25,14 +25,14 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
     typedef cst_bfs_iterator<cst_t> iterator;
     iterator begin = iterator(&cst, cst.root());
     iterator end = iterator(&cst, cst.root(), true, true);
-
+    
     //SET VERBOSE
     VERBOSE = (stoi(configParameter->at("VERBOSE"))) == 1;
 
     //PREPARE THE OUTPUT FILE AND PARAMETER
     std::ofstream bin_out(outputFileName, std::ios::out | std::ios::binary);
 
-    NodeInfoStructure nodeInfoStructure(configParameter);
+    NodeInfoStructure nodeInfoStructure(configParameter, inputFileName);
 
     Header header(&nodeInfoStructure);
     string headerString = header.getString();
@@ -203,3 +203,4 @@ bool TreeParser::checkNumberOfBit(int nBit, NodeInfoStructure *nodeInfoStructure
 
     return true;
 }
+
