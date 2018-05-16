@@ -43,8 +43,8 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
     //PARAMETER THAT I NEED
     SVG_FROM_TOP = stoi(configParameter->at("SVG_FROM_TOP")) == 1;
-    BASIC_KVALUE_KMER =  stoi(configParameter->at("BASIC_KVALUE_KMER"));
-    BASIC_KMER = stoi(configParameter->at("BASIC_KMER")) == 1;
+    BASIC_KVALUE_KMER = stoi(configParameter->at("BASIC_KVALUE_KMER"));
+    string modality = configParameter->at("MODALITY");
 
     RgbColor rgbColor, blenchedRgbColor;    //RGB COLOR rgbColor : colore pieno, blenchedRgbColor: colore sfumato settato dal config
     HsvColor hsvColor, blenchedHsvColor;    //HSV COLOR
@@ -66,137 +66,169 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
         y0 = stoi(configParameter->at("WINDOW_HEIGHT")) - 40;
     }
 
+    //BASIC MODALITY
+    if (modality.compare("BASIC") == 0) {
+        NodeInfo nodeInfoObj(&nodeStructure);
+        while (!bio2.empty()) {
 
-    NodeInfo nodeInfoObj(&nodeStructure);
-    while (!bio2.empty()) {
+            //READ AN OTHER NODE AND PUT THE INFOMATION INSIDE THE nodeInfoObj
+            nodeInfo = readNextNodeInfo(&bio2);
+            nodeInfoObj.setNodeField(&nodeInfo);
 
-        //READ AN OTHER NODE AND PUT THE INFOMATION INSIDE THE nodeInfoObj
-        nodeInfo = readNextNodeInfo(&bio2);
-        nodeInfoObj.setNodeField(&nodeInfo);
+            if (VERBOSE) std::cout << nodeInfoObj.print() << std::endl;
 
-        if (VERBOSE) std::cout << nodeInfoObj.print() << std::endl;
-
-        //ACQUIRE THE DEFAULT PARAMETERS
-        nodeDepth = nodeInfoObj.getNodeDepth();
-        depth = nodeInfoObj.getDepth();
-        lb = nodeInfoObj.getLb();
-        rb = nodeInfoObj.getRb();
-        frequency = rb - lb;
-//        if ( frequency < 25){
-//            continue;
-//        }
-
-        ObjNode objNode = ObjNode(); //lo creo fuori dalle varie opzioni
-        if (stoi(configParameter->at("TYPE_NODE_DIMENSION")) == 1) {
-            //means each children have the same dimension of their brother
+            //ACQUIRE THE DEFAULT PARAMETERS
+            nodeDepth = nodeInfoObj.getNodeDepth();
+            depth = nodeInfoObj.getDepth();
+            lb = nodeInfoObj.getLb();
+            rb = nodeInfoObj.getRb();
+            frequency = rb - lb;
             fatherLabel = nodeInfoObj.getFatherLabel();
             label = nodeInfoObj.getLabel();
 
+            if (stoi(configParameter->at("BASIC_CUT_NODE")) == 1) {
+                if (frequency < stoi(configParameter->at("NODE_FREQUENCY_THRESHOLD"))) {
+                    continue;
+                }
+            }
 
+            if (stoi(configParameter->at("TYPE_NODE_DIMENSION")) == 1) {
+                //means each children have the same dimension of their brother
+
+                if (nodeDepth == 0) {
+                    count = 1; // c'è solo la root
+                } else {
+                    count = hashmap[fatherLabel].getNumberOfChildren() +
+                            1;// numero di figli del padre del nodo che sto valutando compreso se stesso
+                }
+
+                if (nodeDepth == 0) {
+                    w = rootNodeWidth;
+                    x = x0;
+                    y = y0;
+
+                } else { //altrimenti scalo la larghezza per la larghezza del suffix interval
+
+                    hashmap[fatherLabel].incCounter();
+                    int actSons = hashmap[fatherLabel].getSonsCount();
+                    float fatWid = hashmap[fatherLabel].getObjNodeWid();
+                    double fatX = hashmap[fatherLabel].getObjNodeX();
+                    double fatY = hashmap[fatherLabel].getObjNodeY();
+                    if ((rb == lb)) {
+                        w = 0;
+
+                    } else { //(rb != lb)
+                        w = fatWid / count;
+                    }
+
+                    x = fatX + (actSons * w);
+                    if (stoi(configParameter->at("SVG_FROM_TOP")) == 1) {
+                        y = fatY + H + 1;
+                    } else {
+                        y = fatY - H - 1;
+                    }
+                }
+
+            } else if (stoi(configParameter->at("TYPE_NODE_DIMENSION")) == 2) {
+                //means the dimensions of a node is proportional with the depth
+                if (nodeDepth == 0) {  //Root is large as the windows minus a border
+                    w = rootNodeWidth;
+                    maxSuffixArrayLength = rb;
+                    x = x0;
+                    y = y0;
+                    scaleUnit = rootNodeWidth / rb;
+                } else {
+                    //altrimenti scalo la larghezza per la larghezza del suffix interval
+                    setPositionTYPE_NODE_DIMENSION2();
+                }
+
+            } else {
+                printf("Error not valid TYPE_NODE_DIMENSION");
+                exit(-1);
+            }
+
+            ObjNode objNode = ObjNode(); //lo creo fuori dalle varie opzioni
             objNode.setObjNodeDepth(nodeDepth);
-            if (nodeDepth == 0) {
-                count = 1; // c'è solo la root
-            } else {
-                count = hashmap[fatherLabel].getNumberOfChildren() + 1;// numero di figli del padre del nodo che sto valutando compreso se stesso
+            objNode.setObjNodeWid(w);
+            objNode.setObjNodeX(x);
+            objNode.setObjNodeY(y);
+            objNode.setNumberOfChildren(nodeInfoObj.getNumbrOfChildren());
+            objNode.setObjNodeDepth(depth);
+            pair<int, ObjNode> element = {label, objNode};
+            hashmap.insert(element);
+
+            //SETTINGS EDGE INFO
+            if (stoi(configParameter->at("SHOW_EDGE_INFO")) == 1) {
+                edge = nodeInfoObj.getEdgeDecoded();
             }
 
-            if (nodeDepth == 0) {
-                w = rootNodeWidth;
-                x = x0;
-                y = y0;
-                objNode.setObjNodeWid(w);
-                objNode.setObjNodeX(x);
-                objNode.setObjNodeY(y);
-                objNode.setNumberOfChildren(nodeInfoObj.getNumbrOfChildren());
-                objNode.setObjNodeDepth(depth);
-                pair<int, ObjNode> element = {label, objNode};
-                hashmap.insert(element);
-            } else { //altrimenti scalo la larghezza per la larghezza del suffix interval
 
-                hashmap[fatherLabel].incCounter();
-                int actSons = hashmap[fatherLabel].getSonsCount();
-                float fatWid = hashmap[fatherLabel].getObjNodeWid();
-                double fatX = hashmap[fatherLabel].getObjNodeX();
-                double fatY = hashmap[fatherLabel].getObjNodeY();
-                if ((rb == lb)) {
-                    w = 0;
 
+
+            //SETTING COLOR ACCORDING WITH WHAT I WANT TO SHOW
+            string BASIC_INFO_TO_VISUALIZE = configParameter->at("BASIC_INFO_TO_VISUALIZE");
+            if (BASIC_INFO_TO_VISUALIZE.compare("DEPTH") == 0) {
+                long depthThreshold = stoi(configParameter->at("BASIC_DEPTH_THRESHOLD"));
+                if (stoi(configParameter->at("BASIC_DEPTH_WITH_THRESHOLD")) == 1) {
+                    if ( nodeInfoObj.getDepth() > depthThreshold){
+                        SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, blenchedRgbColor);
+                    } else {
+                        SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, rgbColor);
+                    }
                 } else {
-                    //(rb != lb)
-                    w = fatWid / count;
+                    //COLOR WITH A DEPTH GRADIENT
+                    //bisogna farla in proporzione alla depth della stringa
+                    std::cout << "to be implement" << std::endl;
                 }
 
-                x = fatX + (actSons * w);
-                if (stoi(configParameter->at("SVG_FROM_TOP")) == 1) {
-                    y = fatY + H + 1;
-                } else {
-                    y = fatY - H - 1;
+
+            } else if (BASIC_INFO_TO_VISUALIZE.compare("KMER") == 0) {
+
+
+                if (nodeInfoObj.getDepth() >= BASIC_KVALUE_KMER &&
+                    hashmap[nodeInfoObj.getFatherLabel()].getObjNodeDepth() < BASIC_KVALUE_KMER) { //Full color
+                    SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, rgbColor);
+                } else { //Blenched
+                    SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, blenchedRgbColor);
                 }
 
-                objNode.setObjNodeWid(w);
-                objNode.setObjNodeY(y);
-                objNode.setObjNodeX(x);
-                objNode.setNumberOfChildren(nodeInfoObj.getNumbrOfChildren());
-                objNode.setObjNodeDepth(depth);
 
-                //settati tutti i parametri inserisco l'oggetto nodo nella mappa
-                pair<int, ObjNode> element = {label, objNode};
-                hashmap.insert(element);
+            } else if (BASIC_INFO_TO_VISUALIZE.compare("FREQUENCY") == 0) {
+                if (stoi(configParameter->at("BASIC_FREQUENCY_COLOR_TYPE")) == 1) {
+                    //the frequency is representing with a gradient color
+                    blenchedHsvColor.v = 100;
+                    blenchedHsvColor.s = (100 * frequency) / maxSuffixArrayLength + 40;
 
-            }
+                    SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, SvgUtils::HsvToRgb(blenchedHsvColor));
 
-        } else if (stoi(configParameter->at("TYPE_NODE_DIMENSION")) == 2) {
-            //means the dimensions of a node is proportional with the depth
-            if (nodeDepth == 0) {  //Root is large as the windows minus a border
-                w = rootNodeWidth;
-                maxSuffixArrayLength = rb;
-                x = x0;
-                y = y0;
-                scaleUnit = rootNodeWidth / rb;
+                } else if (stoi(configParameter->at("BASIC_FREQUENCY_COLOR_TYPE")) == 2) {
+                    //the node with a frequency lower than a setted thresold are bleached.
+                    if ((frequency >= stoi(configParameter->at("BASIC_FREQUENCY_THRESHOLD"))) &&
+                        (depth >= stoi(configParameter->at("BASIC_DEPTH_THRESHOLD")))) { //Full color
+                        SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, rgbColor);
+                    } else { //Blenched
+                        SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, blenchedRgbColor);
+                    }
+                } else {
+                    //deault
+                    std::cout << "Error occure in config frequency option" << std::endl;
+                }
+
             } else {
-                //altrimenti scalo la larghezza per la larghezza del suffix interval
-                setPositionTYPE_NODE_DIMENSION2();
-            }
-
-        } else {
-            printf("Error not valid TYPE_NODE_DIMENSION");
-            exit(-1);
-        }
-
-        //SETTINGS EDGE INFO
-        if (stoi(configParameter->at("SHOW_EDGE_INFO")) == 1) {
-            edge = nodeInfoObj.getEdgeDecoded();
-        }
-
-        if(BASIC_KMER && stoi(configParameter->at("TYPE_NODE_DIMENSION")) == 1){
-            if (nodeInfoObj.getDepth()>= BASIC_KVALUE_KMER && hashmap[nodeInfoObj.getFatherLabel()].getObjNodeDepth()<BASIC_KVALUE_KMER) { //Full color
+                //default
                 SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, rgbColor);
-            } else { //Blenched
-                SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, blenchedRgbColor);
             }
+
+
         }
-        //SETTING COLOR
-//        if (stoi(configParameter->at("BASIC_FREQUENCY_COLOR_TYPE")) == 1) {
-//            //the frequency is representing with a gradient color
-//            blenchedHsvColor.v = 100;
-//            blenchedHsvColor.s = (100 * frequency) / maxSuffixArrayLength + 40;
-//
-//            SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, SvgUtils::HsvToRgb(blenchedHsvColor));
-//
-//        } else if (stoi(configParameter->at("BASIC_FREQUENCY_COLOR_TYPE")) == 2) {
-//            //the node with a frequency lower than a setted thresold are bleached.
-//            if ((frequency >= stoi(configParameter->at("BASIC_FREQUENCY_THRESHOLD"))) && (depth >= stoi(configParameter->at("BASIC_DEPTH_THRESHOLD")))) { //Full color
-//                SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, rgbColor);
-//            } else { //Blenched
-//                SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, blenchedRgbColor);
-//            }
-//
-//        } else {
-//            SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, rgbColor);
-//        }
-
+    } else if (modality.compare("STATISTIC") == 0) {
+        std::cout << "NOT IMPLEMENTED YET" << std::endl;
+    } else if (modality.compare("MAXREP") == 0) {
+        std::cout << "NOT IMPLEMENTED YET" << std::endl;
+    } else {
+        //error
+        exit(-1);
     }
-
 
     printStatusBar(&svg_out);
     char svgEnd[] = {"</svg>"};  //Close the SVG File
@@ -242,39 +274,52 @@ bool SvgCreator::checkConfigParameter(map<string, string> *configParameter, Node
     string barInfo = "VISUALIZATION MODALITY:  " + configParameter->at("MODALITY");
     statusBarInfo.push_back(barInfo);
 
-    //If I want to use the same dimension for each brother
-    int TYPE_NODE_DIMENSION = stoi(configParameter->at("TYPE_NODE_DIMENSION"));
-    if (TYPE_NODE_DIMENSION == 1 || TYPE_NODE_DIMENSION == 2) {
-        //ok
-    } else {
-        TYPE_NODE_DIMENSION = 2;
-    }
+    string modality = configParameter->at("MODALITY");
 
-    if (TYPE_NODE_DIMENSION == 1) {
-        //I need the children, lable and father label available
-        if (!(nodeInfoStructure->OPT_CHILDREN_INFO && nodeInfoStructure->OPT_FATHERLABLE &&
-              nodeInfoStructure->OPT_LABEL)) {
-
-            printf("if you chose TYPE_NODE_DIMENSION=1 you need: \n OPT_LABEL=1\n"
-                   " OPT_FATHERLABLE=1\n"
-                   " OPT_CHILDREN_INFO=1 \n Or you can chose TYPE_NODE_DIMENSION=2");
-            return false;
-        }
-    }
-
-    //CHECK EDGE AVAILABILITY
-    if (stoi(configParameter->at("SHOW_EDGE_INFO")) == 1) {
-        //show edge info if available
-        if (nodeInfoStructure->OPT_EDGEINFO) {
+    if (modality.compare("BASIC") == 0) {
+        //If I want to use the same dimension for each brother
+        int TYPE_NODE_DIMENSION = stoi(configParameter->at("TYPE_NODE_DIMENSION"));
+        if (TYPE_NODE_DIMENSION == 1 || TYPE_NODE_DIMENSION == 2) {
             //ok
         } else {
-            //the edge info is not available
-            printf("The edge info isn't available");
-            configParameter->at("SHOW_EDGE_INFO") = "0";
+            TYPE_NODE_DIMENSION = 2; //default 2
         }
+
+        if (TYPE_NODE_DIMENSION == 1) {
+            //I need the children, lable and father label available
+            if (!(nodeInfoStructure->OPT_CHILDREN_INFO && nodeInfoStructure->OPT_FATHERLABLE &&
+                  nodeInfoStructure->OPT_LABEL)) {
+
+                printf("if you chose TYPE_NODE_DIMENSION=1 you need: \n OPT_LABEL=1\n"
+                       " OPT_FATHERLABLE=1\n"
+                       " OPT_CHILDREN_INFO=1 \n Or you can chose TYPE_NODE_DIMENSION=2");
+                return false;
+            }
+        }
+
+        //CHECK EDGE AVAILABILITY
+        if (stoi(configParameter->at("SHOW_EDGE_INFO")) == 1) {
+            //show edge info if available
+            if (nodeInfoStructure->OPT_EDGEINFO) {
+                //ok
+            } else {
+                //the edge info is not available
+                printf("The edge info isn't available");
+                configParameter->at("SHOW_EDGE_INFO") = "0";
+            }
+        } else {
+            //ok
+        }
+    } else if (modality.compare("STATISTIC") == 0) {
+
+    } else if (modality.compare("MAXREP") == 0) {
+
     } else {
-        //ok
+        //error
+        std::cout << "MODALITY WRONG, you must chose one among: BASIC, STATISTIC, MAXREP" << std::endl;
+        return false;
     }
+
 
     return true;
 }
@@ -282,27 +327,26 @@ bool SvgCreator::checkConfigParameter(map<string, string> *configParameter, Node
 void SvgCreator::printStatusBar(std::ofstream *svg_out) {
 
     int font_size = 15;
-    int heigth = 40 + (font_size+5) * statusBarInfo.size();
+    int heigth = 40 + (font_size + 5) * statusBarInfo.size();
     int x = 20;
-    int width = stoi(configParameter->at("WINDOW_WIDTH")) - x*2;
+    int width = stoi(configParameter->at("WINDOW_WIDTH")) - x * 2;
 
-    int y = stoi(configParameter->at("WINDOW_HEIGHT")) - heigth -20;
-    string bar = "<rect x=\""+to_string(x)+"\" y=\""+to_string(y)+"\" rx=\"10\" ry=\"10\" width=\""+to_string(width)+"\" height=\""+to_string(heigth)+"\"\n"
-                 "  style=\"fill:white;stroke:black;stroke-width:5;opacity:1.0\" />";
+    int y = stoi(configParameter->at("WINDOW_HEIGHT")) - heigth - 20;
+    string bar = "<rect x=\"" + to_string(x) + "\" y=\"" + to_string(y) + "\" rx=\"10\" ry=\"10\" width=\"" +
+                 to_string(width) + "\" height=\"" + to_string(heigth) + "\"\n"
+                                                                         "  style=\"fill:white;stroke:black;stroke-width:5;opacity:1.0\" />";
 
     int textX = x + 50;
-    int textY = y+40;
-
+    int textY = y + 40;
 
 
     for (int i = 0; i < statusBarInfo.size(); i++) {
-        int y1 = textY + i * (font_size +5);
-        bar += "<text x=\""+to_string(textX)+"\" y=\""+to_string(y1)+"\" \n";
-        bar += "font-family=\"Verdana\" font-size=\""+to_string(font_size)+"\" fill=\"black\" >\n";
+        int y1 = textY + i * (font_size + 5);
+        bar += "<text x=\"" + to_string(textX) + "\" y=\"" + to_string(y1) + "\" \n";
+        bar += "font-family=\"Verdana\" font-size=\"" + to_string(font_size) + "\" fill=\"black\" >\n";
         bar += statusBarInfo.at(i);
         bar += "  </text>";
     }
-
 
 
     char str[bar.length()];

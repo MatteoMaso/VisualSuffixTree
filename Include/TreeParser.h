@@ -15,6 +15,9 @@ typedef cst_bfs_iterator<cst_t> iterator1;
 
 class TreeParser {
 public:
+
+    bool VERBOSE;
+
     TreeParser(char *inputFileName, char *outputFileName, map<string, string> *configParameter);
 
     void printBinFile(string &s, std::ofstream &bin_out);

@@ -27,7 +27,7 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
     iterator end = iterator(&cst, cst.root(), true, true);
 
     //SET VERBOSE
-    bool VERBOSE = (stoi(configParameter->at("VERBOSE"))) == 1;
+    VERBOSE = (stoi(configParameter->at("VERBOSE"))) == 1;
 
     //PREPARE THE OUTPUT FILE AND PARAMETER
     std::ofstream bin_out(outputFileName, std::ios::out | std::ios::binary);
@@ -45,33 +45,42 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
 
     //Check se il numero di bit sono sufficienti per rappresentare le informazione
     long p = cst.rb(*begin);
-    int nBit = log10(p)/log10(2);
-    if ( !checkNumberOfBit(nBit, &nodeInfoStructure)){
+    int nBit = log10(p) / log10(2);
+    if (!checkNumberOfBit(nBit, &nodeInfoStructure)) {
         exit(-1);
     }
 
+    long numberOfNode = cst.id(cst.root());
+    std::cout << numberOfNode << std::endl;
 
+    long counter = 0;
+    int percentage, percentareOld;
     for (iterator it = begin; it != end; ++it) {
-
+        counter++;
+        percentareOld = percentage;
+        percentage = (counter * 100) / numberOfNode;
+        if ( percentage != percentareOld){
+            std::cout << percentage << "%" << std::endl;
+        }
         nodeInfoObj.setDepth(cst.depth(*it));
         nodeInfoObj.setNodeDepth(cst.node_depth(*it));
         nodeInfoObj.setLb(cst.lb(*it));
         nodeInfoObj.setRb(cst.rb(*it));
 
-        if (nodeInfoStructure.OPT_LABEL){
+        if (nodeInfoStructure.OPT_LABEL) {
             nodeInfoObj.setLabel(cst.id(*it));
         }
 
-        if (nodeInfoStructure.OPT_FATHERLABLE){
+        if (nodeInfoStructure.OPT_FATHERLABLE) {
             nodeInfoObj.setFatherLabel(cst.id(cst.parent(*it)));
         }
 
-        if( nodeInfoStructure.OPT_EDGEINFO){
+        if (nodeInfoStructure.OPT_EDGEINFO) {
             string new_edge = getEdge(&cst, &it);
             nodeInfoObj.setEdge(&new_edge);
         }
 
-        if ( nodeInfoStructure.OPT_CHILDREN_INFO){
+        if (nodeInfoStructure.OPT_CHILDREN_INFO) {
             //SET CHILDREN ID
             vector<int> childrenID; //support structure
             for (auto &child: cst.children(*it)) {
@@ -136,13 +145,11 @@ void TreeParser::printNode(NodeInfo *nodeInfo, std::ofstream *bin_out) {
     string length = std::bitset<16>(nodeInfoLength).to_string();
     string completeString = length + nodeInfoFromObj;
 
-#if VERBOSE == 1
-    std::cout << completeString << std::endl;
-#endif
+    if (VERBOSE) {
+        std::cout << completeString << std::endl;
+    }
 
     printBinFile(completeString, *bin_out);
-
-
 }
 
 string TreeParser::getEdge(cst_t *cst, iterator1 *it) {
@@ -181,13 +188,14 @@ string TreeParser::getEdge(cst_t *cst, iterator1 *it) {
 
 }
 
-bool TreeParser::checkNumberOfBit(int nBit, NodeInfoStructure * nodeInfoStructure){
+bool TreeParser::checkNumberOfBit(int nBit, NodeInfoStructure *nodeInfoStructure) {
     if (
             nodeInfoStructure->getBitDepth() <= nBit ||
             nodeInfoStructure->getBitNodeDepth() <= nBit ||
             nodeInfoStructure->getBitRb() <= nBit ||
-            nodeInfoStructure->getBitLb() <= nBit ){
-        std::cout << "You need at least " << nBit + 1<< " for depth, nodedepth, lb, rb, label, fatherLabel" << std::endl;
+            nodeInfoStructure->getBitLb() <= nBit) {
+        std::cout << "You need at least " << nBit + 1 << " for depth, nodedepth, lb, rb, label, fatherLabel"
+                  << std::endl;
         return false;
     }
 
