@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
     if (strcmp(argv[1], firstProgram) == 0) {
         TreeParser(argv[2], argv[3], &configParameter);
     } else if (strcmp(argv[1], secondProgram) == 0) {
-        SvgCreator svgCreator(argv[2], argv[3], &configParameter);
+        SvgCreator svgCreator(argv[2], argv[3], &configParameter, argv[4]);
     } else {
         printf("Bad arguments!");
     }

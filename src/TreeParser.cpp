@@ -203,4 +203,3 @@ bool TreeParser::checkNumberOfBit(int nBit, NodeInfoStructure *nodeInfoStructure
 
     return true;
 }
-

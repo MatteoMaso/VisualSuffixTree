@@ -16,9 +16,11 @@ class SvgCreator{
 
 public:
 
+    long numberOfNode;
 
+    long stringLength;
 
-    SvgCreator(char *inputFileName, char *outputFile, map<string, string> *configParameter);
+    SvgCreator(char *inputFileName, char *outputFile, map<string, string> *configParameter, char * stringFileName);
 
     void openFile(std::ifstream *bin_in, char *inputFileName, BitIo<16> *bio);
 
@@ -38,9 +40,7 @@ private:
     int BASIC_KVALUE_KMER;
     bool BASIC_KMER;
 
-    vector<string> statusBarInfo = {"STATUS BAR"};
-
-    void printStatusBar(std::ofstream *svg_out);
+    void printStatusBar(std::ofstream *svg_out, map<string, string> *configParameter);
 
     void setPositionTYPE_NODE_DIMENSION2(){
         if ((frequency) == 0) {
@@ -178,6 +178,8 @@ private:
     }
 
     bool checkConfigParameter(map<string, string> *configParameter, NodeInfoStructure * nodeInfoStructure);
+
+    long getStringLength(char * inputFileName);
 };
 
 #endif //VISUALSUFFIXTREE_SVGCREATOR_H

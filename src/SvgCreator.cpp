@@ -16,7 +16,8 @@
 
 using namespace std;
 
-SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string> *configParameter) {
+SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string> *configParameter,
+                       char *stringFileName) {
 
     this->configParameter = configParameter;
     //READ BINARY FILE
@@ -27,6 +28,8 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
     //PARAMETER CONFIGURATION
     Header header = Header();
     header.readHeader(&bio2);
+    stringLength = getStringLength(stringFileName);
+
 
     //After reading header create the NodeInfoStructure
     NodeInfoStructure nodeStructure = NodeInfoStructure(header.getNodeInfoStructure(), configParameter);
@@ -106,6 +109,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                     w = rootNodeWidth;
                     x = x0;
                     y = y0;
+                    numberOfNode = label;
 
                 } else { //altrimenti scalo la larghezza per la larghezza del suffix interval
 
@@ -137,6 +141,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                     x = x0;
                     y = y0;
                     scaleUnit = rootNodeWidth / rb;
+                    numberOfNode = label;
                 } else {
                     //altrimenti scalo la larghezza per la larghezza del suffix interval
                     setPositionTYPE_NODE_DIMENSION2();
@@ -170,7 +175,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
             if (BASIC_INFO_TO_VISUALIZE.compare("DEPTH") == 0) {
                 long depthThreshold = stoi(configParameter->at("BASIC_DEPTH_THRESHOLD"));
                 if (stoi(configParameter->at("BASIC_DEPTH_WITH_THRESHOLD")) == 1) {
-                    if ( nodeInfoObj.getDepth() > depthThreshold){
+                    if (nodeInfoObj.getDepth() > depthThreshold) {
                         SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, blenchedRgbColor);
                     } else {
                         SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, rgbColor);
@@ -230,7 +235,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
         exit(-1);
     }
 
-    printStatusBar(&svg_out);
+    printStatusBar(&svg_out, configParameter);
     char svgEnd[] = {"</svg>"};  //Close the SVG File
     svg_out << svgEnd;
 
@@ -272,7 +277,6 @@ string SvgCreator::readNextNodeInfo(BitIo<16> *bio) {
 bool SvgCreator::checkConfigParameter(map<string, string> *configParameter, NodeInfoStructure *nodeInfoStructure) {
 
     string barInfo = "VISUALIZATION MODALITY:  " + configParameter->at("MODALITY");
-    statusBarInfo.push_back(barInfo);
 
     string modality = configParameter->at("MODALITY");
 
@@ -324,27 +328,29 @@ bool SvgCreator::checkConfigParameter(map<string, string> *configParameter, Node
     return true;
 }
 
-void SvgCreator::printStatusBar(std::ofstream *svg_out) {
+void SvgCreator::printStatusBar(std::ofstream *svg_out, map<string, string> *configParameter) {
+
+    string infoToPrint = "STATUS BAR    Modality: "+configParameter->at("MODALITY")+"         StringLength: "+to_string(stringLength)+"       #Nodes: "+to_string(numberOfNode);
 
     int font_size = 15;
-    int heigth = 40 + (font_size + 5) * statusBarInfo.size();
-    int x = 20;
-    int width = stoi(configParameter->at("WINDOW_WIDTH")) - x * 2;
+    int heigth = 40 + (font_size + 5) ;
+    int x = 0;
+    int width = stoi(configParameter->at("WINDOW_WIDTH"));
 
-    int y = stoi(configParameter->at("WINDOW_HEIGHT")) - heigth - 20;
-    string bar = "<rect x=\"" + to_string(x) + "\" y=\"" + to_string(y) + "\" rx=\"10\" ry=\"10\" width=\"" +
+    int y = stoi(configParameter->at("WINDOW_HEIGHT")) - heigth;
+    string bar = "<rect x=\"" + to_string(x) + "\" y=\"" + to_string(y) + "\" rx=\"0\" ry=\"0\" width=\"" +
                  to_string(width) + "\" height=\"" + to_string(heigth) + "\"\n"
-                                                                         "  style=\"fill:white;stroke:black;stroke-width:5;opacity:1.0\" />";
+                                                                         "  style=\"fill:white;stroke:black;stroke-width:1;opacity:1.0\" />";
 
     int textX = x + 50;
     int textY = y + 40;
 
 
-    for (int i = 0; i < statusBarInfo.size(); i++) {
+    for (int i = 0; i < 1; i++) {
         int y1 = textY + i * (font_size + 5);
         bar += "<text x=\"" + to_string(textX) + "\" y=\"" + to_string(y1) + "\" \n";
         bar += "font-family=\"Verdana\" font-size=\"" + to_string(font_size) + "\" fill=\"black\" >\n";
-        bar += statusBarInfo.at(i);
+        bar += infoToPrint;
         bar += "  </text>";
     }
 
@@ -356,5 +362,14 @@ void SvgCreator::printStatusBar(std::ofstream *svg_out) {
 
 }
 
+long SvgCreator::getStringLength(char *inputFileName) {
+    string txt;
+    ifstream file(inputFileName);
 
+    if (file.is_open())
+        while (file.good())
+            getline(file, txt);
+    file.close();
 
+    return txt.length();
+}
