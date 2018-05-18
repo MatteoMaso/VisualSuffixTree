@@ -70,10 +70,11 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
     }
 
 
+    NodeInfo nodeInfoObj(&nodeStructure);
     //BASIC MODALITY
     if (modality.compare("BASIC") == 0) {
 
-        NodeInfo nodeInfoObj(&nodeStructure);
+
         while (!bio2.empty()) {
 
             //READ AN OTHER NODE AND PUT THE INFOMATION INSIDE THE nodeInfoObj
@@ -224,7 +225,6 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
             }
 
 
-
         }
 
         infoStatusBar = "STATUS BAR    Modality: Basic     StringLength: " +
@@ -233,7 +233,83 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
     } else if (modality.compare("STATISTIC") == 0) {
         std::cout << "NOT IMPLEMENTED YET" << std::endl;
     } else if (modality.compare("MAXREP") == 0) {
-        std::cout << "NOT IMPLEMENTED YET" << std::endl;
+        while (!bio2.empty()) {
+
+            //READ AN OTHER NODE AND PUT THE INFOMATION INSIDE THE nodeInfoObj
+            nodeInfo = readNextNodeInfo(&bio2);
+            nodeInfoObj.setNodeField(&nodeInfo);
+
+            if (VERBOSE) std::cout << nodeInfoObj.print() << std::endl;
+
+            //ACQUIRE THE DEFAULT PARAMETERS
+            nodeDepth = nodeInfoObj.getNodeDepth();
+            depth = nodeInfoObj.getDepth();
+            lb = nodeInfoObj.getLb();
+            rb = nodeInfoObj.getRb();
+            frequency = rb - lb;
+            fatherLabel = nodeInfoObj.getFatherLabel();
+            label = nodeInfoObj.getLabel();
+
+
+//            if (stoi(configParameter->at("BASIC_CUT_NODE")) == 1) {
+//                if (frequency < stoi(configParameter->at("NODE_FREQUENCY_THRESHOLD"))) {
+//                    continue;
+//                }
+//            }
+
+
+            //means the dimensions of a node is proportional with the depth
+            if (nodeDepth == 0) {  //Root is large as the windows minus a border
+                w = rootNodeWidth;
+                maxSuffixArrayLength = rb;
+                x = x0;
+                y = y0;
+                scaleUnit = rootNodeWidth / (rb + 1);
+                numberOfNode = label;
+            } else {
+                //altrimenti scalo la larghezza per la larghezza del suffix interval
+                setPositionTYPE_NODE_DIMENSION2();
+            }
+
+
+            ObjNode objNode = ObjNode(); //lo creo fuori dalle varie opzioni
+            objNode.setObjNodeDepth(nodeDepth);
+            objNode.setObjNodeWid(w);
+            objNode.setObjNodeX(x);
+            objNode.setObjNodeY(y);
+            objNode.setNumberOfChildren(nodeInfoObj.getNumbrOfChildren());
+            objNode.setObjNodeDepth(depth);
+            pair<int, ObjNode> element = {label, objNode};
+            hashmap.insert(element);
+
+            //SETTINGS EDGE INFO
+            if (stoi(configParameter->at("SHOW_EDGE_INFO")) == 1) {
+                edge = nodeInfoObj.getEdgeDecoded();
+            }
+
+            //SETTING COLOR ACCORDING WITH WHAT I WANT TO SHOW
+            if (stoi(configParameter->at("MAXREP_SHOW_MAX_REP")) == 1){
+                //colora i max rep e sfuma gli altri
+                int nWl =  nodeInfoObj.getNumberOfWl();
+                if ( nWl == 1 ){
+                    SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, rgbColor, 1);
+                } else {
+                    if( stoi(configParameter->at("MAXREP_BLENCHED")) == 1){
+                        SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, rgbColor, 1-0.1*nWl);
+                    }else {
+                        SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, rgbColor, 0.5);
+                    }
+                }
+            }else {
+                //default
+                SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, rgbColor, 0.5);
+
+            }
+
+        }
+
+        infoStatusBar = "STATUS BAR    Modality: MaxRep     StringLength: " +
+                        to_string(stringLength) + "       #Nodes: " + to_string(numberOfNode);
     } else {
         //error
         exit(-1);

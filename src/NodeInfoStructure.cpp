@@ -28,7 +28,9 @@ NodeInfoStructure::NodeInfoStructure(map<string, string> *configParameter, char 
     this->parameter[INDEX_BIT_EDGELENGTH] = stoi(configParameter->at("bitEdgeLength"));
     this->parameter[INDEX_BIT_EDGECHARACTERENCODING] = stoi(configParameter->at("bitEdgeCharacterEncoding"));
     this->parameter[INDEX_BIT_NUMBEROFCHILDREN] = stoi(configParameter->at("bitNumberOfChildren"));
-    this->parameter[INDEX_BIT_CHILDRENID] = stoi(configParameter->at("bitChildrenId")); //se lo metto variabile devo cambiare sotto
+    this->parameter[INDEX_BIT_CHILDRENID] = 32; //stoi(configParameter->at("bitChildrenId")); //se lo metto variabile devo cambiare sotto
+    this->parameter[INDEX_BIT_NUMBEROFWL] = 8; //todo metterlo = ai bit usati per il charEncoding
+
 
     //AQUIRE THE INFO THAT I WANT TO REPRESENT FROM THE CONFIG FILE
     //standard information:

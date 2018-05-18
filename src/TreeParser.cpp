@@ -16,7 +16,6 @@ using namespace sdsl;
 
 typedef cst_sct3<> cst_t;
 
-
 TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, string> *configParameter) {
 
     //SUFFIX TREE STRUCTURE
@@ -55,7 +54,7 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
 
     long counter = 0;
     int percentage, percentareOld;
-    for (iterator it = begin; it != end; ++it) {
+    for (iterator1 it = begin; it != end; ++it) {
         counter++;
         percentareOld = percentage;
         percentage = (counter * 100) / numberOfNode;
@@ -89,6 +88,18 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
             nodeInfoObj.setChildrenId(&childrenID);
         }
 
+        //ADD WINER LINK
+        //mi serve la serie di caratteri su cui iterare e poi passo un vettore con gli id al setWinerLinkId
+        vector<unsigned long> wl;
+        unsigned long t;
+        for (int i = 0; i < 6 ; i++) {
+            t = cst.id(cst.wl(*it, alphabet[i]));
+            if (t != numberOfNode){
+                wl.push_back(t );
+            }
+        }
+        nodeInfoObj.setWinerLinkId(&wl);
+
 
         if (VERBOSE) {
             std::cout << "\n\n\nNodeDepth: " << cst.node_depth(*it) << " Depth: " << cst.depth(*it) << "-["
@@ -107,6 +118,20 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
 
     bin_out.close();
 };
+
+//vector<unsigned long> TreeParser::getWlVector(cst_t * cst, iterator *it, unsigned long rootId){
+//    vector<unsigned  long> tmp;
+//    unsigned long t;
+//    for (int i = 0; i < 6 ; i++) {
+//        t = cst->id(cst->wl(it, alphabet[i]));
+//        if (t != rootId){
+//            tmp.push_back(t );
+//        }
+//    }
+//
+//    return tmp;
+//}
+
 
 
 void TreeParser::printBinFile(string &s, std::ofstream &bin_out) {

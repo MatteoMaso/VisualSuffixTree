@@ -48,6 +48,13 @@ string NodeInfo::getNodeField() {
         }
     }
 
+    if(true){ //Add winer link
+        temp.append(numberOfWinerLink);
+        if (this->getNumberOfWl() > 0) {
+            temp.append(wlToEncodedString(wlId));
+        }
+    }
+
     return temp;
 }
 
@@ -100,6 +107,17 @@ bool NodeInfo::setNodeField(string * nodeField) {
         to = from + 32 * getNumbrOfChildren() - 1;
         string t = partitioner(nodeField, from, to);
         setChildren(&t);
+    }
+
+    if(true){ //GET WINER LINK
+        from = to + 1;
+        to = from + infoStructure->getBitNumberOfWinerLink() - 1;
+        setNumberOfWinerLink(stoi(partitioner(nodeField, from, to), nullptr, 2));
+
+        from = to + 1;
+        to = from + 32 * getNumberOfWl() - 1;
+        string t = partitioner(nodeField, from, to);
+        setWl(&t);
     }
 
 }
@@ -231,6 +249,17 @@ string NodeInfo::print() {
         s.append("\n#Children:         NOT SET");
     }
 
+    if(true){
+        s.append("\n#Winer Link:       " + to_string(getNumberOfWl()));
+        if ( getNumberOfWl() > 0 ){
+            for (auto i : getWlId()) {
+                s.append("\nWinerLink:    " + to_string(i));
+            }
+        }
+    }
+
+
+
     return s;
 }
 
@@ -286,6 +315,19 @@ void NodeInfo::setNumberOfChildren(int n) {
     numberOfChildren = toBinFormat(infoStructure->getBitNumberOfChildren(), n);
 }
 
+void NodeInfo::setWl(string * winerLinkString) {
+    int bitWlId = 32; //todo dev'essere coerente al config file
+    string id;
+    wlId.clear();
+    for (int i = 0; i < winerLinkString->size() / bitWlId; ++i) {
+        id = "";
+        for (int j = 0 + i * bitWlId; j < ((i + 1) * bitWlId); j++) {
+            id += winerLinkString->at(j);
+        }
+        wlId.push_back(stoi(id, nullptr, 2));
+    }
+}
+
 void NodeInfo::setChildren(string *childrenString) {
     int bitChildrenId = 32; //todo dev'essere coerente al config file
     string id;
@@ -325,5 +367,36 @@ string NodeInfo::childrenToEncodedString(vector<int> v) {
     }
 
     return tmp;
+}
+
+string NodeInfo::wlToEncodedString(vector<unsigned long> v) {
+
+    string tmp = "";
+
+    for (auto i : v) {
+        tmp.append(toBinFormat(32 , i));
+    }
+
+    return tmp;
+}
+
+void NodeInfo::setNumberOfWinerLink(int n) {
+    numberOfWinerLink = toBinFormat(infoStructure->getBitNumberOfWinerLink(), n);
+}
+
+void NodeInfo::setWinerLinkId(vector<unsigned long> *wlId) {
+    setNumberOfWinerLink(wlId->size()); //SET THE NUMBER OF WINER LINK
+    this->wlId.clear();
+    for (auto i : *wlId) {
+        this->wlId.push_back(i);
+    }
+}
+
+int NodeInfo::getNumberOfWl() {
+    return stoi(numberOfWinerLink, nullptr, 2);
+}
+
+vector<unsigned long> NodeInfo::getWlId() {
+    return this->wlId;
 }
 

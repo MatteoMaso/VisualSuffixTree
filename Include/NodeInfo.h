@@ -33,14 +33,19 @@ public:
 
     void setEdgeLength(unsigned long n);
 
-//codifica l'edge da stringa a binario
+    //codifica l'edge da stringa a binario
     void setEdge(string *s);
 
     void setEdgeCharacterEncoding(unsigned long n);
 
     void setNumberOfChildren(int n);
 
-    void setChildrenId(vector <int> * childrenId);
+    //todo change to vector<unsigned long>
+    void setChildrenId(vector<int> *childrenId);
+
+    void setNumberOfWinerLink(int n);
+
+    void setWinerLinkId(vector<unsigned long> *wlId);
 
 
     //GETTER
@@ -78,7 +83,11 @@ public:
 
     vector<int> getChildrenId();
 
-    NodeInfoStructure * infoStructure;
+    int getNumberOfWl();
+
+    vector<unsigned long> getWlId();
+
+    NodeInfoStructure *infoStructure;
 
     //UTILS
     string print();
@@ -94,10 +103,18 @@ public:
     string edgeCharacterEncoding;
     string numberOfChildren;
     vector<int> childrenId;
+    string numberOfWinerLink;
+    vector<unsigned long> wlId;
 
 private:
+
     string childrenToEncodedString(vector<int> v);
-    void setChildren(string * childrenString);
+
+    string wlToEncodedString(vector<unsigned long> v);
+
+    void setChildren(string *childrenString);
+
+    void setWl(string *winerLinkString);
 
 };
 

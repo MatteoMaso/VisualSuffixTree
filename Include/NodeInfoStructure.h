@@ -27,7 +27,7 @@ public:
     //gli passo la stringa e lui inizializza i parametri, serve al decoder
     bool setField(string headerInfo);
 
-    static const int PARAMETER_NUMBER = 10;
+    static const int PARAMETER_NUMBER = 11;
     int parameter[PARAMETER_NUMBER] = {};
 
     const int INDEX_BIT_DEPTH = 0;
@@ -40,6 +40,7 @@ public:
     const int INDEX_BIT_EDGECHARACTERENCODING = 7;
     const int INDEX_BIT_NUMBEROFCHILDREN = 8;
     const int INDEX_BIT_CHILDRENID = 9; //se lo metto variabile devo cambiare sotto
+    const int INDEX_BIT_NUMBEROFWL = 10;
     //IF ADD OTHER PARAMETER INCREMENT THE NUMBER OF PARAMETER_NUMBER
 
     vector<string> alphabet;
@@ -93,6 +94,10 @@ public:
 
     int getBitChildrenId() {
         return this->parameter[INDEX_BIT_CHILDRENID];
+    }
+
+    int getBitNumberOfWinerLink() {
+        return this->parameter[INDEX_BIT_NUMBEROFWL];
     }
 
 private:
