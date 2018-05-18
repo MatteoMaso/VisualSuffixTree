@@ -32,7 +32,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
 
     //After reading header create the NodeInfoStructure
-    NodeInfoStructure nodeStructure = NodeInfoStructure(header.getNodeInfoStructure(), configParameter);
+    NodeInfoStructure nodeStructure = NodeInfoStructure(header.getNodeInfoStructure(), configParameter, stringFileName);
 
     if (!checkConfigParameter(configParameter, &nodeStructure)) exit(-1);
 
@@ -69,8 +69,10 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
         y0 = stoi(configParameter->at("WINDOW_HEIGHT")) - 40;
     }
 
+
     //BASIC MODALITY
     if (modality.compare("BASIC") == 0) {
+
         NodeInfo nodeInfoObj(&nodeStructure);
         while (!bio2.empty()) {
 
@@ -88,6 +90,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
             frequency = rb - lb;
             fatherLabel = nodeInfoObj.getFatherLabel();
             label = nodeInfoObj.getLabel();
+
 
             if (stoi(configParameter->at("BASIC_CUT_NODE")) == 1) {
                 if (frequency < stoi(configParameter->at("NODE_FREQUENCY_THRESHOLD"))) {
@@ -140,7 +143,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                     maxSuffixArrayLength = rb;
                     x = x0;
                     y = y0;
-                    scaleUnit = rootNodeWidth / rb;
+                    scaleUnit = rootNodeWidth / (rb + 1);
                     numberOfNode = label;
                 } else {
                     //altrimenti scalo la larghezza per la larghezza del suffix interval
@@ -167,9 +170,6 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                 edge = nodeInfoObj.getEdgeDecoded();
             }
 
-
-
-
             //SETTING COLOR ACCORDING WITH WHAT I WANT TO SHOW
             string BASIC_INFO_TO_VISUALIZE = configParameter->at("BASIC_INFO_TO_VISUALIZE");
             if (BASIC_INFO_TO_VISUALIZE.compare("DEPTH") == 0) {
@@ -185,7 +185,6 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                     //bisogna farla in proporzione alla depth della stringa
                     std::cout << "to be implement" << std::endl;
                 }
-
 
             } else if (BASIC_INFO_TO_VISUALIZE.compare("KMER") == 0) {
 
@@ -225,7 +224,12 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
             }
 
 
+
         }
+
+        infoStatusBar = "STATUS BAR    Modality: Basic     StringLength: " +
+                        to_string(stringLength) + "       #Nodes: " + to_string(numberOfNode);
+
     } else if (modality.compare("STATISTIC") == 0) {
         std::cout << "NOT IMPLEMENTED YET" << std::endl;
     } else if (modality.compare("MAXREP") == 0) {
@@ -235,7 +239,8 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
         exit(-1);
     }
 
-    printStatusBar(&svg_out, configParameter);
+
+    printStatusBar(&svg_out, configParameter, infoStatusBar);
     char svgEnd[] = {"</svg>"};  //Close the SVG File
     svg_out << svgEnd;
 
@@ -328,12 +333,10 @@ bool SvgCreator::checkConfigParameter(map<string, string> *configParameter, Node
     return true;
 }
 
-void SvgCreator::printStatusBar(std::ofstream *svg_out, map<string, string> *configParameter) {
-
-    string infoToPrint = "STATUS BAR    Modality: "+configParameter->at("MODALITY")+"         StringLength: "+to_string(stringLength)+"       #Nodes: "+to_string(numberOfNode);
+void SvgCreator::printStatusBar(std::ofstream *svg_out, map<string, string> *configParameter, string infoToPrint) {
 
     int font_size = 15;
-    int heigth = 40 + (font_size + 5) ;
+    int heigth = 40 + (font_size + 5);
     int x = 0;
     int width = stoi(configParameter->at("WINDOW_WIDTH"));
 

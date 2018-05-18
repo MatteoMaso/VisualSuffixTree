@@ -58,9 +58,7 @@ public:
         return temp;
     }
 
-    static void
-    printSvgNodeBlock(std::ofstream *svg_out, string text, double width, double x, double y, double height,
-                      RgbColor c) {
+    static void printSvgNodeBlock(std::ofstream *svg_out, string text, double width, double x, double y, double height, RgbColor c) {
 
         string temp = "\n<g class=\"func_g\" onmouseover=\"s(this)\" onmouseout=\"c()\" onclick=\"zoom(this)\">\n""<title>";
         temp += text;

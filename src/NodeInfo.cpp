@@ -97,7 +97,7 @@ bool NodeInfo::setNodeField(string * nodeField) {
         setNumberOfChildren(stoi(partitioner(nodeField, from, to), nullptr, 2));
 
         from = to + 1;
-        to = from + 16 * getNumbrOfChildren() - 1;
+        to = from + 32 * getNumbrOfChildren() - 1;
         string t = partitioner(nodeField, from, to);
         setChildren(&t);
     }
@@ -231,7 +231,6 @@ string NodeInfo::print() {
         s.append("\n#Children:         NOT SET");
     }
 
-
     return s;
 }
 
@@ -288,11 +287,12 @@ void NodeInfo::setNumberOfChildren(int n) {
 }
 
 void NodeInfo::setChildren(string *childrenString) {
+    int bitChildrenId = 32; //todo dev'essere coerente al config file
     string id;
     childrenId.clear();
-    for (int i = 0; i < childrenString->size() / 16; ++i) {
+    for (int i = 0; i < childrenString->size() / bitChildrenId; ++i) {
         id = "";
-        for (int j = 0 + i * 16; j < ((i + 1) * 16); j++) {
+        for (int j = 0 + i * bitChildrenId; j < ((i + 1) * bitChildrenId); j++) {
             id += childrenString->at(j);
         }
         childrenId.push_back(stoi(id, nullptr, 2));

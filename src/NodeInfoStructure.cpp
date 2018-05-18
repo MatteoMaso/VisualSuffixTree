@@ -68,11 +68,12 @@ NodeInfoStructure::NodeInfoStructure(map<string, string> *configParameter, char 
 }
 
 //FOR DECODER
-NodeInfoStructure::NodeInfoStructure(string headerInfo, map<string, string> *configParameter) {
+NodeInfoStructure::NodeInfoStructure(string headerInfo, map<string, string> *configParameter, char *stringFileName) {
 
     setField(headerInfo);
 
-    setAlphabet(configParameter->at("ALPHABET"));
+    string alphabet = getAlphabet(stringFileName);
+    setAlphabet(alphabet);
 
 }
 

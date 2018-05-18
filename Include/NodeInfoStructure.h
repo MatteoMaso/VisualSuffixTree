@@ -20,7 +20,7 @@ public:
     NodeInfoStructure(map<string, string> *configParameter, char *inputFileName);
 
     //For encoder
-    NodeInfoStructure(string headerInfo, map<string, string> *configParameter);
+    NodeInfoStructure(string headerInfo, map<string, string> *configParameter, char *stringFileName);
 
     string getString();
 

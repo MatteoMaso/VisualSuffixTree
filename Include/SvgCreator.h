@@ -26,6 +26,8 @@ public:
 
     string readNextNodeInfo(BitIo<16> *bio);
 
+    string infoStatusBar;
+
 private:
 
     map<string, string> *configParameter;
@@ -40,14 +42,17 @@ private:
     int BASIC_KVALUE_KMER;
     bool BASIC_KMER;
 
-    void printStatusBar(std::ofstream *svg_out, map<string, string> *configParameter);
+    void printStatusBar(std::ofstream *svg_out, map<string, string> *configParameter, string infoToPrint);
 
     void setPositionTYPE_NODE_DIMENSION2(){
-        if ((frequency) == 0) {
-            w = 0;
-        } else {
-            w = scaleUnit * (frequency);
-        }
+//
+//        if ((frequency) == 0) {
+//            w = 0;
+//        } else {
+//            w = scaleUnit * (frequency);
+//        }
+
+        w = scaleUnit  * (frequency + 1);
         x = x0 + lb * scaleUnit;
 
         if (SVG_FROM_TOP) {

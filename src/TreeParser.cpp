@@ -51,7 +51,7 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
     }
 
     long numberOfNode = cst.id(cst.root());
-    std::cout << numberOfNode << std::endl;
+    std::cout << "Number of Node: " << numberOfNode << std::endl;
 
     long counter = 0;
     int percentage, percentareOld;
@@ -97,7 +97,7 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
                       << cst.rb(*it) << "]"
                       << std::endl;//<< "\nAll String length: " << allstring_length << " parent length: " << parent_strLength << "\nEdge: " << edge <<"\nEdge coded: " << e.edgeToString(&edge) << std::endl;
 
-            std::cout << nodeInfoObj.print() << std::endl;
+            std::cout << "NodeInfoobj.print()" << nodeInfoObj.print() << std::endl;
         }
 
         //PRINT THE NODE INFO INTO BINARY FILE
