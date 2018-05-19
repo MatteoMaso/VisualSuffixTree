@@ -91,6 +91,7 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
         //ADD WINER LINK
         //mi serve la serie di caratteri su cui iterare e poi passo un vettore con gli id al setWinerLinkId
         vector<unsigned long> wl;
+        map<string, unsigned long> wl2; //todo salvare sia il char del carattere del winer link
         unsigned long t;
         for (int i = 0; i < 6 ; i++) {
             t = cst.id(cst.wl(*it, alphabet[i]));

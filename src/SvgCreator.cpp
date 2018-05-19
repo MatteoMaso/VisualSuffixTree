@@ -233,6 +233,15 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
     } else if (modality.compare("STATISTIC") == 0) {
         std::cout << "NOT IMPLEMENTED YET" << std::endl;
     } else if (modality.compare("MAXREP") == 0) {
+
+        enum MAXREP_TYPE {maxrep = 1, supermaximalrep = 2, nearsupermaximal = 3, non_supermaximal = 0};
+
+        MAXREP_TYPE max_type;
+        int nWl = 0;    //#number of Winer Link
+
+        int charNumber = 5; //todo trovare sto valore in modo parametrico
+        double opacity = 1;
+
         while (!bio2.empty()) {
 
             //READ AN OTHER NODE AND PUT THE INFOMATION INSIDE THE nodeInfoObj
@@ -249,6 +258,21 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
             frequency = rb - lb;
             fatherLabel = nodeInfoObj.getFatherLabel();
             label = nodeInfoObj.getLabel();
+
+            nWl = nodeInfoObj.getNumberOfWl();
+
+            if( nWl > 1 ){
+                max_type = MAXREP_TYPE::maxrep;
+            } else if (false){
+                //todo per i supermaximal
+                max_type = MAXREP_TYPE::supermaximalrep;
+            }else if (false){
+                //todo per i near supermaximal
+                max_type = MAXREP_TYPE::nearsupermaximal;
+            }else {
+                //Default
+                max_type = MAXREP_TYPE::non_supermaximal;
+            }
 
 
 //            if (stoi(configParameter->at("BASIC_CUT_NODE")) == 1) {
@@ -287,22 +311,29 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                 edge = nodeInfoObj.getEdgeDecoded();
             }
 
+            if (stoi(configParameter->at("MAXREP_BLEND_WL")) == 1){
+                double s = (charNumber - nWl) * (1.0/charNumber);
+                opacity = 1-s;
+            }
+
             //SETTING COLOR ACCORDING WITH WHAT I WANT TO SHOW
             if (stoi(configParameter->at("MAXREP_SHOW_MAX_REP")) == 1){
                 //colora i max rep e sfuma gli altri
-                int nWl =  nodeInfoObj.getNumberOfWl();
-                if ( nWl == 1 ){
-                    SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, rgbColor, 1);
-                } else {
-                    if( stoi(configParameter->at("MAXREP_BLENCHED")) == 1){
-                        SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, rgbColor, 1-0.1*nWl);
-                    }else {
-                        SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, rgbColor, 0.5);
-                    }
+                if ( max_type == MAXREP_TYPE::maxrep ){
+                    SvgUtils::printSvgNodeBlock2(&svg_out, edge, w, x, y, H, configParameter->at("MAXREP_MAXREP_COLOR"), opacity);
+                } else if (max_type == MAXREP_TYPE::supermaximalrep){
+                    SvgUtils::printSvgNodeBlock2(&svg_out, edge, w, x, y, H, configParameter->at("MAXREP_SUPERMAXIMAL_COLOR"), 1);
+                }else if (max_type == MAXREP_TYPE::nearsupermaximal){
+                    SvgUtils::printSvgNodeBlock2(&svg_out, edge, w, x, y, H, configParameter->at("MAXREP_NEARSUPERMAXIMAL_COLOR"), 1);
+                }else {
+                    //non supermaximal
+                    SvgUtils::printSvgNodeBlock2(&svg_out, edge, w, x, y, H, configParameter->at("MAXREP_NONMAXREP_COLOR"), 1);
                 }
+
+
             }else {
                 //default
-                SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, rgbColor, 0.5);
+                SvgUtils::printSvgNodeBlock2(&svg_out, edge, w, x, y, H, configParameter->at("MAXREP_NONMAXREP_COLOR"), 1);
 
             }
 

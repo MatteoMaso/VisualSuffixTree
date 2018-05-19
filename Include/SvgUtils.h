@@ -78,6 +78,25 @@ public:
         *svg_out << str;
     }
 
+    static void printSvgNodeBlock2(std::ofstream *svg_out, string text, double width, double x, double y, double height, string color, double opacity = 1) {
+
+        string temp = "\n<g class=\"func_g\" onmouseover=\"s(this)\" onmouseout=\"c()\" onclick=\"zoom(this)\">\n""<title>";
+        temp += text;
+        temp += "</title><rect x=\"";
+        temp += to_string(x);
+        temp += "\" y=\"";
+        temp += to_string(y);
+        temp += "\" width=\"";
+        temp += to_string(width);
+//        temp += "\" ""height=\"" + to_string(height) + "\" fill=\"rgb("+to_string(c.r)+","+ to_string(c.g)+","+ to_string(c.b)+")\" rx=\"2\" ry=\"2\" />\n""</g>";
+        temp += "\" ""height=\"" + to_string(height) + "\" fill=\""+ color +"\" opacity=\""+ to_string(opacity)+" \" rx=\"2\" ry=\"2\" />\n""</g>";
+
+        char str[temp.length()];
+        strcpy(str, temp.c_str());
+
+        *svg_out << str;
+    }
+
     static string getHeader(string fileName) {
 
         string txt;
