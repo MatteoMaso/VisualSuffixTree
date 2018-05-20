@@ -70,8 +70,9 @@ public:
         temp += to_string(width);
 //        temp += "\" ""height=\"" + to_string(height) + "\" fill=\"rgb("+to_string(c.r)+","+ to_string(c.g)+","+ to_string(c.b)+")\" rx=\"2\" ry=\"2\" />\n""</g>";
         temp += "\" ""height=\"" + to_string(height) + "\" fill=\"rgb(" + to_string(c.r) + "," + to_string(c.g) + "," +
-                to_string(c.b) + ")\" opacity=\""+ to_string(opacity)+" \" rx=\"2\" ry=\"2\" />\n""</g>";
-
+                to_string(c.b) + ")\" opacity=\""+ to_string(opacity)+" \" rx=\"2\" ry=\"2\" />\n";
+        temp += "<text text-anchor=\"\" x=\""+to_string(x+3)+"\" y=\""+to_string(y+10)+"\" font-size=\"12\" font-family=\"Verdana\" fill=\"rgb(0,0,0)\"></text>";
+        temp += "</g>";
         char str[temp.length()];
         strcpy(str, temp.c_str());
 
@@ -89,8 +90,9 @@ public:
         temp += "\" width=\"";
         temp += to_string(width);
 //        temp += "\" ""height=\"" + to_string(height) + "\" fill=\"rgb("+to_string(c.r)+","+ to_string(c.g)+","+ to_string(c.b)+")\" rx=\"2\" ry=\"2\" />\n""</g>";
-        temp += "\" ""height=\"" + to_string(height) + "\" fill=\""+ color +"\" opacity=\""+ to_string(opacity)+" \" rx=\"2\" ry=\"2\" />\n""</g>";
-
+        temp += "\" ""height=\"" + to_string(height) + "\" fill=\""+ color +"\" opacity=\""+ to_string(opacity)+" \" rx=\"2\" ry=\"2\" />\n";
+        temp += "<text text-anchor=\"\" x=\""+to_string(x+3)+"\" y=\""+to_string(y+10)+"\" font-size=\"12\" font-family=\"Verdana\" fill=\"rgb(0,0,0)\"></text>";
+        temp += "</g>";
         char str[temp.length()];
         strcpy(str, temp.c_str());
 

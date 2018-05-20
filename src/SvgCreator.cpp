@@ -66,7 +66,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
         y0 = 40;
     } else { //the root is in the bottom
         x0 = 10;
-        y0 = stoi(configParameter->at("WINDOW_HEIGHT")) - 40;
+        y0 = stoi(configParameter->at("WINDOW_HEIGHT")) - 100;
     }
 
 
@@ -315,6 +315,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                 double s = (charNumber - nWl) * (1.0/charNumber);
                 opacity = 1-s;
             }
+
 
             //SETTING COLOR ACCORDING WITH WHAT I WANT TO SHOW
             if (stoi(configParameter->at("MAXREP_SHOW_MAX_REP")) == 1){
