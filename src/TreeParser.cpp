@@ -24,6 +24,8 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
     typedef cst_bfs_iterator<cst_t> iterator;
     iterator begin = iterator(&cst, cst.root());
     iterator end = iterator(&cst, cst.root(), true, true);
+
+    setAlphabet(inputFileName, this);
     
     //SET VERBOSE
     VERBOSE = (stoi(configParameter->at("VERBOSE"))) == 1;
@@ -90,22 +92,6 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
             nodeInfoObj.setChildrenId(&childrenID);
         }
 
-//        cst_t::char_type a = 'a';
-//        cst_t::char_type c = 'c';
-//        cst_t::char_type g = 'g';
-//        cst_t::char_type t1 = 't';
-//        cst_t::char_type n = 'n';
-//        cst_t::char_type A = 'A';
-//        cst_t::char_type C = 'C';
-//        cst_t::char_type G = 'G';
-//        cst_t::char_type T = 'T';
-//        cst_t::char_type N = 'N';
-//        cst_t::char_type Z = 'Z';
-//
-//        cst_t::char_type alphabet[11] = {a,c,g,t1,n,A,C,G,T,Z,N};
-
-
-
         //ADD WINER LINK
         //mi serve la serie di caratteri su cui iterare e poi passo un vettore con gli id al setWinerLinkId
         vector<unsigned long> wl;
@@ -138,21 +124,6 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
 
     bin_out.close();
 };
-
-//vector<unsigned long> TreeParser::getWlVector(cst_t * cst, iterator *it, unsigned long rootId){
-//    vector<unsigned  long> tmp;
-//    unsigned long t;
-//    for (int i = 0; i < 6 ; i++) {
-//        t = cst->id(cst->wl(it, alphabet[i]));
-//        if (t != rootId){
-//            tmp.push_back(t );
-//        }
-//    }
-//
-//    return tmp;
-//}
-
-
 
 void TreeParser::printBinFile(string &s, std::ofstream &bin_out) {
 
@@ -247,4 +218,44 @@ bool TreeParser::checkNumberOfBit(int nBit, NodeInfoStructure *nodeInfoStructure
     //todo add check label and father label
 
     return true;
+}
+
+bool contains2(vector<char> * character, char c){
+    //todo spostare da qualche altra parte
+    for (int i = 0; i < character->size(); i++) {
+        if ( character->at(i) == c ){
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void TreeParser::setAlphabet(char *inputFileName, TreeParser * treeParser) {
+    //todo spostare da qualche altra parte
+
+    string txt;
+    ifstream file(inputFileName);
+
+    if (file.is_open())
+        while (file.good())
+            getline(file, txt);
+    file.close();
+
+    vector<char> character = {};
+    char c;
+    for (int i = 0; i < txt.length(); i++) {
+        c = txt[i];
+        if ( !contains2(&character, c) ){
+            character.push_back(c);
+        }
+    }
+
+    string alp = "$";
+
+    for (int j = 0; j < character.size(); j++) {
+        cst_t::char_type c = character.at(j);
+        treeParser->alphabet.push_back(c );
+    }
+
 }

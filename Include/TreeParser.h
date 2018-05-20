@@ -29,25 +29,14 @@ public:
 
     string getEdge(cst_t *cst, iterator1 *it);
 
-
-    const cst_t::char_type a = 'a';
-    const cst_t::char_type c = 'c';
-    const cst_t::char_type g = 'g';
-    const cst_t::char_type t = 't';
-    const cst_t::char_type n = 'n';
-    const cst_t::char_type A = 'A';
-    const cst_t::char_type C = 'C';
-    const cst_t::char_type G = 'G';
-    const cst_t::char_type T = 'T';
-    const cst_t::char_type N = 'N';
-    const cst_t::char_type Z = 'Z';
-
-    const cst_t::char_type alphabet[11] = {a,c,g,t,n,A,C,G,T,Z,N};
-    //todo spostare e definire uguale all'alfabeto
+    vector<cst_t::char_type> alphabet;
 
 private:
 
     bool checkNumberOfBit(int nBit, NodeInfoStructure *nodeInfoStructure);
+
+    void setAlphabet(char *inputFileName, TreeParser * treeParser);
+
 
 //    vector<unsigned long> getWlVector(cst_t * cst, iterator *it, unsigned long rootId);
 
