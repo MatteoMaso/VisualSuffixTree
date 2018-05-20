@@ -42,7 +42,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
     std::ofstream svg_out(outputFile, std::ios::out | std::ios::binary);
 
     svg_out << SvgUtils::createSvgHeader(stoi(configParameter->at("WINDOW_WIDTH")),
-                                         stoi(configParameter->at("WINDOW_HEIGHT")));
+                                         stoi(configParameter->at("WINDOW_HEIGHT")), stoi(configParameter->at("SVG_FROM_TOP")));
 
     //PARAMETER THAT I NEED
     SVG_FROM_TOP = stoi(configParameter->at("SVG_FROM_TOP")) == 1;
