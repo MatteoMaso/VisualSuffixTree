@@ -16,7 +16,7 @@ using namespace sdsl;
 
 typedef cst_sct3<> cst_t;
 
-TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, string> *configParameter) {
+TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, string> *configParameter){
 
     //SUFFIX TREE STRUCTURE
     cst_t cst;                              //declare the suffix tree
@@ -79,6 +79,8 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
             nodeInfoObj.setEdge(&new_edge);
         }
 
+
+
         if (nodeInfoStructure.OPT_CHILDREN_INFO) {
             //SET CHILDREN ID
             vector<int> childrenID; //support structure
@@ -88,13 +90,30 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
             nodeInfoObj.setChildrenId(&childrenID);
         }
 
+//        cst_t::char_type a = 'a';
+//        cst_t::char_type c = 'c';
+//        cst_t::char_type g = 'g';
+//        cst_t::char_type t1 = 't';
+//        cst_t::char_type n = 'n';
+//        cst_t::char_type A = 'A';
+//        cst_t::char_type C = 'C';
+//        cst_t::char_type G = 'G';
+//        cst_t::char_type T = 'T';
+//        cst_t::char_type N = 'N';
+//        cst_t::char_type Z = 'Z';
+//
+//        cst_t::char_type alphabet[11] = {a,c,g,t1,n,A,C,G,T,Z,N};
+
+
+
         //ADD WINER LINK
         //mi serve la serie di caratteri su cui iterare e poi passo un vettore con gli id al setWinerLinkId
         vector<unsigned long> wl;
         map<string, unsigned long> wl2; //todo salvare sia il char del carattere del winer link
         unsigned long t;
-        for (int i = 0; i < 6 ; i++) {
+        for (int i = 0; i < 12 ; i++) {
             t = cst.id(cst.wl(*it, alphabet[i]));
+//            t = cst.id(cst.wl(*it, i1));
             if (t != numberOfNode){
                 wl.push_back(t );
             }
