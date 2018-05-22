@@ -31,6 +31,16 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
     stringLength = getStringLength(stringFileName);
 
 
+    string originalString;
+    ifstream file(stringFileName);
+    //todo spostare questa cosa da qualche altra parte
+    if (file.is_open())
+        while (file.good())
+            getline(file, originalString);
+    file.close();
+
+
+
     //After reading header create the NodeInfoStructure
     NodeInfoStructure nodeStructure = NodeInfoStructure(header.getNodeInfoStructure(), configParameter, stringFileName);
 
@@ -70,7 +80,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
     }
 
 
-    NodeInfo nodeInfoObj(&nodeStructure);
+    NodeInfo nodeInfoObj(&nodeStructure, &originalString);
     //BASIC MODALITY
     if (modality.compare("BASIC") == 0) {
 
@@ -168,7 +178,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
             //SETTINGS EDGE INFO
             if (stoi(configParameter->at("SHOW_EDGE_INFO")) == 1) {
-                edge = nodeInfoObj.getEdgeDecoded();
+                edge = nodeInfoObj.getEdge(&originalString, nodeInfoObj.getEdgeIndex(), nodeInfoObj.getEdgeLength());
             }
 
             //SETTING COLOR ACCORDING WITH WHAT I WANT TO SHOW
@@ -308,7 +318,8 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
             //SETTINGS EDGE INFO
             if (stoi(configParameter->at("SHOW_EDGE_INFO")) == 1) {
-                edge = nodeInfoObj.getEdgeDecoded();
+                edge = nodeInfoObj.getEdge(&originalString, nodeInfoObj.getEdgeIndex(), nodeInfoObj.getEdgeLength()
+                );
             }
 
             if (stoi(configParameter->at("MAXREP_BLEND_WL")) == 1){

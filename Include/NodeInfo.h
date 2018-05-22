@@ -14,7 +14,7 @@ class NodeInfo {
 
 public:
 
-    NodeInfo(NodeInfoStructure *nodeInfoStructure);
+    NodeInfo(NodeInfoStructure *nodeInfoStructure, string * originalString);
 
     //SETTER
     bool setNodeField(string *nodeField);
@@ -45,6 +45,7 @@ public:
 
     void setNumberOfWinerLink(int n);
 
+//    void setWinerLinkId(map<string, unsigned long> *wlId);
     void setWinerLinkId(vector<unsigned long> *wlId);
 
 
@@ -68,8 +69,11 @@ public:
 
     int getEdgeCharacterEncoding();
 
-    string getEdgeDecoded();
+    int getEdgeIndex();
 
+//    string getEdgeDecoded();
+
+    string getEdge(string * text, unsigned long idx, unsigned long length);
 
     string partitioner(string *s, int from, int to);
 
@@ -78,6 +82,8 @@ public:
     string decodeCharacter(string *s, vector<string> *codification, vector<string> *alphabet);
 
     void setBinaryEdge(string *s);
+
+    void setEdgeIndex(unsigned long idx);
 
     int getNumbrOfChildren();
 
@@ -99,12 +105,14 @@ public:
     string label;
     string fatherLabel;
     string edgeLength;
-    string edge;
+    string edge_idx;
     string edgeCharacterEncoding;
     string numberOfChildren;
     vector<int> childrenId;
     string numberOfWinerLink;
     vector<unsigned long> wlId;
+
+    string * originalString;
 
 private:
 

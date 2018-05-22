@@ -17,8 +17,6 @@ typedef cst_bfs_iterator<cst_t> iterator1;
 class TreeParser {
 public:
 
-
-
     bool VERBOSE;
 
     TreeParser(char *inputFileName, char *outputFileName, map<string, string> *configParameter);
@@ -36,11 +34,6 @@ private:
     bool checkNumberOfBit(int nBit, NodeInfoStructure *nodeInfoStructure);
 
     void setAlphabet(char *inputFileName, TreeParser * treeParser);
-
-
-//    vector<unsigned long> getWlVector(cst_t * cst, iterator *it, unsigned long rootId);
-
-
 };
 
 #endif //VISUALSUFFIXTREE_TREEPARSER_H

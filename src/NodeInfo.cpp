@@ -11,10 +11,10 @@
 
 using namespace std;
 
-NodeInfo::NodeInfo(NodeInfoStructure *nodeInfoStructure) {
+NodeInfo::NodeInfo(NodeInfoStructure *nodeInfoStructure, string * originalString) {
     //Save the address oh the structure to avoid multiple copies
     this->infoStructure = nodeInfoStructure;
-
+    this->originalString = originalString;
     setEdgeCharacterEncoding(3);
 }
 
@@ -37,7 +37,7 @@ string NodeInfo::getNodeField() {
 
     if (infoStructure->OPT_EDGEINFO) {
         temp.append(edgeLength);
-        temp.append(edge);
+        temp.append(edge_idx);
         //    temp.append(edgeCharacterEncoding); questo non serve metterlo va solo nell'header
     }
 
@@ -93,9 +93,12 @@ bool NodeInfo::setNodeField(string * nodeField) {
         to = from + infoStructure->getBitEdgeLength() - 1;
         setEdgeLength(stoi(partitioner(nodeField, from, to), nullptr, 2));
         from = to + 1;
-        to = from + getEdgeCharacterEncoding() * getEdgeLength() - 1;
-        edge = partitioner(nodeField, from, to);
-        setBinaryEdge(&edge);
+//        to = from + getEdgeCharacterEncoding() * getEdgeLength() - 1;
+//        edge = partitioner(nodeField, from, to);
+//        setBinaryEdge(&edge);
+        to = from + 32 - 1;
+        edge_idx = partitioner(nodeField, from, to);
+//        setBinaryEdge(&edge);
     }
 
     if (infoStructure->OPT_CHILDREN_INFO) {
@@ -152,17 +155,22 @@ void NodeInfo::setEdgeLength(unsigned long n) {
 }
 
 //codifica l'edge da stringa a binario
-void NodeInfo::setEdge(string *s) {
-    edgeLength = toBinFormat(infoStructure->getBitEdgeLength(), s->size());
-//    edgeLength = std::bitset<bitEdgeLength>(s->size()).to_string();
-    string character;
-    string edge = "";
-    for (int i = 0; i < s->size(); i++) {
-        character = "";
-        character += s->at(i);
-        edge += encodeCharacter(&character, &(infoStructure->codification), &(infoStructure->alphabet));
-    }
-    this->edge = edge;
+//void NodeInfo::setEdge(string *s) {
+//    edgeLength = toBinFormat(infoStructure->getBitEdgeLength(), s->size());
+////    edgeLength = std::bitset<bitEdgeLength>(s->size()).to_string();
+//    string character;
+//    string edge = "";
+//    for (int i = 0; i < s->size(); i++) {
+//        character = "";
+//        character += s->at(i);
+//        edge += encodeCharacter(&character, &(infoStructure->codification), &(infoStructure->alphabet));
+//    }
+//    this->edge = edge;
+//}
+
+
+void NodeInfo::setEdgeIndex(unsigned long idx){
+    edge_idx = toBinFormat(32, idx);
 }
 
 void NodeInfo::setEdgeCharacterEncoding(unsigned long n) {
@@ -194,16 +202,38 @@ int NodeInfo::getEdgeCharacterEncoding() {
     return stoi(edgeCharacterEncoding, nullptr, 2);
 }
 
-string NodeInfo::getEdgeDecoded() {
-    int bitChar = stoi(edgeCharacterEncoding, nullptr, 2);
-    string character;
+int NodeInfo::getEdgeIndex(){
+    return stoi(edge_idx, nullptr, 2);
+}
+
+//string NodeInfo::getEdgeDecoded() {
+//    int bitChar = stoi(edgeCharacterEncoding, nullptr, 2);
+//    string character;
+//    string edge = "";
+//    for (int j = 0; j < stoi(edgeLength, nullptr, 2); j++) {
+//        character = "";
+//        for (int i = 0 + j * bitChar; i < ((j + 1) * bitChar); i++) {
+//            character += this->edge[i];
+//        }
+//        edge += decodeCharacter(&character, &(infoStructure->codification), &(infoStructure->alphabet));
+//    }
+//
+//    return edge;
+//}
+
+string NodeInfo::getEdge(string * text, unsigned long idx, unsigned long length){
+    //todo rimuoveri i parametri di passaggio
     string edge = "";
-    for (int j = 0; j < stoi(edgeLength, nullptr, 2); j++) {
-        character = "";
-        for (int i = 0 + j * bitChar; i < ((j + 1) * bitChar); i++) {
-            character += this->edge[i];
+    unsigned long l = getEdgeLength();
+
+
+    for (int j = idx; j < idx + l; j++) {
+//        edge += text->at(j);
+        if ( j == originalString->length()) {
+            edge += "$";
+        } else {
+            edge += originalString->at(j);
         }
-        edge += decodeCharacter(&character, &(infoStructure->codification), &(infoStructure->alphabet));
     }
 
     return edge;
@@ -232,7 +262,7 @@ string NodeInfo::print() {
 
     if (infoStructure->OPT_EDGEINFO) {
         s.append("\nEdge Length:      " + to_string(getEdgeLength()));
-        s.append("\nEdge:             " + getEdgeDecoded());
+        s.append("\nEdge:             " + getEdge(originalString, getEdgeIndex(), getEdgeLength()));
     } else {
         s.append("\nEdge:             NOT SET");
     }
@@ -299,9 +329,9 @@ string NodeInfo::decodeCharacter(string *s, vector<string> *codification, vector
     exit(12);
 }
 
-void NodeInfo::setBinaryEdge(string *s) {
-    edge = *s;
-}
+//void NodeInfo::setBinaryEdge(string *s) {
+//    edge = *s;
+//}
 
 int NodeInfo::getLabel() {
     return stoi(label, nullptr, 2);
@@ -384,6 +414,7 @@ void NodeInfo::setNumberOfWinerLink(int n) {
     numberOfWinerLink = toBinFormat(infoStructure->getBitNumberOfWinerLink(), n);
 }
 
+//void NodeInfo::setWinerLinkId(map<string, unsigned long> *wlId) {
 void NodeInfo::setWinerLinkId(vector<unsigned long> *wlId) {
     setNumberOfWinerLink(wlId->size()); //SET THE NUMBER OF WINER LINK
     this->wlId.clear();

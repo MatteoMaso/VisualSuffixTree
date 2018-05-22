@@ -16,7 +16,7 @@ using namespace sdsl;
 
 typedef cst_sct3<> cst_t;
 
-TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, string> *configParameter){
+TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, string> *configParameter) {
 
     //SUFFIX TREE STRUCTURE
     cst_t cst;                              //declare the suffix tree
@@ -26,7 +26,15 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
     iterator end = iterator(&cst, cst.root(), true, true);
 
     setAlphabet(inputFileName, this);
-    
+
+    string originalString;
+    ifstream file(inputFileName);
+    //todo spostare questa cosa da qualche altra parte
+    if (file.is_open())
+        while (file.good())
+            getline(file, originalString);
+    file.close();
+
     //SET VERBOSE
     VERBOSE = (stoi(configParameter->at("VERBOSE"))) == 1;
 
@@ -42,7 +50,7 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
     BitIo<16> bio;
 
     string nodeInfo;
-    NodeInfo nodeInfoObj(&nodeInfoStructure);
+    NodeInfo nodeInfoObj(&nodeInfoStructure, &originalString);
 
     //Check se il numero di bit sono sufficienti per rappresentare le informazione
     long p = cst.rb(*begin);
@@ -54,13 +62,19 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
     long numberOfNode = cst.id(cst.root());
     std::cout << "Number of Node: " << numberOfNode << std::endl;
 
+
+    csa_wt<> csa = cst.csa;
+    //tempopary value
+    unsigned long id_mostSx_leaf;
+    unsigned long idx_suffix_array;
+
     long counter = 0;
     int percentage, percentareOld;
     for (iterator1 it = begin; it != end; ++it) {
         counter++;
         percentareOld = percentage;
         percentage = (counter * 100) / numberOfNode;
-        if ( percentage != percentareOld){
+        if (percentage != percentareOld) {
             std::cout << percentage << "%" << std::endl;
         }
         nodeInfoObj.setDepth(cst.depth(*it));
@@ -77,10 +91,22 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
         }
 
         if (nodeInfoStructure.OPT_EDGEINFO) {
-            string new_edge = getEdge(&cst, &it);
-            nodeInfoObj.setEdge(&new_edge);
+//            string new_edge = getEdge(&cst, &it);
+//            nodeInfoObj.setEdge(&new_edge);
+            nodeInfoObj.setEdgeLength(cst.depth(*it)-cst.depth(cst.parent(*it)));
+            unsigned  long t3 = cst.sn(cst.leftmost_leaf(*it));
+//            nodeInfoObj.setEdgeIndex(cst.sn(cst.leftmost_leaf(*it)));
+            nodeInfoObj.setEdgeIndex(t3+cst.depth(cst.parent(*it)));
         }
 
+//        //todo sostituire al posto di edge info
+//        id_mostSx_leaf = cst.id(cst.leftmost_leaf(*it));
+//
+////        idx_suffix_array = cst.sn(cst.leftmost_leaf(*it));
+//        idx_suffix_array = cst.sn(cst.leftmost_leaf(*it));
+
+
+//        unsigned long idx_string =  csa.bwt()
 
 
         if (nodeInfoStructure.OPT_CHILDREN_INFO) {
@@ -95,13 +121,20 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
         //ADD WINER LINK
         //mi serve la serie di caratteri su cui iterare e poi passo un vettore con gli id al setWinerLinkId
         vector<unsigned long> wl;
-        map<string, unsigned long> wl2; //todo salvare sia il char del carattere del winer link
+        wl.clear();
+//        map<string, unsigned long> wl2; //todo salvare sia il char del carattere del winer link
+//        wl2.clear();
         unsigned long t;
-        for (int i = 0; i < 12 ; i++) {
-            t = cst.id(cst.wl(*it, alphabet[i]));
-//            t = cst.id(cst.wl(*it, i1));
-            if (t != numberOfNode){
-                wl.push_back(t );
+
+        for (int i = 0; i < alphabet.size(); i++) {
+            cst_t::char_type c = alphabet[i];
+            t = cst.id(cst.wl(*it, c));
+
+            if (t != numberOfNode) {
+                string s = "" + c;
+                pair<string, unsigned long> pair1 = {s, t};
+                wl.push_back(t);
+//                wl2.insert(pair1);
             }
         }
         nodeInfoObj.setWinerLinkId(&wl);
@@ -220,10 +253,10 @@ bool TreeParser::checkNumberOfBit(int nBit, NodeInfoStructure *nodeInfoStructure
     return true;
 }
 
-bool contains2(vector<char> * character, char c){
+bool contains2(vector<char> *character, char c) {
     //todo spostare da qualche altra parte
     for (int i = 0; i < character->size(); i++) {
-        if ( character->at(i) == c ){
+        if (character->at(i) == c) {
             return true;
         }
     }
@@ -231,7 +264,7 @@ bool contains2(vector<char> * character, char c){
     return false;
 }
 
-void TreeParser::setAlphabet(char *inputFileName, TreeParser * treeParser) {
+void TreeParser::setAlphabet(char *inputFileName, TreeParser *treeParser) {
     //todo spostare da qualche altra parte
 
     string txt;
@@ -246,7 +279,7 @@ void TreeParser::setAlphabet(char *inputFileName, TreeParser * treeParser) {
     char c;
     for (int i = 0; i < txt.length(); i++) {
         c = txt[i];
-        if ( !contains2(&character, c) ){
+        if (!contains2(&character, c)) {
             character.push_back(c);
         }
     }
@@ -255,7 +288,7 @@ void TreeParser::setAlphabet(char *inputFileName, TreeParser * treeParser) {
 
     for (int j = 0; j < character.size(); j++) {
         cst_t::char_type c = character.at(j);
-        treeParser->alphabet.push_back(c );
+        treeParser->alphabet.push_back(c);
     }
 
 }
