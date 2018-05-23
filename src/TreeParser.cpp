@@ -67,6 +67,8 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
     //tempopary value
     unsigned long id_mostSx_leaf;
     unsigned long idx_suffix_array;
+    //MAP OF THE WINER LINK key = index of the alphabet character
+    map<int, unsigned long> wl;
 
     long counter = 0;
     int percentage, percentareOld;
@@ -91,22 +93,17 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
         }
 
         if (nodeInfoStructure.OPT_EDGEINFO) {
-//            string new_edge = getEdge(&cst, &it);
-//            nodeInfoObj.setEdge(&new_edge);
             nodeInfoObj.setEdgeLength(cst.depth(*it)-cst.depth(cst.parent(*it)));
             unsigned  long t3 = cst.sn(cst.leftmost_leaf(*it));
-//            nodeInfoObj.setEdgeIndex(cst.sn(cst.leftmost_leaf(*it)));
             nodeInfoObj.setEdgeIndex(t3+cst.depth(cst.parent(*it)));
         }
 
-//        //todo sostituire al posto di edge info
-//        id_mostSx_leaf = cst.id(cst.leftmost_leaf(*it));
-//
-////        idx_suffix_array = cst.sn(cst.leftmost_leaf(*it));
-//        idx_suffix_array = cst.sn(cst.leftmost_leaf(*it));
-
-
-//        unsigned long idx_string =  csa.bwt()
+        //For calculate the max depth of the tree
+        if ( cst.is_leaf(*it)){
+            if ( cst.node_depth(*it) > tree_max_depth){
+                tree_max_depth = cst.node_depth(*it);
+            }
+        }
 
 
         if (nodeInfoStructure.OPT_CHILDREN_INFO) {
@@ -119,22 +116,16 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
         }
 
         //ADD WINER LINK
-        //mi serve la serie di caratteri su cui iterare e poi passo un vettore con gli id al setWinerLinkId
-        vector<unsigned long> wl;
         wl.clear();
-//        map<string, unsigned long> wl2; //todo salvare sia il char del carattere del winer link
-//        wl2.clear();
         unsigned long t;
-
-        for (int i = 0; i < alphabet.size(); i++) {
-            cst_t::char_type c = alphabet[i];
+        cst_t::char_type c;
+        for (int i = 0; i < nodeInfoStructure.alphabet.size(); i++) {
+            c = nodeInfoStructure.alphabet.at(i)[0];
             t = cst.id(cst.wl(*it, c));
 
-            if (t != numberOfNode) {
-                string s = "" + c;
-                pair<string, unsigned long> pair1 = {s, t};
-                wl.push_back(t);
-//                wl2.insert(pair1);
+            if (t != numberOfNode) { // == number of node when there isn't a valid wl
+                pair<int, unsigned long> pair = {i, t};
+                wl.insert(pair);
             }
         }
         nodeInfoObj.setWinerLinkId(&wl);
@@ -147,12 +138,17 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
                       << cst.rb(*it) << "]"
                       << std::endl;//<< "\nAll String length: " << allstring_length << " parent length: " << parent_strLength << "\nEdge: " << edge <<"\nEdge coded: " << e.edgeToString(&edge) << std::endl;
 
-            std::cout << "NodeInfoobj.print()" << nodeInfoObj.print() << std::endl;
+            std::cout << "NodeInfoobj.print()" << nodeInfoObj.print(&nodeInfoStructure.alphabet) << std::endl;
         }
 
         //PRINT THE NODE INFO INTO BINARY FILE
         printNode(&nodeInfoObj, &bin_out);
 
+    }
+
+    if (true){
+        //todo inserire ma tree max depth nell'header e rendere l'albero con i nodi alti in modo proporzionale alla profondità max
+        std::cout << "Tree max depth: " << tree_max_depth << std::endl;
     }
 
     bin_out.close();

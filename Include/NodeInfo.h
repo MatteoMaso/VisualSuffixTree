@@ -45,8 +45,7 @@ public:
 
     void setNumberOfWinerLink(int n);
 
-//    void setWinerLinkId(map<string, unsigned long> *wlId);
-    void setWinerLinkId(vector<unsigned long> *wlId);
+    void setWinerLinkId(map<int, unsigned long> *wlId);
 
 
     //GETTER
@@ -91,12 +90,14 @@ public:
 
     int getNumberOfWl();
 
-    vector<unsigned long> getWlId();
+    map<int, unsigned long> getWlId();
+
+    map<string, unsigned long> getWlCharacter(vector<string> * alphabet);
 
     NodeInfoStructure *infoStructure;
 
     //UTILS
-    string print();
+    string print(vector<string> * alphabet);
 
     string depth;
     string nodeDepth;
@@ -110,15 +111,18 @@ public:
     string numberOfChildren;
     vector<int> childrenId;
     string numberOfWinerLink;
-    vector<unsigned long> wlId;
+    map<int, unsigned long> wlId;
 
     string * originalString;
+
+    int BIT_WINERLINK = 16; //todo mettere a 32
+    int BIT_IDX_WL = 16;    //todo mettere a 32 ed adattare il codice
 
 private:
 
     string childrenToEncodedString(vector<int> v);
 
-    string wlToEncodedString(vector<unsigned long> v);
+    string wlToEncodedString(map<int, unsigned long>);
 
     void setChildren(string *childrenString);
 

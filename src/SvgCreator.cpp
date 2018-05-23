@@ -91,7 +91,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
             nodeInfo = readNextNodeInfo(&bio2);
             nodeInfoObj.setNodeField(&nodeInfo);
 
-            if (VERBOSE) std::cout << nodeInfoObj.print() << std::endl;
+            if (VERBOSE) std::cout << nodeInfoObj.print(&nodeStructure.alphabet) << std::endl;
 
             //ACQUIRE THE DEFAULT PARAMETERS
             nodeDepth = nodeInfoObj.getNodeDepth();
@@ -258,7 +258,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
             nodeInfo = readNextNodeInfo(&bio2);
             nodeInfoObj.setNodeField(&nodeInfo);
 
-            if (VERBOSE) std::cout << nodeInfoObj.print() << std::endl;
+            if (VERBOSE) std::cout << nodeInfoObj.print(&nodeStructure.alphabet) << std::endl;
 
             //ACQUIRE THE DEFAULT PARAMETERS
             nodeDepth = nodeInfoObj.getNodeDepth();

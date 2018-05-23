@@ -93,12 +93,8 @@ bool NodeInfo::setNodeField(string * nodeField) {
         to = from + infoStructure->getBitEdgeLength() - 1;
         setEdgeLength(stoi(partitioner(nodeField, from, to), nullptr, 2));
         from = to + 1;
-//        to = from + getEdgeCharacterEncoding() * getEdgeLength() - 1;
-//        edge = partitioner(nodeField, from, to);
-//        setBinaryEdge(&edge);
         to = from + 32 - 1;
         edge_idx = partitioner(nodeField, from, to);
-//        setBinaryEdge(&edge);
     }
 
     if (infoStructure->OPT_CHILDREN_INFO) {
@@ -118,7 +114,7 @@ bool NodeInfo::setNodeField(string * nodeField) {
         setNumberOfWinerLink(stoi(partitioner(nodeField, from, to), nullptr, 2));
 
         from = to + 1;
-        to = from + 32 * getNumberOfWl() - 1;
+        to = from + (BIT_WINERLINK + BIT_IDX_WL) * getNumberOfWl() - 1;
         string t = partitioner(nodeField, from, to);
         setWl(&t);
     }
@@ -153,21 +149,6 @@ void NodeInfo::setFatherLabel(unsigned long n) {
 void NodeInfo::setEdgeLength(unsigned long n) {
     edgeLength = toBinFormat(infoStructure->getBitEdgeLength(), n);
 }
-
-//codifica l'edge da stringa a binario
-//void NodeInfo::setEdge(string *s) {
-//    edgeLength = toBinFormat(infoStructure->getBitEdgeLength(), s->size());
-////    edgeLength = std::bitset<bitEdgeLength>(s->size()).to_string();
-//    string character;
-//    string edge = "";
-//    for (int i = 0; i < s->size(); i++) {
-//        character = "";
-//        character += s->at(i);
-//        edge += encodeCharacter(&character, &(infoStructure->codification), &(infoStructure->alphabet));
-//    }
-//    this->edge = edge;
-//}
-
 
 void NodeInfo::setEdgeIndex(unsigned long idx){
     edge_idx = toBinFormat(32, idx);
@@ -206,21 +187,6 @@ int NodeInfo::getEdgeIndex(){
     return stoi(edge_idx, nullptr, 2);
 }
 
-//string NodeInfo::getEdgeDecoded() {
-//    int bitChar = stoi(edgeCharacterEncoding, nullptr, 2);
-//    string character;
-//    string edge = "";
-//    for (int j = 0; j < stoi(edgeLength, nullptr, 2); j++) {
-//        character = "";
-//        for (int i = 0 + j * bitChar; i < ((j + 1) * bitChar); i++) {
-//            character += this->edge[i];
-//        }
-//        edge += decodeCharacter(&character, &(infoStructure->codification), &(infoStructure->alphabet));
-//    }
-//
-//    return edge;
-//}
-
 string NodeInfo::getEdge(string * text, unsigned long idx, unsigned long length){
     //todo rimuoveri i parametri di passaggio
     string edge = "";
@@ -239,7 +205,7 @@ string NodeInfo::getEdge(string * text, unsigned long idx, unsigned long length)
     return edge;
 }
 
-string NodeInfo::print() {
+string NodeInfo::print(vector<string> * alphabet) {
     string s;
     s.append("\nNodeDepth:        " + to_string(getNodeDepth()));
     s.append("\nDepth:            " + to_string(getDepth()));
@@ -283,7 +249,7 @@ string NodeInfo::print() {
         s.append("\n#Winer Link:       " + to_string(getNumberOfWl()));
         if ( getNumberOfWl() > 0 ){
             for (auto i : getWlId()) {
-                s.append("\nWinerLink:    " + to_string(i));
+                s.append("\nWinerLink char: " + alphabet->at(i.first)+ "   wl: "+ to_string(i.second));
             }
         }
     }
@@ -346,15 +312,22 @@ void NodeInfo::setNumberOfChildren(int n) {
 }
 
 void NodeInfo::setWl(string * winerLinkString) {
-    int bitWlId = 32; //todo dev'essere coerente al config file
-    string id;
+    int idx;
+    unsigned  long l;
     wlId.clear();
-    for (int i = 0; i < winerLinkString->size() / bitWlId; ++i) {
-        id = "";
-        for (int j = 0 + i * bitWlId; j < ((i + 1) * bitWlId); j++) {
-            id += winerLinkString->at(j);
-        }
-        wlId.push_back(stoi(id, nullptr, 2));
+    int from = 0;
+    int to = BIT_IDX_WL - 1;
+
+    for (int i = 0; i < winerLinkString->size() / (BIT_IDX_WL + BIT_WINERLINK); ++i) {
+
+        idx = stoi(partitioner(winerLinkString, from, to ), nullptr, 2);
+        from = to + 1;
+        to = from + BIT_WINERLINK -1;
+        l = stoi(partitioner(winerLinkString, from, to ), nullptr, 2);
+        from = to + 1;
+        to = from + BIT_IDX_WL -1;
+
+        wlId.insert({idx, l});
     }
 }
 
@@ -399,12 +372,13 @@ string NodeInfo::childrenToEncodedString(vector<int> v) {
     return tmp;
 }
 
-string NodeInfo::wlToEncodedString(vector<unsigned long> v) {
+string NodeInfo::wlToEncodedString(map<int, unsigned long> v) {
 
     string tmp = "";
 
     for (auto i : v) {
-        tmp.append(toBinFormat(32 , i));
+        tmp.append(toBinFormat(BIT_IDX_WL , i.first));
+        tmp.append(toBinFormat(BIT_WINERLINK , i.second));
     }
 
     return tmp;
@@ -415,11 +389,11 @@ void NodeInfo::setNumberOfWinerLink(int n) {
 }
 
 //void NodeInfo::setWinerLinkId(map<string, unsigned long> *wlId) {
-void NodeInfo::setWinerLinkId(vector<unsigned long> *wlId) {
+void NodeInfo::setWinerLinkId(map<int, unsigned long> *wlId) {
     setNumberOfWinerLink(wlId->size()); //SET THE NUMBER OF WINER LINK
     this->wlId.clear();
     for (auto i : *wlId) {
-        this->wlId.push_back(i);
+        this->wlId.insert(i);
     }
 }
 
@@ -427,7 +401,15 @@ int NodeInfo::getNumberOfWl() {
     return stoi(numberOfWinerLink, nullptr, 2);
 }
 
-vector<unsigned long> NodeInfo::getWlId() {
+map<int, unsigned long> NodeInfo::getWlId() {
     return this->wlId;
+}
+
+map<string, unsigned long> NodeInfo::getWlCharacter(vector<string> * alphabet) {
+    map<string, unsigned long> tmp;
+    for (int i = 0; i < wlId.size(); i++) {
+        tmp.insert({alphabet->at(i), wlId.at(i)});
+    }
+    return tmp;
 }
 

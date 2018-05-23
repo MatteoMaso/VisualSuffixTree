@@ -15,6 +15,7 @@ typedef cst_sct3<> cst_t;
 typedef cst_bfs_iterator<cst_t> iterator1;
 
 class TreeParser {
+
 public:
 
     bool VERBOSE;
@@ -30,6 +31,8 @@ public:
     vector<cst_t::char_type> alphabet;
 
 private:
+
+    int tree_max_depth = 0;
 
     bool checkNumberOfBit(int nBit, NodeInfoStructure *nodeInfoStructure);
 
