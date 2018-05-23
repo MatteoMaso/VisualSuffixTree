@@ -190,11 +190,8 @@ int NodeInfo::getEdgeIndex(){
 string NodeInfo::getEdge(string * text, unsigned long idx, unsigned long length){
     //todo rimuoveri i parametri di passaggio
     string edge = "";
-    unsigned long l = getEdgeLength();
 
-
-    for (int j = idx; j < idx + l; j++) {
-//        edge += text->at(j);
+    for (int j = idx; j < idx + length; j++) {
         if ( j == originalString->length()) {
             edge += "$";
         } else {

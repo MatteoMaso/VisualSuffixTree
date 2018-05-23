@@ -105,7 +105,6 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
             }
         }
 
-
         if (nodeInfoStructure.OPT_CHILDREN_INFO) {
             //SET CHILDREN ID
             vector<int> childrenID; //support structure
@@ -129,7 +128,6 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
             }
         }
         nodeInfoObj.setWinerLinkId(&wl);
-
 
         if (VERBOSE) {
             std::cout << "\n\n\nNodeDepth: " << cst.node_depth(*it) << " Depth: " << cst.depth(*it) << "-["

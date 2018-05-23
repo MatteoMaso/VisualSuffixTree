@@ -30,6 +30,34 @@ public:
 
 private:
 
+    enum MAXREP_TYPE {maxrep = 1, supermaximalrep = 2, nearsupermaximal = 3, non_supermaximal = 0};
+
+    struct tmp_node{
+        unsigned long label;
+        unsigned long nodeDepth;
+        unsigned long depth;
+        unsigned long lb;
+        unsigned long rb;
+        unsigned long frequency;
+        unsigned long fatherLabel;
+        bool is_leaf;
+        int numberOfChildren;
+        vector<int> childrenId; //todo change to unsigned long
+        unsigned long edge_length;
+        unsigned long edge_index;
+        //wl
+        int numberOfWl;
+        map<int, unsigned long> wlId;
+        MAXREP_TYPE maxrep_type;
+
+        //plotting
+        double posX;
+        double posY;
+        double w;
+        double opacity;
+        //todo extend
+    };
+
     map<string, string> *configParameter;
     map<int, ObjNode> hashmap; //Useful only when we represent the dimension of the child equel to the dim of the brother
     int H; //the height of the block
@@ -44,14 +72,18 @@ private:
 
     void printStatusBar(std::ofstream *svg_out, map<string, string> *configParameter, string infoToPrint);
 
-    void setPositionTYPE_NODE_DIMENSION2(){
-//
-//        if ((frequency) == 0) {
-//            w = 0;
-//        } else {
-//            w = scaleUnit * (frequency);
-//        }
+    void setPositionTYPE_NODE_DIMENSION3(tmp_node * tmpNode){
+        tmpNode->w = scaleUnit  * (tmpNode->frequency + 1);
+        tmpNode->posX = x0 + tmpNode->lb * scaleUnit;
 
+        if (SVG_FROM_TOP) {
+            tmpNode->posY = y0 + (tmpNode->nodeDepth * H) + tmpNode->nodeDepth * 0.7;
+        } else {
+            tmpNode->posY = y0 - (tmpNode->nodeDepth * H) - tmpNode->nodeDepth * 0.7;
+        }
+    }
+
+    void setPositionTYPE_NODE_DIMENSION2(){
         w = scaleUnit  * (frequency + 1);
         x = x0 + lb * scaleUnit;
 

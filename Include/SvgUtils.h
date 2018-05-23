@@ -431,7 +431,6 @@ public:
         temp += "</g>";
         char str[temp.length()];
         strcpy(str, temp.c_str());
-
         *svg_out << str;
     }
 

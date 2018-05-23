@@ -244,13 +244,16 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
         std::cout << "NOT IMPLEMENTED YET" << std::endl;
     } else if (modality.compare("MAXREP") == 0) {
 
-        enum MAXREP_TYPE {maxrep = 1, supermaximalrep = 2, nearsupermaximal = 3, non_supermaximal = 0};
+//        enum MAXREP_TYPE {maxrep = 1, supermaximalrep = 2, nearsupermaximal = 3, non_supermaximal = 0};
 
         MAXREP_TYPE max_type;
         int nWl = 0;    //#number of Winer Link
 
         int charNumber = 5; //todo trovare sto valore in modo parametrico
         double opacity = 1;
+
+
+        map<unsigned long, tmp_node> maxrep_map;
 
         while (!bio2.empty()) {
 
@@ -260,28 +263,38 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
             if (VERBOSE) std::cout << nodeInfoObj.print(&nodeStructure.alphabet) << std::endl;
 
-            //ACQUIRE THE DEFAULT PARAMETERS
-            nodeDepth = nodeInfoObj.getNodeDepth();
-            depth = nodeInfoObj.getDepth();
-            lb = nodeInfoObj.getLb();
-            rb = nodeInfoObj.getRb();
-            frequency = rb - lb;
-            fatherLabel = nodeInfoObj.getFatherLabel();
-            label = nodeInfoObj.getLabel();
+            tmp_node tmpNode;
+            tmpNode.nodeDepth = nodeInfoObj.getNodeDepth();
+            tmpNode.depth = nodeInfoObj.getDepth();
+            tmpNode.lb = nodeInfoObj.getLb();
+            tmpNode.rb = nodeInfoObj.getRb();
+            tmpNode.frequency = tmpNode.rb - tmpNode.lb;
+            tmpNode.fatherLabel = nodeInfoObj.getFatherLabel();
+            tmpNode.label = nodeInfoObj.getLabel();
+            tmpNode.numberOfChildren = nodeInfoObj.getNumbrOfChildren();
+            tmpNode.numberOfWl = nodeInfoObj.getNumberOfWl();
+            tmpNode.edge_index = nodeInfoObj.getEdgeIndex();
+            tmpNode.edge_length = nodeInfoObj.getEdgeLength();
+            tmpNode.childrenId = nodeInfoObj.getChildrenId();
+            tmpNode.wlId = nodeInfoObj.getWlId();
 
-            nWl = nodeInfoObj.getNumberOfWl();
+            if ( nodeInfoObj.getNumbrOfChildren()  ==  0){
+                tmpNode.is_leaf = true;
+            } else {
+                tmpNode.is_leaf = false;
+            }
 
-            if( nWl > 1 ){
-                max_type = MAXREP_TYPE::maxrep;
+            if( tmpNode.numberOfWl > 1 ){
+                tmpNode.maxrep_type = MAXREP_TYPE::maxrep;
             } else if (false){
                 //todo per i supermaximal
-                max_type = MAXREP_TYPE::supermaximalrep;
+                tmpNode.maxrep_type = MAXREP_TYPE::supermaximalrep;
             }else if (false){
                 //todo per i near supermaximal
-                max_type = MAXREP_TYPE::nearsupermaximal;
+                tmpNode.maxrep_type = MAXREP_TYPE::nearsupermaximal;
             }else {
                 //Default
-                max_type = MAXREP_TYPE::non_supermaximal;
+                tmpNode.maxrep_type = MAXREP_TYPE::non_supermaximal;
             }
 
 
@@ -293,62 +306,107 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
 
             //means the dimensions of a node is proportional with the depth
-            if (nodeDepth == 0) {  //Root is large as the windows minus a border
-                w = rootNodeWidth;
-                maxSuffixArrayLength = rb;
-                x = x0;
-                y = y0;
-                scaleUnit = rootNodeWidth / (rb + 1);
-                numberOfNode = label;
+            if (tmpNode.nodeDepth == 0) {  //Root is large as the windows minus a border
+                tmpNode.w = rootNodeWidth;
+                maxSuffixArrayLength = tmpNode.rb;
+                tmpNode.posX = x0;
+                tmpNode.posY = y0;
+                scaleUnit = rootNodeWidth / (tmpNode.rb + 1);
+                numberOfNode = tmpNode.label;
             } else {
                 //altrimenti scalo la larghezza per la larghezza del suffix interval
-                setPositionTYPE_NODE_DIMENSION2();
+                setPositionTYPE_NODE_DIMENSION3(&tmpNode);
             }
 
 
-            ObjNode objNode = ObjNode(); //lo creo fuori dalle varie opzioni
-            objNode.setObjNodeDepth(nodeDepth);
-            objNode.setObjNodeWid(w);
-            objNode.setObjNodeX(x);
-            objNode.setObjNodeY(y);
-            objNode.setNumberOfChildren(nodeInfoObj.getNumbrOfChildren());
-            objNode.setObjNodeDepth(depth);
-            pair<int, ObjNode> element = {label, objNode};
-            hashmap.insert(element);
+            if (stoi(configParameter->at("MAXREP_BLEND_WL")) == 1){
+                double s = ((charNumber) - tmpNode.numberOfWl) * (1.0/(charNumber));
+                tmpNode.opacity = 1-s;
+            }
+
+//            std::cout << "Nwl: " << tmpNode.numberOfWl << "  op:  " << tmpNode.opacity << std::endl;
+            maxrep_map.insert({tmpNode.label, tmpNode});
+
+        }
+
+        unsigned  long counter = 0;
+        std::cout << maxrep_map.size() << std::endl;
+
+        while(counter < maxrep_map.size()){
+            //COMPLETE THE SVG CREATION
+
+            tmp_node n = maxrep_map.at(counter);
+
+            //find nearSupermaximal
+            if ( n.maxrep_type == MAXREP_TYPE::maxrep){
+                //discover if it's near-supermaximal
+                int leafNumber = 0;
+                bool is_nearSupMax = false;
+                for (int i = 0; i < n.childrenId.size(); i++) {
+                    tmp_node children = maxrep_map.at(n.childrenId.at(i));
+                    if (!children.is_leaf){ //if children is not a leaf continue
+                        continue;
+                    }
+
+                    //se è una foglia
+                    unsigned long V;
+                    for (auto i : children.wlId) {
+                        V = i.second;
+                    }
+
+                    if (maxrep_map.at(V).frequency>1){
+                        continue;
+                    }
+
+                    is_nearSupMax = true;
+                    leafNumber++;
+
+//                    std::cout<<"this is near-supermaximal" << std::endl;
+
+//                    std::cout<<"Is near supermaximal? " << n.maxrep_type << std::endl;
+                }
+
+                if (is_nearSupMax){
+                    n.maxrep_type = MAXREP_TYPE::nearsupermaximal;
+                }
+
+                if ( leafNumber == n.childrenId.size()){
+                    n.maxrep_type = MAXREP_TYPE::supermaximalrep;
+                }
+
+            }
+
+//            std::cout<<"Is near supermaximal? " << n.maxrep_type << std::endl;
+
 
             //SETTINGS EDGE INFO
             if (stoi(configParameter->at("SHOW_EDGE_INFO")) == 1) {
-                edge = nodeInfoObj.getEdge(&originalString, nodeInfoObj.getEdgeIndex(), nodeInfoObj.getEdgeLength()
-                );
+                edge = nodeInfoObj.getEdge(&originalString, n.edge_index, n.edge_length);
             }
-
-            if (stoi(configParameter->at("MAXREP_BLEND_WL")) == 1){
-                double s = (charNumber - nWl) * (1.0/charNumber);
-                opacity = 1-s;
-            }
-
 
             //SETTING COLOR ACCORDING WITH WHAT I WANT TO SHOW
             if (stoi(configParameter->at("MAXREP_SHOW_MAX_REP")) == 1){
                 //colora i max rep e sfuma gli altri
-                if ( max_type == MAXREP_TYPE::maxrep ){
-                    SvgUtils::printSvgNodeBlock2(&svg_out, edge, w, x, y, H, configParameter->at("MAXREP_MAXREP_COLOR"), opacity);
-                } else if (max_type == MAXREP_TYPE::supermaximalrep){
-                    SvgUtils::printSvgNodeBlock2(&svg_out, edge, w, x, y, H, configParameter->at("MAXREP_SUPERMAXIMAL_COLOR"), 1);
-                }else if (max_type == MAXREP_TYPE::nearsupermaximal){
-                    SvgUtils::printSvgNodeBlock2(&svg_out, edge, w, x, y, H, configParameter->at("MAXREP_NEARSUPERMAXIMAL_COLOR"), 1);
-                }else {
+                if ( n.maxrep_type == MAXREP_TYPE::maxrep ){
+                    SvgUtils::printSvgNodeBlock2(&svg_out, edge, n.w, n.posX, n.posY, H, configParameter->at("MAXREP_MAXREP_COLOR"), n.opacity);
+                } else if (n.maxrep_type == MAXREP_TYPE::supermaximalrep){
+                    SvgUtils::printSvgNodeBlock2(&svg_out, edge, n.w, n.posX, n.posY, H, configParameter->at("MAXREP_SUPERMAXIMAL_COLOR"), 1);
+                } else if (n.maxrep_type == MAXREP_TYPE::nearsupermaximal){
+//                    std::cout<<"enter "<< std::endl;
+                    SvgUtils::printSvgNodeBlock2(&svg_out, edge, n.w, n.posX, n.posY, H, configParameter->at("MAXREP_NEARSUPERMAXIMAL_COLOR"), 1);
+                } else {
                     //non supermaximal
-                    SvgUtils::printSvgNodeBlock2(&svg_out, edge, w, x, y, H, configParameter->at("MAXREP_NONMAXREP_COLOR"), 1);
+                    SvgUtils::printSvgNodeBlock2(&svg_out, edge, n.w, n.posX, n.posY, H, configParameter->at("MAXREP_NONMAXREP_COLOR"), 1);
                 }
 
 
             }else {
                 //default
-                SvgUtils::printSvgNodeBlock2(&svg_out, edge, w, x, y, H, configParameter->at("MAXREP_NONMAXREP_COLOR"), 1);
+                SvgUtils::printSvgNodeBlock2(&svg_out, edge, n.w, n.posX, n.posY, H, configParameter->at("MAXREP_NONMAXREP_COLOR"), 1);
 
             }
 
+            counter++;
         }
 
         infoStatusBar = "STATUS BAR    Modality: MaxRep     StringLength: " +
