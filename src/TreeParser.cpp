@@ -25,6 +25,8 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
     iterator begin = iterator(&cst, cst.root());
     iterator end = iterator(&cst, cst.root(), true, true);
 
+    std::cout << "finish tree costruction" << std::endl;
+
     setAlphabet(inputFileName, this);
 
     string originalString;
@@ -107,7 +109,7 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
 
         if (nodeInfoStructure.OPT_CHILDREN_INFO) {
             //SET CHILDREN ID
-            vector<int> childrenID; //support structure
+            vector<unsigned long> childrenID; //support structure
             for (auto &child: cst.children(*it)) {
                 childrenID.push_back(cst.id(child));
             }

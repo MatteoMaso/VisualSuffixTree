@@ -136,9 +136,6 @@ bool NodeInfoStructure::setField(string headerInfo) {
 
     int pippo = PARAMETER_NUMBER;
 
-//    for (int k = 160; k < 2000; ++k) {
-//        std::cout << headerInfo.at(k) << std::endl;
-//    }
 
     OPT_DEPTH = getParameter(headerInfo, pippo++);
     OPT_NODEDEPTH = getParameter(headerInfo, pippo++);

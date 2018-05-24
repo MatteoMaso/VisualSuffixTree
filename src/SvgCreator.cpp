@@ -335,26 +335,25 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
         while(counter < maxrep_map.size()){
             //COMPLETE THE SVG CREATION
 
-            tmp_node n = maxrep_map.at(counter);
+            tmp_node V = maxrep_map.at(counter);
 
             //find nearSupermaximal
-            if ( n.maxrep_type == MAXREP_TYPE::maxrep){
+            if ( V.maxrep_type == MAXREP_TYPE::maxrep){
                 //discover if it's near-supermaximal
                 int leafNumber = 0;
                 bool is_nearSupMax = false;
-                for (int i = 0; i < n.childrenId.size(); i++) {
-                    tmp_node children = maxrep_map.at(n.childrenId.at(i));
-                    if (!children.is_leaf){ //if children is not a leaf continue
+                for (int i = 0; i < V.childrenId.size(); i++) { //per ogni figlio
+                    tmp_node W = maxrep_map.at(V.childrenId.at(i));
+                    if (!W.is_leaf){ //if children is not a leaf continue
                         continue;
                     }
 
-                    //se è una foglia
-                    unsigned long V;
-                    for (auto i : children.wlId) {
-                        V = i.second;
+                    unsigned long U; //id nodo targhet wl(V) label with char of the only one wl(W)
+                    for (auto i : W.wlId) {
+                        U = V.wlId.at(i.first);
                     }
 
-                    if (maxrep_map.at(V).frequency>1){
+                    if (maxrep_map.at(U).frequency > 1){
                         continue;
                     }
 
@@ -367,11 +366,11 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                 }
 
                 if (is_nearSupMax){
-                    n.maxrep_type = MAXREP_TYPE::nearsupermaximal;
+                    V.maxrep_type = MAXREP_TYPE::nearsupermaximal;
                 }
 
-                if ( leafNumber == n.childrenId.size()){
-                    n.maxrep_type = MAXREP_TYPE::supermaximalrep;
+                if ( leafNumber == V.childrenId.size()){
+                    V.maxrep_type = MAXREP_TYPE::supermaximalrep;
                 }
 
             }
@@ -381,28 +380,28 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
             //SETTINGS EDGE INFO
             if (stoi(configParameter->at("SHOW_EDGE_INFO")) == 1) {
-                edge = nodeInfoObj.getEdge(&originalString, n.edge_index, n.edge_length);
+                edge = nodeInfoObj.getEdge(&originalString, V.edge_index, V.edge_length);
             }
 
             //SETTING COLOR ACCORDING WITH WHAT I WANT TO SHOW
             if (stoi(configParameter->at("MAXREP_SHOW_MAX_REP")) == 1){
                 //colora i max rep e sfuma gli altri
-                if ( n.maxrep_type == MAXREP_TYPE::maxrep ){
-                    SvgUtils::printSvgNodeBlock2(&svg_out, edge, n.w, n.posX, n.posY, H, configParameter->at("MAXREP_MAXREP_COLOR"), n.opacity);
-                } else if (n.maxrep_type == MAXREP_TYPE::supermaximalrep){
-                    SvgUtils::printSvgNodeBlock2(&svg_out, edge, n.w, n.posX, n.posY, H, configParameter->at("MAXREP_SUPERMAXIMAL_COLOR"), 1);
-                } else if (n.maxrep_type == MAXREP_TYPE::nearsupermaximal){
+                if ( V.maxrep_type == MAXREP_TYPE::maxrep ){
+                    SvgUtils::printSvgNodeBlock2(&svg_out, edge, V.w, V.posX, V.posY, H, configParameter->at("MAXREP_MAXREP_COLOR"), V.opacity);
+                } else if (V.maxrep_type == MAXREP_TYPE::supermaximalrep){
+                    SvgUtils::printSvgNodeBlock2(&svg_out, edge, V.w, V.posX, V.posY, H, configParameter->at("MAXREP_SUPERMAXIMAL_COLOR"), 1);
+                } else if (V.maxrep_type == MAXREP_TYPE::nearsupermaximal){
 //                    std::cout<<"enter "<< std::endl;
-                    SvgUtils::printSvgNodeBlock2(&svg_out, edge, n.w, n.posX, n.posY, H, configParameter->at("MAXREP_NEARSUPERMAXIMAL_COLOR"), 1);
+                    SvgUtils::printSvgNodeBlock2(&svg_out, edge, V.w, V.posX, V.posY, H, configParameter->at("MAXREP_NEARSUPERMAXIMAL_COLOR"), 1);
                 } else {
                     //non supermaximal
-                    SvgUtils::printSvgNodeBlock2(&svg_out, edge, n.w, n.posX, n.posY, H, configParameter->at("MAXREP_NONMAXREP_COLOR"), 1);
+                    SvgUtils::printSvgNodeBlock2(&svg_out, edge, V.w, V.posX, V.posY, H, configParameter->at("MAXREP_NONMAXREP_COLOR"), 1);
                 }
 
 
             }else {
                 //default
-                SvgUtils::printSvgNodeBlock2(&svg_out, edge, n.w, n.posX, n.posY, H, configParameter->at("MAXREP_NONMAXREP_COLOR"), 1);
+                SvgUtils::printSvgNodeBlock2(&svg_out, edge, V.w, V.posX, V.posY, H, configParameter->at("MAXREP_NONMAXREP_COLOR"), 1);
 
             }
 

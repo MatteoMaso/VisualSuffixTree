@@ -40,8 +40,7 @@ public:
 
     void setNumberOfChildren(int n);
 
-    //todo change to vector<unsigned long>
-    void setChildrenId(vector<int> *childrenId);
+    void setChildrenId(vector<unsigned long> *childrenId);
 
     void setNumberOfWinerLink(int n);
 
@@ -52,29 +51,29 @@ public:
 
     string getNodeField();
 
-    int getDepth();
+    unsigned long getDepth();
 
-    int getNodeDepth();
+    unsigned long getNodeDepth();
 
-    int getLb();
+    unsigned long getLb();
 
-    int getRb();
+    unsigned long getRb();
 
-    int getLabel();
+    unsigned long getLabel();
 
-    int getFatherLabel();
+    unsigned long getFatherLabel();
 
-    int getEdgeLength();
+    unsigned long getEdgeLength();
 
     int getEdgeCharacterEncoding();
 
-    int getEdgeIndex();
+    unsigned long getEdgeIndex();
 
 //    string getEdgeDecoded();
 
     string getEdge(string * text, unsigned long idx, unsigned long length);
 
-    string partitioner(string *s, int from, int to);
+    string partitioner(string *s, unsigned long from, unsigned long to);
 
     string encodeCharacter(string *s, vector<string> *codification, vector<string> *alphabet);
 
@@ -86,7 +85,7 @@ public:
 
     int getNumbrOfChildren();
 
-    vector<int> getChildrenId();
+    vector<unsigned long> getChildrenId();
 
     int getNumberOfWl();
 
@@ -109,7 +108,7 @@ public:
     string edge_idx;
     string edgeCharacterEncoding;
     string numberOfChildren;
-    vector<int> childrenId;
+    vector<unsigned long> childrenId;
     string numberOfWinerLink;
     map<int, unsigned long> wlId;
 
@@ -120,7 +119,7 @@ public:
 
 private:
 
-    string childrenToEncodedString(vector<int> v);
+    string childrenToEncodedString(vector<unsigned long> v);
 
     string wlToEncodedString(map<int, unsigned long>);
 

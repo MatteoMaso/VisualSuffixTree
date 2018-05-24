@@ -159,23 +159,23 @@ void NodeInfo::setEdgeCharacterEncoding(unsigned long n) {
 }
 
 
-int NodeInfo::getDepth() {
+unsigned long NodeInfo::getDepth() {
     return stoi(depth, nullptr, 2);;
 }
 
-int NodeInfo::getNodeDepth() {
+unsigned long NodeInfo::getNodeDepth() {
     return stoi(nodeDepth, nullptr, 2);
 }
 
-int NodeInfo::getLb() {
+unsigned long NodeInfo::getLb() {
     return stoi(lb, nullptr, 2);;
 }
 
-int NodeInfo::getRb() {
+unsigned long NodeInfo::getRb() {
     return stoi(rb, nullptr, 2);
 }
 
-int NodeInfo::getEdgeLength() {
+unsigned long NodeInfo::getEdgeLength() {
     return stoi(edgeLength, nullptr, 2);
 }
 
@@ -183,7 +183,7 @@ int NodeInfo::getEdgeCharacterEncoding() {
     return stoi(edgeCharacterEncoding, nullptr, 2);
 }
 
-int NodeInfo::getEdgeIndex(){
+unsigned long NodeInfo::getEdgeIndex(){
     return stoi(edge_idx, nullptr, 2);
 }
 
@@ -191,7 +191,7 @@ string NodeInfo::getEdge(string * text, unsigned long idx, unsigned long length)
     //todo rimuoveri i parametri di passaggio
     string edge = "";
 
-    for (int j = idx; j < idx + length; j++) {
+    for (unsigned long j = idx; j < idx + length; j++) {
         if ( j == originalString->length()) {
             edge += "$";
         } else {
@@ -257,10 +257,10 @@ string NodeInfo::print(vector<string> * alphabet) {
 }
 
 
-string NodeInfo::partitioner(string *s, int from, int to) {
+string NodeInfo::partitioner(string *s, unsigned long from, unsigned long to) {
 
     string a = "";
-    for (int i = from; i <= to; i++) {
+    for (unsigned long i = from; i <= to; i++) {
         a += s->at(i);
     }
     return a;
@@ -296,12 +296,12 @@ string NodeInfo::decodeCharacter(string *s, vector<string> *codification, vector
 //    edge = *s;
 //}
 
-int NodeInfo::getLabel() {
-    return stoi(label, nullptr, 2);
+unsigned long NodeInfo::getLabel() {
+    return stoul(label, nullptr, 2);
 }
 
-int NodeInfo::getFatherLabel() {
-    return stoi(fatherLabel, nullptr, 2);
+unsigned long NodeInfo::getFatherLabel() {
+    return stoul(fatherLabel, nullptr, 2);
 }
 
 void NodeInfo::setNumberOfChildren(int n) {
@@ -309,6 +309,7 @@ void NodeInfo::setNumberOfChildren(int n) {
 }
 
 void NodeInfo::setWl(string * winerLinkString) {
+    //todo check int
     int idx;
     unsigned  long l;
     wlId.clear();
@@ -329,6 +330,7 @@ void NodeInfo::setWl(string * winerLinkString) {
 }
 
 void NodeInfo::setChildren(string *childrenString) {
+    //todo check numero bit e int type
     int bitChildrenId = 32; //todo dev'essere coerente al config file
     string id;
     childrenId.clear();
@@ -341,7 +343,7 @@ void NodeInfo::setChildren(string *childrenString) {
     }
 }
 
-void NodeInfo::setChildrenId(vector<int> *childrenId) {
+void NodeInfo::setChildrenId(vector<unsigned long> *childrenId) {
 
     setNumberOfChildren(childrenId->size());
     this->childrenId.clear();
@@ -354,11 +356,11 @@ int NodeInfo::getNumbrOfChildren() {
     return stoi(numberOfChildren, nullptr, 2);
 }
 
-vector<int> NodeInfo::getChildrenId() {
+vector<unsigned long> NodeInfo::getChildrenId() {
     return this->childrenId;
 }
 
-string NodeInfo::childrenToEncodedString(vector<int> v) {
+string NodeInfo::childrenToEncodedString(vector<unsigned long> v) {
 
     string tmp = "";
 

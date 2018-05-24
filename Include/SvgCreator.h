@@ -42,7 +42,7 @@ private:
         unsigned long fatherLabel;
         bool is_leaf;
         int numberOfChildren;
-        vector<int> childrenId; //todo change to unsigned long
+        vector<unsigned long> childrenId;
         unsigned long edge_length;
         unsigned long edge_index;
         //wl
