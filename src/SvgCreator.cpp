@@ -224,6 +224,8 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
         int charNumber = (int)nodeStructure.alphabet.size();
         map<unsigned long, tmp_node> maxrep_map;
 
+        unsigned long maxrep_counter = 0, supermaxrep_counter = 0, nearsupermax_counter = 0;
+
         while (!bio2.empty()) {
 
             //READ AN OTHER NODE AND PUT THE INFOMATION INSIDE THE nodeInfoObj
@@ -286,6 +288,9 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
             //find nearSupermaximal
             if (V.maxrep_type == MAXREP_TYPE::maxrep) {
+
+                maxrep_counter++; //increment the number of maxrep node
+
                 //discover if it's near-supermaximal
                 int leafNumber = 0;
                 bool is_nearSupMax = false;
@@ -307,10 +312,12 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
                 if (is_nearSupMax) {
                     V.maxrep_type = MAXREP_TYPE::nearsupermaximal;
+                    nearsupermax_counter++;
                 }
 
                 if (leafNumber == V.childrenId.size()) {
                     V.maxrep_type = MAXREP_TYPE::supermaximalrep;
+                    supermaxrep_counter++;
                 }
             }
 
@@ -356,8 +363,11 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
             counter++;
         }
 
-        infoStatusBar = "STATUS BAR    Modality: MaxRep     StringLength: " +
-                        to_string(stringLength) + "       #Nodes: " + to_string(numberOfNode);
+
+
+        infoStatusBar = "Modality: MaxRep     StringLength: " +
+                        to_string(stringLength) + "         #Nodes: " + to_string(numberOfNode) + "        Maxrep: " + to_string((maxrep_counter*100)/numberOfNode)
+                + "%       NearSuperMax: " + to_string((nearsupermax_counter*100)/numberOfNode) + "%      SuperMax:  " + to_string((supermaxrep_counter*100)/numberOfNode) + "%";
     } else {
         //error
         exit(-1);
