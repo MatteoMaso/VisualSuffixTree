@@ -48,7 +48,6 @@ public:
 
 
     //GETTER
-
     string getNodeField();
 
     unsigned long getDepth();
@@ -69,9 +68,7 @@ public:
 
     unsigned long getEdgeIndex();
 
-//    string getEdgeDecoded();
-
-    string getEdge(string * text, unsigned long idx, unsigned long length);
+    string getEdge(unsigned long idx, unsigned long length);
 
     string partitioner(string *s, unsigned long from, unsigned long to);
 
@@ -114,8 +111,8 @@ public:
 
     string * originalString;
 
-    int BIT_WINERLINK = 16; //todo mettere a 32
-    int BIT_IDX_WL = 16;    //todo mettere a 32 ed adattare il codice
+    int BIT_WINERLINK = 32;
+    int BIT_IDX_WL = 32;
 
 private:
 
@@ -129,4 +126,4 @@ private:
 
 };
 
-#endif //VISUALSUFFIXTREE_NODEINFO_H
+#endif

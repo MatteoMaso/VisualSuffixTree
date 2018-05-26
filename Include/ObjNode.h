@@ -13,9 +13,9 @@ class ObjNode{
 public:
     ObjNode();
 
-    int getObjNodeDepth();
+    unsigned long getObjNodeDepth();
 
-    void setObjNodeDepth(int objNodeDepth);
+    void setObjNodeDepth(unsigned long objNodeDepth);
 
     double getObjNodeX();
 
@@ -25,7 +25,7 @@ public:
 
     void setObjNodeY(double objNodeY);
 
-    float getObjNodeWid();
+    double getObjNodeWid();
 
     void setObjNodeWid(double objNodeWid);
 
@@ -39,10 +39,10 @@ public:
 
 
 private:
-    int objNodeDepth;
+    unsigned long objNodeDepth;
     double objNodeX;
     double objNodeY;
-    float objNodeWid;
+    double objNodeWid;
     int numberOfChildren;
     int sonsCount = 0;
     //int ovjNodeHeigth; per ora li facciamo tutti alla stessa altezza

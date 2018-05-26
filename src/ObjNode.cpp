@@ -19,11 +19,11 @@ ObjNode::ObjNode() {
     sonsCount = 0;
 }
 
-int ObjNode::getObjNodeDepth(){
+unsigned long ObjNode::getObjNodeDepth(){
     return objNodeDepth;
 }
 
-void ObjNode::setObjNodeDepth(int objNodeDepth) {
+void ObjNode::setObjNodeDepth(unsigned long objNodeDepth) {
     this->objNodeDepth = objNodeDepth;
 }
 
@@ -43,7 +43,7 @@ void ObjNode::setObjNodeY(double objNodeY) {
     this->objNodeY = objNodeY;
 }
 
-float ObjNode::getObjNodeWid(){
+double ObjNode::getObjNodeWid(){
     return objNodeWid;
 }
 

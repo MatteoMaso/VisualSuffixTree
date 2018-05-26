@@ -17,54 +17,40 @@ NodeInfoStructure::NodeInfoStructure(map<string, string> *configParameter, char 
     long stringLength = getStringLength(inputFileName);
     string alphabet = getAlphabet(inputFileName);
     
-    //NUMBER OF BIT FOR EACH FIELD REPRESENTATION
     //AQUIRE PARAMETER FROM CONFIG FILE
+    int BIT_ID_NODE = 32;
+
+    //SET NUMBER OF BIT FOR EACH FIELD REPRESENTATION
     this->parameter[INDEX_BIT_DEPTH] = stoi(configParameter->at("bitDepth"));
     this->parameter[INDEX_BIT_NODEDEPTH] = stoi(configParameter->at("bitNodeDepth"));
-    this->parameter[INDEX_BIT_LB] = stoi(configParameter->at("bitLb"));
-    this->parameter[INDEX_BIT_RB] = stoi(configParameter->at("bitRb"));
-    this->parameter[INDEX_BIT_LABEL] = stoi(configParameter->at("bitLabel"));
-    this->parameter[INDEX_BIT_FATHERLABEL] = stoi(configParameter->at("bitFatherLabel"));
+    this->parameter[INDEX_BIT_LB] = BIT_ID_NODE; //stoi(configParameter->at("bitLb"));
+    this->parameter[INDEX_BIT_RB] = BIT_ID_NODE; //stoi(configParameter->at("bitRb"));
+    this->parameter[INDEX_BIT_LABEL] = BIT_ID_NODE; //stoi(configParameter->at("bitLabel"));
+    this->parameter[INDEX_BIT_FATHERLABEL] = BIT_ID_NODE; //stoi(configParameter->at("bitFatherLabel"));
     this->parameter[INDEX_BIT_EDGELENGTH] = stoi(configParameter->at("bitEdgeLength"));
     this->parameter[INDEX_BIT_EDGECHARACTERENCODING] = stoi(configParameter->at("bitEdgeCharacterEncoding"));
     this->parameter[INDEX_BIT_NUMBEROFCHILDREN] = stoi(configParameter->at("bitNumberOfChildren"));
-    this->parameter[INDEX_BIT_CHILDRENID] = 32; //stoi(configParameter->at("bitChildrenId")); //se lo metto variabile devo cambiare sotto
+    this->parameter[INDEX_BIT_CHILDRENID] = BIT_ID_NODE; //stoi(configParameter->at("bitChildrenId")); //se lo metto variabile devo cambiare sotto
     this->parameter[INDEX_BIT_NUMBEROFWL] = 8; //todo metterlo = ai bit usati per il charEncoding
 
 
     //AQUIRE THE INFO THAT I WANT TO REPRESENT FROM THE CONFIG FILE
-    //standard information:
     this->OPT_DEPTH = true;
     this->OPT_NODEDEPTH = true;
     this->OPT_LB = true;
     this->OPT_RB = true;
 
     //LABEL INFO
-    if (stoi(configParameter->at("OPT_LABEL")) == 1) {
-        this->OPT_LABEL = true;
-    } else {
-        this->OPT_LABEL = false;
-    }
+    this->OPT_LABEL = (stoi(configParameter->at("OPT_LABEL")) == 1);
+
     //FATHER LABEL INFO
-    if (stoi(configParameter->at("OPT_FATHERLABLE")) == 1) {
-        this->OPT_FATHERLABLE = true;
-    } else {
-        this->OPT_FATHERLABLE = false;
-    }
+    this->OPT_FATHERLABLE = (stoi(configParameter->at("OPT_FATHERLABLE")) == 1);
 
     //ENGE LABEL INFO
-    if (stoi(configParameter->at("OPT_EDGEINFO")) == 1) {
-        this->OPT_EDGEINFO = true;
-    } else {
-        this->OPT_EDGEINFO = false;
-    }
+    this->OPT_EDGEINFO = (stoi(configParameter->at("OPT_EDGEINFO")) == 1);
 
     //CHILDREN INFO
-    if (stoi(configParameter->at("OPT_CHILDREN_INFO")) == 1) {
-        this->OPT_CHILDREN_INFO = true;
-    } else {
-        this->OPT_CHILDREN_INFO = false;
-    }
+    this->OPT_CHILDREN_INFO = (stoi(configParameter->at("OPT_CHILDREN_INFO")) == 1);
 
     setAlphabet(alphabet);
 }
@@ -243,7 +229,6 @@ string NodeInfoStructure::getAlphabet(char *inputFileName) {
         std::cout << character.at(j) <<std::endl;
         string ca = string(character.at(j));
         alp.append("," + character.at(j));
-//        alp += "," + ;
     }
     
     return alp;

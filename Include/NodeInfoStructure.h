@@ -101,6 +101,7 @@ public:
     }
 
 private:
+
     string getAlphabet(char *inputFileName);
 
     long getStringLength(char * inputFileName);

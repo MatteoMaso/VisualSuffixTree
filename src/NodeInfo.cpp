@@ -122,7 +122,6 @@ bool NodeInfo::setNodeField(string * nodeField) {
 }
 
 void NodeInfo::setDepth(unsigned long n) {
-//    depth = std::bitset<bitDepth>(n).to_string();
     depth = toBinFormat(infoStructure->getBitDepth(), n);
 }
 
@@ -187,8 +186,7 @@ unsigned long NodeInfo::getEdgeIndex(){
     return stoi(edge_idx, nullptr, 2);
 }
 
-string NodeInfo::getEdge(string * text, unsigned long idx, unsigned long length){
-    //todo rimuoveri i parametri di passaggio
+string NodeInfo::getEdge(unsigned long idx, unsigned long length){
     string edge = "";
 
     for (unsigned long j = idx; j < idx + length; j++) {
@@ -225,7 +223,7 @@ string NodeInfo::print(vector<string> * alphabet) {
 
     if (infoStructure->OPT_EDGEINFO) {
         s.append("\nEdge Length:      " + to_string(getEdgeLength()));
-        s.append("\nEdge:             " + getEdge(originalString, getEdgeIndex(), getEdgeLength()));
+        s.append("\nEdge:             " + getEdge(getEdgeIndex(), getEdgeLength()));
     } else {
         s.append("\nEdge:             NOT SET");
     }
@@ -292,10 +290,6 @@ string NodeInfo::decodeCharacter(string *s, vector<string> *codification, vector
     exit(12);
 }
 
-//void NodeInfo::setBinaryEdge(string *s) {
-//    edge = *s;
-//}
-
 unsigned long NodeInfo::getLabel() {
     return stoul(label, nullptr, 2);
 }
@@ -309,7 +303,6 @@ void NodeInfo::setNumberOfChildren(int n) {
 }
 
 void NodeInfo::setWl(string * winerLinkString) {
-    //todo check int
     int idx;
     unsigned  long l;
     wlId.clear();

@@ -12,7 +12,7 @@
 #include "ObjNode.h"
 
 
-class SvgCreator{
+class SvgCreator {
 
 public:
 
@@ -20,19 +20,58 @@ public:
 
     long stringLength;
 
-    SvgCreator(char *inputFileName, char *outputFile, map<string, string> *configParameter, char * stringFileName);
+    SvgCreator(char *inputFileName, char *outputFile, map<string, string> *configParameter, char *stringFileName);
 
-    void openFile(std::ifstream *bin_in, char *inputFileName, BitIo<16> *bio);
+    void openFile(std::ifstream *bin_in, char *inputFileName, BitIo<16> *bio) {
+        if (!(*bin_in).is_open()) {
+            std::cout << "I'm not able to open file: " << inputFileName
+                      << " probably you must create the file test.bin inside Output with "
+                         " the first program" << std::endl;
+            exit(7);
+        }
+        *bin_in >> *bio;
 
-    string readNextNodeInfo(BitIo<16> *bio);
+        //Check that the node property file generate with the first program must contain informations
+        if ((*bio).size() == 8) {
+            printf("The node property file generated with the first program is empty, probably you have passed a bad string path");
+            exit(8);
+        }
+
+    }
+
+    string readNextNodeInfo(BitIo<16> *bio) {
+
+        string nodeInfo = "";
+
+        int e = stoi((*bio).pop_front().to_string(), nullptr, 2);
+
+        for (int i = 0; i < e; i++) {
+            nodeInfo += (*bio).pop_front().to_string();
+        }
+
+        return nodeInfo;
+    }
 
     string infoStatusBar;
 
+    void setOriginalStringParameter(char *originalStringFileName) {
+        this->originalString = "";
+        ifstream file(originalStringFileName);
+        if (file.is_open())
+            while (file.good())
+                getline(file, this->originalString);
+        file.close();
+
+        this->stringLength = this->originalString.size();
+    }
+
 private:
 
-    enum MAXREP_TYPE {maxrep = 1, supermaximalrep = 2, nearsupermaximal = 3, non_supermaximal = 0};
+    enum MAXREP_TYPE {
+        maxrep = 1, supermaximalrep = 2, nearsupermaximal = 3, non_supermaximal = 0
+    };
 
-    struct tmp_node{
+    struct tmp_node {
         unsigned long label;
         unsigned long nodeDepth;
         unsigned long depth;
@@ -45,35 +84,67 @@ private:
         vector<unsigned long> childrenId;
         unsigned long edge_length;
         unsigned long edge_index;
-        //wl
+
+        //WINER LINK INFORMATION
         int numberOfWl;
         map<int, unsigned long> wlId;
         MAXREP_TYPE maxrep_type;
 
-        //plotting
+        //PLOTTING INFORMATION
         double posX;
         double posY;
         double w;
         double opacity;
-        //todo extend
     };
 
     map<string, string> *configParameter;
-    map<int, ObjNode> hashmap; //Useful only when we represent the dimension of the child equel to the dim of the brother
+    map<int, ObjNode> hashmap; //Useful only when we represent the dimension of the child equal to the dim of the brother
     int H; //the height of the block
     double x0, y0, w, x, y, rectWidth, rootNodeWidth;
-    int count, fatherLabel, label, frequency, maxSuffixArrayLength, lb, rb, nodeDepth, depth;
+    unsigned long fatherLabel, label, frequency, maxSuffixArrayLength, lb, rb, nodeDepth, depth;
+    int count;
     string edge = "";
     double scaleUnit = 0;
     string nodeInfo;
     bool SVG_FROM_TOP;
     int BASIC_KVALUE_KMER;
-    bool BASIC_KMER;
 
-    void printStatusBar(std::ofstream *svg_out, map<string, string> *configParameter, string infoToPrint);
+    string originalString; //the original string that we have analized
 
-    void setPositionTYPE_NODE_DIMENSION3(tmp_node * tmpNode){
-        tmpNode->w = scaleUnit  * (tmpNode->frequency + 1);
+    void printStatusBar(std::ofstream *svg_out, map<string, string> *configParameter, string infoToPrint) {
+
+        int font_size = 15;
+        int heigth = 40 + (font_size + 5);
+        int x = 0;
+        int width = stoi(configParameter->at("WINDOW_WIDTH"));
+
+        int y = stoi(configParameter->at("WINDOW_HEIGHT")) - heigth;
+        string bar = "<rect x=\"" + to_string(x) + "\" y=\"" + to_string(y) + "\" rx=\"0\" ry=\"0\" width=\"" +
+                     to_string(width) + "\" height=\"" + to_string(heigth) + "\"\n"
+                                                                             "  style=\"fill:white;stroke:black;stroke-width:1;opacity:1.0\" />";
+
+        int textX = x + 50;
+        int textY = y + 40;
+
+
+        for (int i = 0; i < 1; i++) {
+            int y1 = textY + i * (font_size + 5);
+            bar += "<text x=\"" + to_string(textX) + "\" y=\"" + to_string(y1) + "\" \n";
+            bar += "font-family=\"Verdana\" font-size=\"" + to_string(font_size) + "\" fill=\"black\" >\n";
+            bar += infoToPrint;
+            bar += "  </text>";
+        }
+
+
+        char str[bar.length()];
+        strcpy(str, bar.c_str());
+
+        *svg_out << str;
+
+    }
+
+    void setPositionTYPE_NODE_DIMENSION3(tmp_node *tmpNode) {
+        tmpNode->w = scaleUnit * (tmpNode->frequency + 1);
         tmpNode->posX = x0 + tmpNode->lb * scaleUnit;
 
         if (SVG_FROM_TOP) {
@@ -83,8 +154,8 @@ private:
         }
     }
 
-    void setPositionTYPE_NODE_DIMENSION2(){
-        w = scaleUnit  * (frequency + 1);
+    void setPositionTYPE_NODE_DIMENSION2() {
+        w = scaleUnit * (frequency + 1);
         x = x0 + lb * scaleUnit;
 
         if (SVG_FROM_TOP) {
@@ -94,7 +165,8 @@ private:
         }
     }
 
-    void colorSetter(RgbColor *rgbColor, RgbColor *blenchedRgbColor, HsvColor *hsvColor,HsvColor *blenchedHsvColor, map<string, string> *configParameter){
+    void colorSetter(RgbColor *rgbColor, RgbColor *blenchedRgbColor, HsvColor *hsvColor, HsvColor *blenchedHsvColor,
+                     map<string, string> *configParameter) {
 
         //COLOR PARAMETER
         if (configParameter->at("BASIC_COLOR").compare("RGB") == 0) {
@@ -154,51 +226,42 @@ private:
                 rgbColor->g = 255;
                 rgbColor->b = 0;
             } else if (color == 8) {
-//                svgColor = "(128,0,0)";
                 rgbColor->r = 128;
                 rgbColor->g = 0;
                 rgbColor->b = 0;
             } else if (color == 9) {
-//                svgColor = "(0,0,128)";
                 rgbColor->r = 0;
                 rgbColor->g = 0;
                 rgbColor->b = 128;
             } else if (color == 10) {
-//                svgColor = "(128,128,0)";
                 rgbColor->r = 128;
                 rgbColor->g = 128;
                 rgbColor->b = 0;
             } else if (color == 11) {
-//                svgColor = "(128,0,128)";
                 rgbColor->r = 128;
                 rgbColor->g = 0;
                 rgbColor->b = 128;
             } else if (color == 12) {
-//                svgColor = "(255,0,0)";
                 rgbColor->r = 255;
                 rgbColor->g = 0;
                 rgbColor->b = 0;
             } else if (color == 13) {
-//                svgColor = "(192,192,192)";
                 rgbColor->r = 192;
                 rgbColor->g = 192;
                 rgbColor->b = 192;
             } else if (color == 14) {
-//                svgColor = "(0,128,128)";
                 rgbColor->r = 0;
                 rgbColor->g = 128;
                 rgbColor->b = 128;
             } else if (color == 15) {
-//                svgColor = "(0,255,255)";
                 rgbColor->r = 0;
                 rgbColor->g = 255;
                 rgbColor->b = 255;
             } else if (color == 16) {
-//                svgColor = "(255,255,0)";
                 rgbColor->r = 255;
                 rgbColor->g = 255;
                 rgbColor->b = 0;
-            } else{
+            } else {
                 //default
                 rgbColor->r = 255;
                 rgbColor->g = 255;
@@ -214,9 +277,60 @@ private:
         *blenchedRgbColor = SvgUtils::HsvToRgb(*blenchedHsvColor);
     }
 
-    bool checkConfigParameter(map<string, string> *configParameter, NodeInfoStructure * nodeInfoStructure);
+    bool checkConfigParameter(map<string, string> *configParameter, NodeInfoStructure *nodeInfoStructure) {
 
-    long getStringLength(char * inputFileName);
+        string barInfo = "VISUALIZATION MODALITY:  " + configParameter->at("MODALITY");
+
+        string modality = configParameter->at("MODALITY");
+
+        if (modality.compare("BASIC") == 0) {
+            //If I want to use the same dimension for each brother
+            int TYPE_NODE_DIMENSION = stoi(configParameter->at("TYPE_NODE_DIMENSION"));
+            if (TYPE_NODE_DIMENSION == 1 || TYPE_NODE_DIMENSION == 2) {
+                //ok
+            } else {
+                TYPE_NODE_DIMENSION = 2; //default 2
+            }
+
+            if (TYPE_NODE_DIMENSION == 1) {
+                //I need the children, lable and father label available
+                if (!(nodeInfoStructure->OPT_CHILDREN_INFO && nodeInfoStructure->OPT_FATHERLABLE &&
+                      nodeInfoStructure->OPT_LABEL)) {
+
+                    printf("if you chose TYPE_NODE_DIMENSION=1 you need: \n OPT_LABEL=1\n"
+                           " OPT_FATHERLABLE=1\n"
+                           " OPT_CHILDREN_INFO=1 \n Or you can chose TYPE_NODE_DIMENSION=2");
+                    return false;
+                }
+            }
+
+            //CHECK EDGE AVAILABILITY
+            if (stoi(configParameter->at("SHOW_EDGE_INFO")) == 1) {
+                //show edge info if available
+                if (nodeInfoStructure->OPT_EDGEINFO) {
+                    //ok
+                } else {
+                    //the edge info is not available
+                    printf("The edge info isn't available");
+                    configParameter->at("SHOW_EDGE_INFO") = "0";
+                }
+            } else {
+                //ok
+            }
+        } else if (modality.compare("STATISTIC") == 0) {
+
+        } else if (modality.compare("MAXREP") == 0) {
+
+        } else {
+            //error
+            std::cout << "MODALITY WRONG, you must chose one among: BASIC, STATISTIC, MAXREP" << std::endl;
+            return false;
+        }
+
+
+        return true;
+    }
+
 };
 
 #endif //VISUALSUFFIXTREE_SVGCREATOR_H
