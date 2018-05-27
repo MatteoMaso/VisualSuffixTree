@@ -251,7 +251,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
             tmpNode.is_leaf = (nodeInfoObj.getNumbrOfChildren() == 0);
             tmpNode.maxrep_type = (tmpNode.numberOfWl > 1) ? MAXREP_TYPE::maxrep : MAXREP_TYPE::non_supermaximal;
 
-
+//todo sistemare questa opzione
 //            if (stoi(configParameter->at("BASIC_CUT_NODE")) == 1) {
 //                if (frequency < stoi(configParameter->at("NODE_FREQUENCY_THRESHOLD"))) {
 //                    continue;
@@ -271,7 +271,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                 setPositionTYPE_NODE_DIMENSION3(&tmpNode);
             }
 
-            if (stoi(configParameter->at("MAXREP_BLEND_WL")) == 1) {
+            if ( configParameter->at("MAXREP_MODALITY") == "frequency") {
                 double s = ((charNumber) - tmpNode.numberOfWl) * (1.0 / (charNumber));
                 tmpNode.opacity = 1 - s;
             }
@@ -286,7 +286,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
             tmp_node V = maxrep_map.at(counter);
 
-            //find nearSupermaximal
+            //Find different type of maximal repeat
             if (V.maxrep_type == MAXREP_TYPE::maxrep) {
 
                 maxrep_counter++; //increment the number of maxrep node
@@ -327,37 +327,57 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                 if (V.is_leaf) {
                     if (V.edge_length > stoi(configParameter->at("MAX_LEAF_CHAR"))) {
                         edge = nodeInfoObj.getEdge(V.edge_index, stoul(configParameter->at("MAX_LEAF_CHAR")));
+                        edge += "...";
                     } else {
                         edge = nodeInfoObj.getEdge(V.edge_index, V.edge_length);
                     }
-                    edge += "...";
                 } else {
                     edge = nodeInfoObj.getEdge(V.edge_index, V.edge_length);
                 }
             }
 
             //SETTING COLOR ACCORDING WITH WHAT I WANT TO SHOW
-            if (stoi(configParameter->at("MAXREP_SHOW_MAX_REP")) == 1) {
-                //colora i max rep e sfuma gli altri
-                if (V.maxrep_type == MAXREP_TYPE::maxrep) {
-                    SvgUtils::printSvgNodeBlock2(&svg_out, edge, V.w, V.posX, V.posY, H,
-                                                 configParameter->at("MAXREP_MAXREP_COLOR"), V.opacity);
-                } else if (V.maxrep_type == MAXREP_TYPE::supermaximalrep) {
-                    SvgUtils::printSvgNodeBlock2(&svg_out, edge, V.w, V.posX, V.posY, H,
-                                                 configParameter->at("MAXREP_SUPERMAXIMAL_COLOR"), 1);
-                } else if (V.maxrep_type == MAXREP_TYPE::nearsupermaximal) {
-                    SvgUtils::printSvgNodeBlock2(&svg_out, edge, V.w, V.posX, V.posY, H,
-                                                 configParameter->at("MAXREP_NEARSUPERMAXIMAL_COLOR"), 1);
-                } else {
-                    //non supermaximal
+            if (configParameter->at("MAXREP_MODALITY") == "frequency"){
+                if (V.maxrep_type == MAXREP_TYPE::non_supermaximal) {
                     SvgUtils::printSvgNodeBlock2(&svg_out, edge, V.w, V.posX, V.posY, H,
                                                  configParameter->at("MAXREP_NONMAXREP_COLOR"), 1);
+                } else {
+                    SvgUtils::printSvgNodeBlock2(&svg_out, edge, V.w, V.posX, V.posY, H,
+                                                 configParameter->at("MAXREP_MAXREP_COLOR"), V.opacity);
+                }
+            } else if (configParameter->at("MAXREP_MODALITY") == "type"){
+
+                switch (V.maxrep_type){
+                    case MAXREP_TYPE ::non_supermaximal :
+                        SvgUtils::printSvgNodeBlock2(&svg_out, edge, V.w, V.posX, V.posY, H,
+                                                     configParameter->at("MAXREP_NONMAXREP_COLOR"), V.opacity);
+                        break;
+                    case MAXREP_TYPE ::maxrep :
+                        SvgUtils::printSvgNodeBlock2(&svg_out, edge, V.w, V.posX, V.posY, H,
+                                                     configParameter->at("MAXREP_MAXREP_COLOR"), V.opacity);
+                        break;
+                    case MAXREP_TYPE ::nearsupermaximal :
+                        SvgUtils::printSvgNodeBlock2(&svg_out, edge, V.w, V.posX, V.posY, H,
+                                                     configParameter->at("MAXREP_NEARSUPERMAXIMAL_COLOR"), V.opacity);
+                        break;
+                    case MAXREP_TYPE ::supermaximalrep :
+                        SvgUtils::printSvgNodeBlock2(&svg_out, edge, V.w, V.posX, V.posY, H,
+                                                     configParameter->at("MAXREP_SUPERMAXIMAL_COLOR"), V.opacity);
+                        break;
+                    default :
+                        //invalid selection
+                        std::cout << "System Error in MAXREP_TYPE of a node" << std::endl;
+                        closeOpenFile(&bin_in, &svg_out);
+                        exit(-1);
+                        break;
+
                 }
 
             } else {
                 //default
-                SvgUtils::printSvgNodeBlock2(&svg_out, edge, V.w, V.posX, V.posY, H,
-                                             configParameter->at("MAXREP_NONMAXREP_COLOR"), 1);
+                std::cout << "Error in MAXREP_MODALITY!, you can chose: frequency or type" << std::endl;
+                closeOpenFile(&bin_in, &svg_out);
+                exit(-1);
             }
 
             counter++;
@@ -370,6 +390,8 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                 + "%       NearSuperMax: " + to_string((nearsupermax_counter*100)/numberOfNode) + "%      SuperMax:  " + to_string((supermaxrep_counter*100)/numberOfNode) + "%";
     } else {
         //error
+        std::cout << "Error in modality!, you can chose: BASIC, STATISTIC, MAXREP" << std::endl;
+        closeOpenFile(&bin_in, &svg_out);
         exit(-1);
     }
 
@@ -378,6 +400,5 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
     char svgEnd[] = {"</svg>"};  //Close the SVG File
     svg_out << svgEnd;
 
-    bin_in.close();     //Close the input file
-    svg_out.close();    //chiudo il file on output*/
+    closeOpenFile(&bin_in, &svg_out);
 }

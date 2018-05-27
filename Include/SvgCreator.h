@@ -68,7 +68,7 @@ public:
 private:
 
     enum MAXREP_TYPE {
-        maxrep = 1, supermaximalrep = 2, nearsupermaximal = 3, non_supermaximal = 0
+        non_supermaximal = 0 , maxrep = 1, nearsupermaximal = 2 , supermaximalrep = 3
     };
 
     struct tmp_node {
@@ -88,13 +88,13 @@ private:
         //WINER LINK INFORMATION
         int numberOfWl;
         map<int, unsigned long> wlId;
-        MAXREP_TYPE maxrep_type;
+        MAXREP_TYPE maxrep_type = MAXREP_TYPE::non_supermaximal;
 
         //PLOTTING INFORMATION
         double posX;
         double posY;
         double w;
-        double opacity;
+        double opacity = 1;
     };
 
     map<string, string> *configParameter;
@@ -329,6 +329,11 @@ private:
 
 
         return true;
+    }
+
+    void closeOpenFile(std::ifstream * bin_in, std::ofstream * svg_out){
+        bin_in->close(); //Close the input file
+        svg_out->close(); //chiudo il file on output*/
     }
 
 };
