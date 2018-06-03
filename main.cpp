@@ -27,9 +27,29 @@ using namespace sdsl;
 
 typedef cst_sct3<> cst_t;
 
-vector<string> split(const char *str, char c1, char c2);
+vector<string> split(const char *str, char c1 = ' ', char c2 = 'w')
+{
+    vector<string> result;
 
-bool exist(const std::string& name);
+    do
+    {
+        const char *begin = str;
+
+        while((( *str != c1 ) && (*str != c2))  && *str)
+            str++;
+
+        result.push_back(string(begin, str));
+    } while (0 != *str++);
+
+    return result;
+}
+
+
+bool exist(const std::string& name) {
+    ifstream f(name.c_str());
+    return f.good();
+}
+
 
 int main(int argc, char *argv[]) {
 
@@ -103,10 +123,36 @@ int main(int argc, char *argv[]) {
                 exit(-1);
             }
 
+            int version = 1;
+
+
             string svgFile = cCurrentPath;
-            svgFile.append("/Output/Svg_Output/svg_" + s + ".html");
+            svgFile.append("/Output/Svg_Output/svg_" + s + "_" + to_string(version) + ".html");
+
             char * svgFilePointer = new char [svgFile.length()+1];
             strcpy (svgFilePointer, svgFile.c_str());
+
+            bool nameFree = true;
+
+            do{
+
+                svgFile = cCurrentPath;
+                svgFile.append("/Output/Svg_Output/svg_" + s + "_" + to_string(version) + ".html");
+
+                svgFilePointer = new char [svgFile.length()+1];
+                strcpy (svgFilePointer, svgFile.c_str());
+
+                if(exist(svgFilePointer)){
+                    version++;
+                    nameFree = false;
+                } else {
+                    nameFree = true;
+                }
+
+
+            }while(!nameFree);
+
+
 
             SvgCreator svgCreator(binFilePointer, svgFilePointer, &configParameter, argv[2]);
         }
@@ -118,25 +164,3 @@ int main(int argc, char *argv[]) {
 }
 
 
-vector<string> split(const char *str, char c1 = ' ', char c2 = 'w')
-{
-    vector<string> result;
-
-    do
-    {
-        const char *begin = str;
-
-        while((( *str != c1 ) && (*str != c2))  && *str)
-            str++;
-
-        result.push_back(string(begin, str));
-    } while (0 != *str++);
-
-    return result;
-}
-
-
-bool exist(const std::string& name) {
-    ifstream f(name.c_str());
-    return f.good();
-}

@@ -20,11 +20,11 @@ In order to configure properly the output you have to setting up the config.txt 
 
 Given a file containing a string as a sequence of characters on a single line without headers, you first need to build an index that contains all the necessary information for drawing the suffix tree later. This is done by issuing the command:
 ```
-./VisualSuffixTree -data [input_string.txt] [index.bin]
-example:  -data ./Example/test/blue-whale-mt.txt ./Output/blue-whale-mt.bin
+./VisualSuffixTree -data [input_string.txt]
+example:  ./VisualSuffixTree -data ./Example/input_example.txt
 ```
 Given the index, you can create an SVG drawing of the suffix tree as follows:
 ```
-./VisualSuffixTree -svg [index.bin] [drawing.html] [input_string.txt]
-example: -svg ./Output/blue-whale-mt.bin ./Output/svg_blue-whale-mt.html ./Example/test/blue-whale-mt.txt
+./VisualSuffixTree -svg [input_string.txt]
+example: ./VisualSuffixTree -svg ./Example/input_example.txt
 ```
