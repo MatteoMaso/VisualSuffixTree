@@ -10,18 +10,38 @@
 #include "Include/SvgCreator.h"
 #include "Include/ConfigParser.h"
 
+
+#ifdef WINDOWS
+    #include <direct.h>
+    #define GetCurrentDir _getcwd
+#else
+    #include <unistd.h>
+    #define GetCurrentDir getcwd
+#endif
+
+char cCurrentPath[FILENAME_MAX];
+
 using namespace std;
 using namespace sdsl;
 
 
 typedef cst_sct3<> cst_t;
 
+vector<string> split(const char *str, char c1, char c2);
 
-static const int parameters[10] = {10, 10, 16, 16};
+bool exist(const std::string& name);
 
 int main(int argc, char *argv[]) {
 
-    int status = mkdir("Output", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    if (!GetCurrentDir(cCurrentPath, sizeof(cCurrentPath)))
+    {
+        std::cout << "Error in reading current dir!... report on gitHub thanks" << std::endl;
+        return errno;
+    }
+
+    cCurrentPath[sizeof(cCurrentPath) - 1] = '\0'; /* not really required */
+
+    std::cout <<  "The current working directory is " << cCurrentPath << "\n " << std::endl;
 
     if (argc < 2) {
         cout << "insert -data nameInput for starting treeParser or -svg to create the SVG file" << std::endl;
@@ -32,15 +52,91 @@ int main(int argc, char *argv[]) {
     map<string, string> configParameter;
     ConfigParser cfPars("./Settings/config.cfg", &configParameter); //Initialize the configurations Parameter
 
-    char firstProgram[6]  = "-data";
-    char secondProgram[5] = "-svg";
+    string prog = argv[1];
 
-    if (strcmp(argv[1], firstProgram) == 0) {
-        TreeParser(argv[2], argv[3], &configParameter);
-    } else if (strcmp(argv[1], secondProgram) == 0) {
-        SvgCreator svgCreator(argv[2], argv[3], &configParameter, argv[4]);
+    if (prog == "-data") {
+
+        if ( argc != 3 ){
+            std::cout << "Bad arguments in -data program, so please show readMe file!" << std::endl;
+            exit(-1);
+
+        } else {
+
+            vector<string> tmp = split(argv[2], '\\' , '/');
+            std::string s = tmp.at(tmp.size() - 1).substr(0,tmp.at(tmp.size() - 1).size() - 4);  ;
+
+            s += ".bin";
+
+//            std::cout << s << std::endl;
+
+            string outputFileName = cCurrentPath;
+            outputFileName += "/Output/Binary_File/";
+            outputFileName += s;
+
+            char * tab2 = new char [outputFileName.length()+1];
+            strcpy (tab2, outputFileName.c_str());
+
+//            std::cout << tab2 << std::endl;
+
+            TreeParser(argv[2], tab2, &configParameter);
+        }
+
+
+    } else if (prog == "-svg") {
+
+        if ( argc != 3 ){
+            std::cout << "Bad arguments in -svg program, so please show readMe file!" << std::endl;
+            exit(-1);
+
+        } else {
+
+            vector<string> tmp = split(argv[2], '\\' , '/');
+            std::string s = tmp.at(tmp.size() - 1).substr(0,tmp.at(tmp.size() - 1).size() - 4);  ;
+
+            string binFile = cCurrentPath;
+            binFile.append("/Output/Binary_File/" + s + ".bin");
+            char * binFilePointer = new char [binFile.length()+1];
+            strcpy (binFilePointer, binFile.c_str());
+
+            if (!exist(binFilePointer)){
+                std::cout << "File: " << binFile << " not fount in Output/Binary_File, so create file first with -data program " << std::endl;
+                exit(-1);
+            }
+
+            string svgFile = cCurrentPath;
+            svgFile.append("/Output/Svg_Output/svg_" + s + ".html");
+            char * svgFilePointer = new char [svgFile.length()+1];
+            strcpy (svgFilePointer, svgFile.c_str());
+
+            SvgCreator svgCreator(binFilePointer, svgFilePointer, &configParameter, argv[2]);
+        }
+
     } else {
-        printf("Bad arguments!");
+        std::cout << "Bad arguments! Chose -data or -svg" << std::endl;
+        exit(-1);
     }
 }
 
+
+vector<string> split(const char *str, char c1 = ' ', char c2 = 'w')
+{
+    vector<string> result;
+
+    do
+    {
+        const char *begin = str;
+
+        while((( *str != c1 ) && (*str != c2))  && *str)
+            str++;
+
+        result.push_back(string(begin, str));
+    } while (0 != *str++);
+
+    return result;
+}
+
+
+bool exist(const std::string& name) {
+    ifstream f(name.c_str());
+    return f.good();
+}
