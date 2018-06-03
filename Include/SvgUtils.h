@@ -56,8 +56,8 @@ public:
 
         temp += "<defs>\n"
                 "\t<linearGradient id=\"background\" y1=\"0\" y2=\"1\" x1=\"0\" x2=\"0\">\n"
-                "\t\t<stop stop-color=\"#eeeeee\" offset=\"5%\"/>\n"
-                "\t\t<stop stop-color=\"#eeeeb0\" offset=\"95%\"/>\n"
+                "\t\t<stop stop-color=\"#ffffff\" offset=\"5%\"/>\n"
+                "\t\t<stop stop-color=\"#ffffff\" offset=\"95%\"/>\n"
                 "\t</linearGradient>\n"
                 "</defs>\n"
                 "<style type=\"text/css\">\n"

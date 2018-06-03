@@ -251,14 +251,6 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
             tmpNode.is_leaf = (nodeInfoObj.getNumbrOfChildren() == 0);
             tmpNode.maxrep_type = (tmpNode.numberOfWl > 1) ? MAXREP_TYPE::maxrep : MAXREP_TYPE::non_supermaximal;
 
-//todo sistemare questa opzione
-//            if (stoi(configParameter->at("BASIC_CUT_NODE")) == 1) {
-//                if (frequency < stoi(configParameter->at("NODE_FREQUENCY_THRESHOLD"))) {
-//                    continue;
-//                }
-//            }
-
-
             //means the dimensions of a node is proportional with the depth
             if (tmpNode.nodeDepth == 0) {  //Root is large as the windows minus a border
                 tmpNode.w = rootNodeWidth;
@@ -285,6 +277,14 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
         while (counter < maxrep_map.size()) { //COMPLETE THE SVG CREATION
 
             tmp_node V = maxrep_map.at(counter);
+
+            //todo sistemare questa opzione
+//            if (stoi(configParameter->at("BASIC_CUT_NODE")) == 1) {
+//                if (frequency < stoi(configParameter->at("NODE_FREQUENCY_THRESHOLD"))) {
+//                    continue;
+//
+//                }
+//            }
 
             //Find different type of maximal repeat
             if (V.maxrep_type == MAXREP_TYPE::maxrep) {
@@ -336,6 +336,8 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                 }
             }
 
+
+
             //SETTING COLOR ACCORDING WITH WHAT I WANT TO SHOW
             if (configParameter->at("MAXREP_MODALITY") == "frequency"){
                 if (V.maxrep_type == MAXREP_TYPE::non_supermaximal) {
@@ -361,8 +363,8 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                                                      configParameter->at("MAXREP_NEARSUPERMAXIMAL_COLOR"), V.opacity);
                         break;
                     case MAXREP_TYPE ::supermaximalrep :
-                        SvgUtils::printSvgNodeBlock2(&svg_out, edge, V.w, V.posX, V.posY, H,
-                                                     configParameter->at("MAXREP_SUPERMAXIMAL_COLOR"), V.opacity);
+                            SvgUtils::printSvgNodeBlock2(&svg_out, edge, V.w, V.posX, V.posY, H,
+                                                         configParameter->at("MAXREP_SUPERMAXIMAL_COLOR"), V.opacity);
                         break;
                     default :
                         //invalid selection
@@ -385,7 +387,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
 
 
-        infoStatusBar = "Modality: MaxRep     StringLength: " +
+        infoStatusBar = "REP   Modality: MaxRep     StringLength: " +
                         to_string(stringLength) + "         #Nodes: " + to_string(numberOfNode) + "        Maxrep: " + to_string((maxrep_counter*100)/numberOfNode)
                 + "%       NearSuperMax: " + to_string((nearsupermax_counter*100)/numberOfNode) + "%      SuperMax:  " + to_string((supermaxrep_counter*100)/numberOfNode) + "%";
     } else {

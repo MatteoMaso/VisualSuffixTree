@@ -8,3 +8,5 @@ cmake-build-debug/
 *.bin
 *.html
 *.svg
+*.sdsl
+PresentationFile/
