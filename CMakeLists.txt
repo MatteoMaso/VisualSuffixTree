@@ -1,13 +1,20 @@
-#the minimum version of CMake required
+## The minimum version of CMake required ##
 cmake_minimum_required(VERSION 3.10)
 
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules")
+
+## Project information ##
 project(VisualSuffixTree)
+set(PROJECT_VENDOR "Matteo Maso")
+set(PROJECT_CONTACT "matteo.maso.93@gmail.com")
+set(PROJECT_URL "https://github.com/MatteoMaso/VisualSuffixTree")
+set(PROJECT_DESCRIPTION "VisualSuffixTree: Visual tool for Suffix Tree visualization")
 
 set(CMAKE_CXX_STANDARD 11)
 
 #used for header library file
-#include_directories(/opt/sdsl/include/sdsl)
-#link_directories(/opt/sdsl/lib)
+include_directories($ENV{HOME}/include)
+link_directories($ENV{HOME}/lib)
 
 set(SOURCE_FILE main.cpp)
 

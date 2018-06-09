@@ -1,4 +1,5 @@
 #include <sdsl/suffix_trees.hpp>
+
 #include <iostream>
 #include <string>
 #include <bitset> //to use quickly bit representation

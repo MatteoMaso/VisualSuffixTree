@@ -4,6 +4,8 @@
 #include <bitset>       //to use quickly bit representation
 #include <vector>
 #include <fstream>
+#include <iosfwd>
+#include <bits/ios_base.h>
 
 #include "../Include/SvgCreator.h"
 #include "../Include/ConfigParser.h"
