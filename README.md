@@ -3,8 +3,9 @@ Representing suffix trees as flame graphs
 
 Installation
 ------------
-First, install the [SDSL library](https://github.com/simongog/sdsl.git) into ./usr/local
-command: ./install.sh ./usr/local
+First, install the [SDSL library](https://github.com/simongog/sdsl.git) into ./usr/local:
+```
+./install.sh ./usr/local
 ```
 Finally, build the project from its root path:
 ```
