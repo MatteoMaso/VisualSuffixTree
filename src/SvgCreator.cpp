@@ -106,7 +106,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                 //means each children have the same dimension of their brother
 
                 //If root set count = 1
-                count = (nodeDepth == 0) ? 1 : hashmap[fatherLabel].getNumberOfChildren() + 1;
+                count = (nodeDepth == 0) ? 1 : hashmap[fatherLabel].getNumberOfChildren();
 
                 if (nodeDepth == 0) {
                     w = rootNodeWidth;
@@ -116,14 +116,14 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
                 } else { //altrimenti scalo la larghezza per la larghezza del suffix interval
 
-                    hashmap[fatherLabel].incCounter();
                     int actSons = hashmap[fatherLabel].getSonsCount();
                     double fatWid = hashmap[fatherLabel].getObjNodeWid();
                     double fatX = hashmap[fatherLabel].getObjNodeX();
                     double fatY = hashmap[fatherLabel].getObjNodeY();
-                    w = (rb == lb) ? 0 : fatWid / count;
+                    w = fatWid / count;
                     x = fatX + (actSons * w);
                     y = (stoi(configParameter->at("SVG_FROM_TOP")) == 1) ? fatY + H + 1 : fatY - H - 1;
+                    hashmap[fatherLabel].incCounter();
                 }
 
             } else if (stoi(configParameter->at("TYPE_NODE_DIMENSION")) == 2) {
