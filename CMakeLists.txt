@@ -1,5 +1,7 @@
 ## The minimum version of CMake required ##
 cmake_minimum_required(VERSION 3.10)
+SET(CMAKE_C_FLAGS_DEBUG "-D_DEBUG")
+
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules")
 

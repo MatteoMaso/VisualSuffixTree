@@ -71,6 +71,114 @@ private:
         non_supermaximal = 0 , maxrep = 1, nearsupermaximal = 2 , supermaximalrep = 3
     };
 
+
+
+    //Struttura inizializzata comune a tutte le modalità contiene poco più delle info contenute nel file iniziale
+    struct tmp_basic_nodeInfo{
+
+        unsigned long label;
+        unsigned long nodeDepth;
+        unsigned long depth;
+        unsigned long lb;
+        unsigned long rb;
+        unsigned long frequency;
+        unsigned long fatherLabel;
+        bool is_leaf;
+        int numberOfChildren;
+        vector<unsigned long> childrenId;
+        unsigned long edge_length;
+        unsigned long edge_index;
+
+        //WINER LINK INFORMATION
+        int numberOfWl;
+        map<int, unsigned long> wlId;
+    };
+
+    std::map<unsigned long, tmp_basic_nodeInfo> general_map; //First map with the initial data, id = label nodo
+
+    struct plotting_info{
+
+        //PLOTTING INFORMATION
+        double posX;
+        double posY;
+        double w;
+        double opacity = 1;
+        int child_set = 0; //number of child already set
+    };
+
+    std::map<unsigned long, plotting_info> plot_map; //Contain information reguarding plotting
+
+    //passo un node di tipo tmp_basic_nodeInfo e lui salva la posizione nella struttura designata
+    void setNodePosition(tmp_basic_nodeInfo * node){
+
+        plotting_info position;
+
+        //Search if father already set
+        if(plot_map.count(node->fatherLabel) == 0){
+            setNodePosition(&general_map[node->fatherLabel]);
+        }
+
+        plotting_info *  father = &plot_map[node->fatherLabel];
+
+        switch (stoi(configParameter->at("TYPE_NODE_DIMENSION")))
+        {
+            case 1:
+                //means each children have the same dimension of their brother
+                position.w = father->w / general_map[node->fatherLabel].numberOfChildren;
+                position.posX = father->posX + (father->child_set * position.w);
+                father->child_set++; //incrementa il numero di figli già settati
+            break;
+
+            case 2:
+                //means the dimensions of a node is proportional with the frequency
+                position.w = scaleUnit * (node->frequency + 1);
+                position.posX = x0 + node->lb * scaleUnit;
+            break;
+
+            default:
+                // istruzioni
+                std::cout << "error in type_node_chosing" << std::endl;
+                exit(-1);
+                break;
+        }
+
+        switch (stoi(configParameter->at("SVG_FROM_TOP"))){
+            case 1: //from top
+                position.posY = y0 + node->nodeDepth * (H + 0.7);
+                break;
+
+            case 0: //from bottom
+                position.posY = y0 - node->nodeDepth * (H + 0.7);
+                break;
+
+            default:
+                std::cout << "error in svg from top" << std::endl;
+                exit(-1);
+
+        }
+
+
+        this->plot_map.insert({node->label, position}); //insert position in the map
+    }
+
+    void setRootPosition(tmp_basic_nodeInfo * node){
+        plotting_info root;
+
+        root.w = rootNodeWidth;
+        root.posX = x0;
+        root.posY = y0;
+
+        //todo togliere da qui l'inizializzazione dei seguenti 3 parametri
+        numberOfNode = node->label;
+        maxSuffixArrayLength = node->rb;
+        scaleUnit = rootNodeWidth / (node->rb + 1);
+
+        this->plot_map.insert({node->label, root}); //insert position in the map
+    }
+
+
+    //old parameter%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
     struct tmp_node {
         unsigned long label;
         unsigned long nodeDepth;
@@ -96,6 +204,9 @@ private:
         double w;
         double opacity = 1;
     };
+
+
+
 
     map<string, string> *configParameter;
     map<int, ObjNode> hashmap; //Useful only when we represent the dimension of the child equal to the dim of the brother

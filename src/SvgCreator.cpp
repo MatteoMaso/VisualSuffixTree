@@ -74,6 +74,59 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
 
     NodeInfo nodeInfoObj(&nodeStructure, &originalString);
+
+/*
+
+    //First data load
+//    map<unsigned long, tmp_basic_nodeInfo> general_map; //First map with the initial data, id = label nodo
+    while(!bio2.empty()){
+        //READ AN OTHER NODE AND PUT THE INFOMATION INSIDE THE nodeInfoObj
+        nodeInfo = readNextNodeInfo(&bio2);
+        nodeInfoObj.setNodeField(&nodeInfo);
+
+        tmp_basic_nodeInfo tmpNode;
+        tmpNode.label = nodeInfoObj.getLabel();
+        tmpNode.nodeDepth = nodeInfoObj.getNodeDepth();
+        tmpNode.depth = nodeInfoObj.getDepth();
+        tmpNode.lb = nodeInfoObj.getLb();
+        tmpNode.rb = nodeInfoObj.getRb();
+        tmpNode.frequency = tmpNode.rb -tmpNode.lb;
+        tmpNode.fatherLabel = nodeInfoObj.getFatherLabel();
+        tmpNode.numberOfChildren = nodeInfoObj.getNumbrOfChildren();
+        tmpNode.numberOfWl = nodeInfoObj.getNumberOfWl();
+        tmpNode.edge_index = nodeInfoObj.getEdgeIndex();
+        tmpNode.edge_length = nodeInfoObj.getEdgeLength();
+        tmpNode.childrenId = nodeInfoObj.getChildrenId();
+        tmpNode.wlId = nodeInfoObj.getWlId();
+        tmpNode.is_leaf = (frequency == 1) ? true : false;
+
+        general_map.insert({nodeInfoObj.getLabel(), tmpNode});
+//        std::cout << "w" << std::endl;
+    }
+
+    //todo chiudere il file in input
+
+    //set root
+    setRootPosition(&general_map[general_map.size() - 1 ]);
+    for (std::pair<unsigned long, tmp_basic_nodeInfo> node : general_map) {
+
+        //if not already insert generate the position
+        if (plot_map.count(node.first) == 0) {
+            setNodePosition(&node.second);
+        }
+    };
+
+
+    //Print svg file
+    for (std::pair<unsigned long, plotting_info> node : plot_map) {
+
+        SvgUtils::printSvgNodeBlock2(&svg_out, "f", node.second.w , node.second.posX, node.second.posY, H,
+                                     configParameter->at("MAXREP_MAXREP_COLOR"), node.second.opacity);
+    };
+
+
+    infoStatusBar = "pippa";
+*/
     //BASIC MODALITY
     if (modality == "BASIC") {
 
@@ -220,6 +273,8 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
     } else if (modality == "STATISTIC") {
         std::cout << "NOT IMPLEMENTED YET" << std::endl;
+
+
     } else if (modality == "MAXREP") {
 
         int charNumber = (int)nodeStructure.alphabet.size();
@@ -405,5 +460,4 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
     closeOpenFile(&bin_in, &svg_out);
 }
 
-//todo rendere la posizione del comando search e degli altri proporzionale alla dimensione delle finestra
 //todo aggiungere il taglio della lunghezza sulle foglie anche nella modalità BASIC
