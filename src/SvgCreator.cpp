@@ -47,7 +47,6 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
     svg_out << SvgUtils::createSvgHeader(stoi(configParameter->at("WINDOW_WIDTH")),
                                          stoi(configParameter->at("WINDOW_HEIGHT")),
                                          stoi(configParameter->at("SVG_FROM_TOP")));
-
     //PARAMETER THAT I NEED
     SVG_FROM_TOP = stoi(configParameter->at("SVG_FROM_TOP")) == 1;
     BASIC_KVALUE_KMER = stoi(configParameter->at("BASIC_KVALUE_KMER"));
@@ -323,7 +322,6 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                 }
             }
 
-
             //SETTINGS EDGE INFO
             if (stoi(configParameter->at("SHOW_EDGE_INFO")) == 1) {
                 if (V.is_leaf) {
@@ -406,3 +404,6 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
     closeOpenFile(&bin_in, &svg_out);
 }
+
+//todo rendere la posizione del comando search e degli altri proporzionale alla dimensione delle finestra
+//todo aggiungere il taglio della lunghezza sulle foglie anche nella modalità BASIC
