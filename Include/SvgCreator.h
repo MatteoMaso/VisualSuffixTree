@@ -225,6 +225,84 @@ private:
         }
     }
 
+    void maxrep_frequency(tmp_basic_nodeInfo * node, int charNumber){
+
+        double s = ((charNumber) - node->numberOfWl) * (1.0 / (charNumber));
+        plot_map[node->label].opacity = 1 - s;
+
+        if (node->maxrep_type == MAXREP_TYPE::non_supermaximal) {
+            plot_map[node->label].colorString = configParameter->at("MAXREP_NONMAXREP_COLOR");
+        } else {
+            plot_map[node->label].colorString = configParameter->at("MAXREP_MAXREP_COLOR");
+        }
+
+    }
+
+
+    void maxrep_type(tmp_basic_nodeInfo * node, unsigned long * maxrep_counter, unsigned long * supermaxrep_counter, unsigned long * nearsupermax_counter){
+
+        //Find different type of maximal repeat
+        if (node->maxrep_type == MAXREP_TYPE::maxrep) {
+
+            *maxrep_counter = *maxrep_counter + 1; //increment the number of maxrep node
+
+            //discover if it's near-supermaximal
+            int leafNumber = 0;
+            bool is_nearSupMax = false;
+            unsigned long U; //id nodo targhet wl(V) label with char of the only one wl(W)
+            for (int i = 0; i < node->childrenId.size(); i++) { //per ogni figlio
+                tmp_basic_nodeInfo W = general_map[node->childrenId.at(i)];
+                if (!W.is_leaf) continue; //if children is not a leaf continue
+
+                for (auto i1 : W.wlId) {
+                    U = node->wlId.at(i1.first);
+                }
+
+                if (general_map[U].frequency > 1) continue;
+
+                is_nearSupMax = true;
+                leafNumber++;
+
+            }
+
+            if (is_nearSupMax) {
+                node->maxrep_type = MAXREP_TYPE::nearsupermaximal;
+                *nearsupermax_counter = *nearsupermax_counter +1;
+            }
+
+            if (leafNumber == node->childrenId.size()) {
+                node->maxrep_type = MAXREP_TYPE::supermaximalrep;
+                *supermaxrep_counter = *supermaxrep_counter + 1;
+            }
+        }
+
+        switch (node->maxrep_type) {
+
+            case MAXREP_TYPE::non_supermaximal :
+                plot_map[node->label].colorString = configParameter->at("MAXREP_NONMAXREP_COLOR");
+                break;
+
+            case MAXREP_TYPE::maxrep :
+                plot_map[node->label].colorString = configParameter->at("MAXREP_MAXREP_COLOR");
+                break;
+
+            case MAXREP_TYPE::nearsupermaximal :
+                plot_map[node->label].colorString = configParameter->at("MAXREP_NEARSUPERMAXIMAL_COLOR");
+                break;
+
+            case MAXREP_TYPE::supermaximalrep :
+                plot_map[node->label].colorString = configParameter->at("MAXREP_SUPERMAXIMAL_COLOR");
+                break;
+
+            default :
+                //invalid selection
+                std::cout << "System Error in MAXREP_TYPE of a node" << std::endl;
+                exit(-1);
+                break;
+        }
+
+    }
+
     void setRootPosition(tmp_basic_nodeInfo * node){
         plotting_info root;
 

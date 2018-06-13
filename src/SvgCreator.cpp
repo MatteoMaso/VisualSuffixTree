@@ -118,8 +118,6 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
     };
 
 
-
-
     //BASIC CUT NODE
     /*  if (stoi(configParameter->at("BASIC_CUT_NODE")) == 1) {
                 if (frequency < stoi(configParameter->at("NODE_FREQUENCY_THRESHOLD"))) {
@@ -160,80 +158,14 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
             unsigned long maxrep_counter = 0, supermaxrep_counter = 0, nearsupermax_counter = 0;
 
             if (configParameter->at("MAXREP_MODALITY") == "frequency") {
+
                 for (std::pair<unsigned long, tmp_basic_nodeInfo> node : general_map) {
-
-                    double s = ((charNumber) - node.second.numberOfWl) * (1.0 / (charNumber));
-                    plot_map[node.second.label].opacity = 1 - s;
-
-                    if (node.second.maxrep_type == MAXREP_TYPE::non_supermaximal) {
-                        plot_map[node.second.label].colorString = configParameter->at("MAXREP_NONMAXREP_COLOR");
-                    } else {
-                        plot_map[node.second.label].colorString = configParameter->at("MAXREP_MAXREP_COLOR");
-                    }
-
+                    maxrep_frequency(&node.second, charNumber);
                 }
+
             } else if (configParameter->at("MAXREP_MODALITY") == "type") {
                 for (std::pair<unsigned long, tmp_basic_nodeInfo> node : general_map) {
-                    //Find different type of maximal repeat
-                    if (node.second.maxrep_type == MAXREP_TYPE::maxrep) {
-
-                        maxrep_counter++; //increment the number of maxrep node
-
-                        //discover if it's near-supermaximal
-                        int leafNumber = 0;
-                        bool is_nearSupMax = false;
-                        unsigned long U; //id nodo targhet wl(V) label with char of the only one wl(W)
-                        for (int i = 0; i < node.second.childrenId.size(); i++) { //per ogni figlio
-                            tmp_basic_nodeInfo W = general_map[node.second.childrenId.at(i)];
-                            if (!W.is_leaf) continue; //if children is not a leaf continue
-
-                            for (auto i1 : W.wlId) {
-                                U = node.second.wlId.at(i1.first);
-                            }
-
-                            if (general_map[U].frequency > 1) continue;
-
-                            is_nearSupMax = true;
-                            leafNumber++;
-
-                        }
-
-                        if (is_nearSupMax) {
-                            node.second.maxrep_type = MAXREP_TYPE::nearsupermaximal;
-                            nearsupermax_counter++;
-                        }
-
-                        if (leafNumber == node.second.childrenId.size()) {
-                            node.second.maxrep_type = MAXREP_TYPE::supermaximalrep;
-                            supermaxrep_counter++;
-                        }
-                    }
-
-                    switch (node.second.maxrep_type) {
-
-                        case MAXREP_TYPE::non_supermaximal :
-                            plot_map[node.second.label].colorString = configParameter->at("MAXREP_NONMAXREP_COLOR");
-                            break;
-
-                        case MAXREP_TYPE::maxrep :
-                            plot_map[node.second.label].colorString = configParameter->at("MAXREP_MAXREP_COLOR");
-                            break;
-
-                        case MAXREP_TYPE::nearsupermaximal :
-                            plot_map[node.second.label].colorString = configParameter->at("MAXREP_NEARSUPERMAXIMAL_COLOR");
-                            break;
-
-                        case MAXREP_TYPE::supermaximalrep :
-                            plot_map[node.second.label].colorString = configParameter->at("MAXREP_SUPERMAXIMAL_COLOR");
-                            break;
-
-                        default :
-                            //invalid selection
-                            std::cout << "System Error in MAXREP_TYPE of a node" << std::endl;
-                            closeOpenFile(&bin_in, &svg_out);
-                            exit(-1);
-                            break;
-                    }
+                    maxrep_type(&node.second, &maxrep_counter, &supermaxrep_counter, &nearsupermax_counter);
                 }
 
                 infoStatusBar = "REP   Modality: MaxRep     StringLength: " +
@@ -476,7 +408,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 //
 //            tmp_node V = maxrep_map.at(counter);
 //
-//            //todo sistemare questa opzione
+//
 ////            if (stoi(configParameter->at("BASIC_CUT_NODE")) == 1) {
 ////                if (frequency < stoi(configParameter->at("NODE_FREQUENCY_THRESHOLD"))) {
 ////                    continue;
