@@ -72,6 +72,11 @@ private:
     };
 
 
+    enum MODALITY_TYPE{
+        BASIC = 0, STATISTIC = 1, MAXREP = 2
+    };
+
+    MODALITY_TYPE modality_type = MODALITY_TYPE ::BASIC;
 
     //Struttura inizializzata comune a tutte le modalità contiene poco più delle info contenute nel file iniziale
     struct tmp_basic_nodeInfo{
@@ -92,6 +97,8 @@ private:
         //WINER LINK INFORMATION
         int numberOfWl;
         map<int, unsigned long> wlId;
+        MAXREP_TYPE maxrep_type = MAXREP_TYPE::non_supermaximal;
+
     };
 
     std::map<unsigned long, tmp_basic_nodeInfo> general_map; //First map with the initial data, id = label nodo
@@ -104,6 +111,9 @@ private:
         double w;
         double opacity = 1;
         int child_set = 0; //number of child already set
+        RgbColor color;
+        string colorString;
+
     };
 
     std::map<unsigned long, plotting_info> plot_map; //Contain information reguarding plotting
@@ -159,6 +169,60 @@ private:
 
 
         this->plot_map.insert({node->label, position}); //insert position in the map
+    }
+
+    void basicMod_depth(tmp_basic_nodeInfo * node, RgbColor rgbColor){
+
+        long depthThreshold = stoi(configParameter->at("BASIC_DEPTH_THRESHOLD"));
+        if (stoi(configParameter->at("BASIC_DEPTH_WITH_THRESHOLD")) == 1) {
+            if (node->depth > depthThreshold) {
+                plot_map[node->label].color = rgbColor;
+                plot_map[node->label].opacity = 0.5;
+            } else {
+                plot_map[node->label].color = rgbColor;
+            }
+        } else {
+            //COLOR WITH A DEPTH GRADIENT
+            //bisogna farla in proporzione alla depth della stringa
+            std::cout << "to be implement" << std::endl;
+        }
+    }
+
+    void basicMod_kmer(tmp_basic_nodeInfo * node, RgbColor rgbColor){
+
+        if (node->depth >= BASIC_KVALUE_KMER && general_map[node->fatherLabel].nodeDepth < BASIC_KVALUE_KMER)
+        { //Full color
+            plot_map[node->label].color = rgbColor;
+        } else { //Blenched
+            plot_map[node->label].color = rgbColor;
+            plot_map[node->label].opacity = 0.5;
+        }
+    }
+
+    void basicMod_frequency(tmp_basic_nodeInfo * node, RgbColor rgbColor){
+
+        if (stoi(configParameter->at("BASIC_FREQUENCY_COLOR_TYPE")) == 1) {
+            //the frequency is representing with a gradient color
+//            blenchedHsvColor.v = 100;
+//            blenchedHsvColor.s = (100 * frequency) / maxSuffixArrayLength + 40;
+            //todo implementare gradiente logaritmico
+
+            //todo non devo passare rgb ma una sfumatura dello stesso in base al gradiente logaritmico
+            plot_map[node->label].color = rgbColor;
+
+        } else if (stoi(configParameter->at("BASIC_FREQUENCY_COLOR_TYPE")) == 2) {
+            //the node with a frequency lower than a setted thresold are bleached.
+            if ((node->frequency >= stoi(configParameter->at("BASIC_FREQUENCY_THRESHOLD"))) &&
+                (node->depth >= stoi(configParameter->at("BASIC_DEPTH_THRESHOLD")))) { //Full color
+                plot_map[node->label].color = rgbColor;
+            } else { //Blenched
+                plot_map[node->label].color = rgbColor;
+                plot_map[node->label].opacity = 0.5;
+            }
+        } else {
+            //deault
+            std::cout << "Error occure in config frequency option" << std::endl;
+        }
     }
 
     void setRootPosition(tmp_basic_nodeInfo * node){
@@ -394,7 +458,9 @@ private:
 
         string modality = configParameter->at("MODALITY");
 
+
         if (modality.compare("BASIC") == 0) {
+            modality_type = MODALITY_TYPE ::BASIC;
             //If I want to use the same dimension for each brother
             int TYPE_NODE_DIMENSION = stoi(configParameter->at("TYPE_NODE_DIMENSION"));
             if (TYPE_NODE_DIMENSION == 1 || TYPE_NODE_DIMENSION == 2) {
@@ -429,8 +495,10 @@ private:
                 //ok
             }
         } else if (modality.compare("STATISTIC") == 0) {
+            modality_type = MODALITY_TYPE ::STATISTIC;
 
         } else if (modality.compare("MAXREP") == 0) {
+            modality_type = MODALITY_TYPE ::MAXREP;
 
         } else {
             //error
