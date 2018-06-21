@@ -78,31 +78,14 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
 
     //First data load
-//    map<unsigned long, tmp_basic_nodeInfo> general_map; //First map with the initial data, id = label nodo
     while (!bio2.empty()) {
         //READ AN OTHER NODE AND PUT THE INFOMATION INSIDE THE nodeInfoObj
         nodeInfo = readNextNodeInfo(&bio2);
         nodeInfoObj.setNodeField(&nodeInfo);
 
-        tmp_basic_nodeInfo tmpNode;
-        tmpNode.label = nodeInfoObj.getLabel();
-        tmpNode.nodeDepth = nodeInfoObj.getNodeDepth();
-        tmpNode.depth = nodeInfoObj.getDepth();
-        tmpNode.lb = nodeInfoObj.getLb();
-        tmpNode.rb = nodeInfoObj.getRb();
-        tmpNode.frequency = tmpNode.rb - tmpNode.lb;
-        tmpNode.fatherLabel = nodeInfoObj.getFatherLabel();
-        tmpNode.numberOfChildren = nodeInfoObj.getNumbrOfChildren();
-        tmpNode.numberOfWl = nodeInfoObj.getNumberOfWl();
-        tmpNode.edge_index = nodeInfoObj.getEdgeIndex();
-        tmpNode.edge_length = nodeInfoObj.getEdgeLength();
-        tmpNode.childrenId = nodeInfoObj.getChildrenId();
-        tmpNode.wlId = nodeInfoObj.getWlId();
-        tmpNode.is_leaf = (nodeInfoObj.getNumbrOfChildren() == 0);
-        tmpNode.maxrep_type = (tmpNode.numberOfWl > 1) ? MAXREP_TYPE::maxrep : MAXREP_TYPE::non_supermaximal;
-
+        tmp_basic_nodeInfo tmpNode = createTmpNode(&nodeInfoObj);
         general_map.insert({nodeInfoObj.getLabel(), tmpNode});
-//        std::cout << "w" << std::endl;
+
     }
 
     //todo chiudere il file in input
@@ -119,13 +102,19 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
 
     //BASIC CUT NODE
-    /*  if (stoi(configParameter->at("BASIC_CUT_NODE")) == 1) {
+    /*if (stoi(configParameter->at("BASIC_CUT_NODE")) == 1) {
                 if (frequency < stoi(configParameter->at("NODE_FREQUENCY_THRESHOLD"))) {
                     continue;
                 }
-            }*/
+    }*/
 
-    //SHOW EDGE INFO ...AGGIUNGO ALLA FINE
+
+
+    //some statistic parameter to initialize
+    double p_pnorm_parameter = stod(configParameter->at("STATISTIC_PNORM_PARAMETER")); //P-parameter user set;
+    int statistics_type = stoi(configParameter->at("STATISTIC_TYPE"));
+    string tau = "STATISTIC_TAU_" + to_string(statistics_type);
+    double tau_i = stod(configParameter->at(tau));
 
     switch (modality_type) {
         case MODALITY_TYPE::BASIC:
@@ -150,8 +139,139 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
             }
             break;
         case MODALITY_TYPE::STATISTIC:
-            //todo preprocessing
+
+            //Set the suffix link
+            for (std::pair<unsigned long, tmp_basic_nodeInfo> node : general_map) {
+
+                for(std::pair<int, unsigned long> wlNode : node.second.wlId ){
+                    general_map[wlNode.second].suffixLink = node.first;
+                }
+            }
+
+
+            for (std::pair<unsigned long, tmp_basic_nodeInfo> node : general_map) {
+
+                statistic_info tmpNode;
+                if(node.second.is_leaf || node.second.nodeDepth == 0){
+                    statistic_map.insert({node.first, tmpNode});
+                    continue;
+                }
+
+
+                //todo check cosa succede se i figli non esistono
+
+                //KL divergence
+
+                double kl = 0;
+
+                for(std::pair<int, unsigned long> wlNode : node.second.wlId ){
+                        kl += f(&wlNode.second) * log( ( (double(f(&wlNode.second)) / double(f(&node.first))) / ( double(f(&node.second.suffixLink)) /  double(f(&general_map[node.second.suffixLink].wlId[wlNode.first]))) ) );
+                }
+                tmpNode.kl = kl;
+
+
+                //P-norm without paramenter
+                double pnorm = 0;
+
+                for(std::pair<int, unsigned long> wlNode : node.second.wlId ){
+                    pnorm += pow(abs( double((f(&wlNode.second))/(f(&node.first))) - double((f(&general_map[node.second.suffixLink].wlId[wlNode.first]))/(f(&node.second.suffixLink)))  ), p_pnorm_parameter);
+                }
+
+                pnorm = pow(pnorm, 1 / p_pnorm_parameter);
+
+                tmpNode.pNormNoF = pnorm;
+
+                //P-norm
+                tmpNode.pNormNoF = pnorm * f(&node.first);
+
+
+                //Entropy
+                double entropy = 0;
+
+                for(std::pair<int, unsigned long> wlNode : node.second.wlId ){
+                    entropy += ((double(f(&wlNode.second))/(f(&node.first))) * (log(double(f(&wlNode.second))/(f(&node.first)))));
+                }
+
+                tmpNode.H = -entropy;
+
+
+                //f(W)H(w) - sum(f(aw)H(aw))
+//                double entropy2 = 0;
+//
+//                entropy2 = f(&node.first)*entropy - f(&node.second.suffixLink)*;
+//                //todo aspettare la risposta di fc per questo parametro altrimenti non posso procedere ...in caso fare due passate prima H(w) poi quella completa
+//
+//                //add into info parameter into the node
+
+
+                statistic_map.insert({node.first, tmpNode});
+            }
+
+
+            //set color according to the option chosen
+            RgbColor gray; gray.r = 140; gray.b = 140; gray.g = 140;
+
+
+            infoStatusBar = "STAT  Modality:   " +  to_string(statistics_type) + " tau:  " + configParameter->at(tau) +  "    StringLength: " +
+                            to_string(stringLength) + "         #Nodes: " + to_string(numberOfNode) + "";
+
+            for (std::pair<unsigned long, statistic_info> statNode : statistic_map) {
+
+                switch (statistics_type) {
+                    case 1:
+
+                        if (statNode.second.kl >= tau_i){
+                            plot_map[statNode.first].color = rgbColor;
+                        } else {
+                            plot_map[statNode.first].color = gray;
+                        }
+
+                        break;
+
+                    case 2:
+
+                        if (statNode.second.pNorm >= stod(configParameter->at(tau))){
+                            plot_map[statNode.first].color = rgbColor;
+                        } else {
+                            plot_map[statNode.first].color = gray;
+                        }
+
+
+                        break;
+
+                    case 3:
+
+                        if (statNode.second.pNormNoF >= stod(configParameter->at(tau))){
+                            plot_map[statNode.first].color = rgbColor;
+                        } else {
+                            plot_map[statNode.first].color = gray;
+                        }
+
+
+                        break;
+
+
+                    case 4: //todo the entropy function according to fc mail
+
+                        if (statNode.second.H >= stod(configParameter->at(tau))){
+                            plot_map[statNode.first].color = rgbColor;
+                        } else {
+                            plot_map[statNode.first].color = gray;
+                        }
+
+
+                        break;
+
+                    default:
+                        //error todo some error
+                        break;
+
+                }
+
+            }
+
             break;
+
         case MODALITY_TYPE::MAXREP:
 
             int charNumber = (int) nodeStructure.alphabet.size();
@@ -163,12 +283,15 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                     maxrep_frequency(&node.second, charNumber);
                 }
 
+                infoStatusBar = "REP   Modality: MaxRep Frequency    StringLength: " +
+                                to_string(stringLength) + "         #Nodes: " + to_string(numberOfNode) + "";
+
             } else if (configParameter->at("MAXREP_MODALITY") == "type") {
                 for (std::pair<unsigned long, tmp_basic_nodeInfo> node : general_map) {
                     maxrep_type(&node.second, &maxrep_counter, &supermaxrep_counter, &nearsupermax_counter);
                 }
 
-                infoStatusBar = "REP   Modality: MaxRep     StringLength: " +
+                infoStatusBar = "REP   Modality: MaxRep Type    StringLength: " +
                         to_string(stringLength) + "         #Nodes: " + to_string(numberOfNode) + "        Maxrep: " +
                         to_string((maxrep_counter * 100) / numberOfNode)
                         + "%       NearSuperMax: " + to_string((nearsupermax_counter * 100) / numberOfNode) +
@@ -189,8 +312,15 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
         switch (modality_type) {
             case MODALITY_TYPE ::BASIC:
 
-                SvgUtils::printSvgNodeBlock(&svg_out, "todo", node.second.w, node.second.posX, node.second.posY, H,
+                SvgUtils::printSvgNodeBlock(&svg_out, to_string(general_map[node.first].frequency), node.second.w, node.second.posX, node.second.posY, H,
                                             node.second.color, node.second.opacity);
+                break;
+
+
+            case MODALITY_TYPE ::STATISTIC:
+
+                SvgUtils::printSvgNodeBlock2(&svg_out, "todo", node.second.w, node.second.posX, node.second.posY, H,
+                                            "red", node.second.opacity);
                 break;
 
             case MODALITY_TYPE ::MAXREP:

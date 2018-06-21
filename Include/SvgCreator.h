@@ -10,6 +10,7 @@
 #include "SvgUtils.h"
 #include "NodeInfoStructure.h"
 #include "ObjNode.h"
+#include "NodeInfo.h"
 
 
 class SvgCreator {
@@ -34,7 +35,7 @@ public:
         //Check that the node property file generate with the first program must contain informations
         if ((*bio).size() == 8) {
             printf("The node property file generated with the first program is empty, probably you have passed a bad string path");
-            exit(8);
+            exit(81);
         }
 
     }
@@ -99,7 +100,19 @@ private:
         map<int, unsigned long> wlId;
         MAXREP_TYPE maxrep_type = MAXREP_TYPE::non_supermaximal;
 
+        unsigned long suffixLink; //usefull only in statistic mod
+
     };
+
+    /**
+     * @param nodeLabel the lable of a node
+     * @return the frequncy of that node
+     */
+    unsigned long f(unsigned long  * nodeLabel){
+
+        return general_map[*nodeLabel].frequency;
+
+    }
 
     std::map<unsigned long, tmp_basic_nodeInfo> general_map; //First map with the initial data, id = label nodo
 
@@ -117,6 +130,21 @@ private:
     };
 
     std::map<unsigned long, plotting_info> plot_map; //Contain information reguarding plotting
+
+    //Structure used to store statistic information used only in statistic modality
+    struct statistic_info{
+
+        //todo check type of this number
+        double H = 0;
+        double kl = 0;
+        double pNorm = 0;
+        double pNormNoF = 0;
+
+    };
+
+
+    std::map<unsigned long, statistic_info> statistic_map; //Contain information reguarding statistic
+
 
     //passo un node di tipo tmp_basic_nodeInfo e lui salva la posizione nella struttura designata
     void setNodePosition(tmp_basic_nodeInfo * node){
@@ -141,7 +169,13 @@ private:
 
             case 2:
                 //means the dimensions of a node is proportional with the frequency
-                position.w = scaleUnit * (node->frequency + 1);
+
+                    position.w = scaleUnit * (node->frequency);
+
+//                    position.w = scaleUnit * (node->frequency+1);
+
+
+
                 position.posX = x0 + node->lb * scaleUnit;
             break;
 
@@ -224,6 +258,7 @@ private:
             std::cout << "Error occure in config frequency option" << std::endl;
         }
     }
+
 
     void maxrep_frequency(tmp_basic_nodeInfo * node, int charNumber){
 
@@ -316,6 +351,29 @@ private:
         scaleUnit = rootNodeWidth / (node->rb + 1);
 
         this->plot_map.insert({node->label, root}); //insert position in the map
+    }
+
+    tmp_basic_nodeInfo createTmpNode(NodeInfo * nodeInfoObj){
+
+        tmp_basic_nodeInfo tmpNode;
+
+        tmpNode.label = nodeInfoObj->getLabel();
+        tmpNode.nodeDepth = nodeInfoObj->getNodeDepth();
+        tmpNode.depth = nodeInfoObj->getDepth();
+        tmpNode.lb = nodeInfoObj->getLb();
+        tmpNode.rb = nodeInfoObj->getRb();
+        tmpNode.frequency = tmpNode.rb - tmpNode.lb + 1;
+        tmpNode.fatherLabel = nodeInfoObj->getFatherLabel();
+        tmpNode.numberOfChildren = nodeInfoObj->getNumbrOfChildren();
+        tmpNode.numberOfWl = nodeInfoObj->getNumberOfWl();
+        tmpNode.edge_index = nodeInfoObj->getEdgeIndex();
+        tmpNode.edge_length = nodeInfoObj->getEdgeLength();
+        tmpNode.childrenId = nodeInfoObj->getChildrenId();
+        tmpNode.wlId = nodeInfoObj->getWlId();
+        tmpNode.is_leaf = (nodeInfoObj->getNumbrOfChildren() == 0);
+        tmpNode.maxrep_type = (tmpNode.numberOfWl > 1) ? MAXREP_TYPE::maxrep : MAXREP_TYPE::non_supermaximal;
+
+        return tmpNode;
     }
 
 
