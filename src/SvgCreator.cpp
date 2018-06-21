@@ -75,8 +75,6 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
     NodeInfo nodeInfoObj(&nodeStructure, &originalString);
 
-
-
     //First data load
     while (!bio2.empty()) {
         //READ AN OTHER NODE AND PUT THE INFOMATION INSIDE THE nodeInfoObj
@@ -143,7 +141,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
             //Set the suffix link
             for (std::pair<unsigned long, tmp_basic_nodeInfo> node : general_map) {
 
-                for(std::pair<int, unsigned long> wlNode : node.second.wlId ){
+                for (std::pair<int, unsigned long> wlNode : node.second.wlId) {
                     general_map[wlNode.second].suffixLink = node.first;
                 }
             }
@@ -152,7 +150,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
             for (std::pair<unsigned long, tmp_basic_nodeInfo> node : general_map) {
 
                 statistic_info tmpNode;
-                if(node.second.is_leaf || node.second.nodeDepth == 0){
+                if (node.second.is_leaf || node.second.nodeDepth == 0) {
                     statistic_map.insert({node.first, tmpNode});
                     continue;
                 }
@@ -164,8 +162,10 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
                 double kl = 0;
 
-                for(std::pair<int, unsigned long> wlNode : node.second.wlId ){
-                        kl += f(&wlNode.second) * log( ( (double(f(&wlNode.second)) / double(f(&node.first))) / ( double(f(&node.second.suffixLink)) /  double(f(&general_map[node.second.suffixLink].wlId[wlNode.first]))) ) );
+                for (std::pair<int, unsigned long> wlNode : node.second.wlId) {
+                    kl += f(&wlNode.second) * log(((double(f(&wlNode.second)) / double(f(&node.first))) /
+                                                   (double(f(&node.second.suffixLink)) / double(f(
+                                                           &general_map[node.second.suffixLink].wlId[wlNode.first])))));
                 }
                 tmpNode.kl = kl;
 
@@ -173,8 +173,10 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                 //P-norm without paramenter
                 double pnorm = 0;
 
-                for(std::pair<int, unsigned long> wlNode : node.second.wlId ){
-                    pnorm += pow(abs( double((f(&wlNode.second))/(f(&node.first))) - double((f(&general_map[node.second.suffixLink].wlId[wlNode.first]))/(f(&node.second.suffixLink)))  ), p_pnorm_parameter);
+                for (std::pair<int, unsigned long> wlNode : node.second.wlId) {
+                    pnorm += pow(abs(double((f(&wlNode.second)) / (f(&node.first))) -
+                                     double((f(&general_map[node.second.suffixLink].wlId[wlNode.first])) /
+                                            (f(&node.second.suffixLink)))), p_pnorm_parameter);
                 }
 
                 pnorm = pow(pnorm, 1 / p_pnorm_parameter);
@@ -188,8 +190,9 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                 //Entropy
                 double entropy = 0;
 
-                for(std::pair<int, unsigned long> wlNode : node.second.wlId ){
-                    entropy += ((double(f(&wlNode.second))/(f(&node.first))) * (log(double(f(&wlNode.second))/(f(&node.first)))));
+                for (std::pair<int, unsigned long> wlNode : node.second.wlId) {
+                    entropy += ((double(f(&wlNode.second)) / (f(&node.first))) *
+                                (log(double(f(&wlNode.second)) / (f(&node.first)))));
                 }
 
                 tmpNode.H = -entropy;
@@ -209,10 +212,14 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
 
             //set color according to the option chosen
-            RgbColor gray; gray.r = 140; gray.b = 140; gray.g = 140;
+            RgbColor gray;
+            gray.r = 140;
+            gray.b = 140;
+            gray.g = 140;
 
 
-            infoStatusBar = "STAT  Modality:   " +  to_string(statistics_type) + " tau:  " + configParameter->at(tau) +  "    StringLength: " +
+            infoStatusBar = "STAT  Modality:   " + to_string(statistics_type) + " tau:  " + configParameter->at(tau) +
+                            "    StringLength: " +
                             to_string(stringLength) + "         #Nodes: " + to_string(numberOfNode) + "";
 
             for (std::pair<unsigned long, statistic_info> statNode : statistic_map) {
@@ -220,7 +227,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                 switch (statistics_type) {
                     case 1:
 
-                        if (statNode.second.kl >= tau_i){
+                        if (statNode.second.kl >= tau_i) {
                             plot_map[statNode.first].color = rgbColor;
                         } else {
                             plot_map[statNode.first].color = gray;
@@ -230,7 +237,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
                     case 2:
 
-                        if (statNode.second.pNorm >= stod(configParameter->at(tau))){
+                        if (statNode.second.pNorm >= stod(configParameter->at(tau))) {
                             plot_map[statNode.first].color = rgbColor;
                         } else {
                             plot_map[statNode.first].color = gray;
@@ -241,7 +248,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
                     case 3:
 
-                        if (statNode.second.pNormNoF >= stod(configParameter->at(tau))){
+                        if (statNode.second.pNormNoF >= stod(configParameter->at(tau))) {
                             plot_map[statNode.first].color = rgbColor;
                         } else {
                             plot_map[statNode.first].color = gray;
@@ -253,7 +260,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
                     case 4: //todo the entropy function according to fc mail
 
-                        if (statNode.second.H >= stod(configParameter->at(tau))){
+                        if (statNode.second.H >= stod(configParameter->at(tau))) {
                             plot_map[statNode.first].color = rgbColor;
                         } else {
                             plot_map[statNode.first].color = gray;
@@ -292,10 +299,11 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                 }
 
                 infoStatusBar = "REP   Modality: MaxRep Type    StringLength: " +
-                        to_string(stringLength) + "         #Nodes: " + to_string(numberOfNode) + "        Maxrep: " +
-                        to_string((maxrep_counter * 100) / numberOfNode)
-                        + "%       NearSuperMax: " + to_string((nearsupermax_counter * 100) / numberOfNode) +
-                        "%      SuperMax:  " + to_string((supermaxrep_counter * 100) / numberOfNode) + "%";
+                                to_string(stringLength) + "         #Nodes: " + to_string(numberOfNode) +
+                                "        Maxrep: " +
+                                to_string((maxrep_counter * 100) / numberOfNode)
+                                + "%       NearSuperMax: " + to_string((nearsupermax_counter * 100) / numberOfNode) +
+                                "%      SuperMax:  " + to_string((supermaxrep_counter * 100) / numberOfNode) + "%";
 
             } else {
                 exit(-1);
@@ -305,26 +313,53 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
     }
 
 
+    //SETTINGS EDGE INFO
+    if (stoi(configParameter->at("SHOW_EDGE_INFO")) == 1) {
+
+        int max_char = stoi(configParameter->at("MAX_LEAF_CHAR"));
+
+        for (std::pair<unsigned long, tmp_basic_nodeInfo> node : general_map) {
+
+            if (node.second.is_leaf) {
+                if (node.second.edge_length > max_char) {
+                    edge = getEdge(node.second.edge_index, max_char);
+                    edge += "...";
+                } else {
+                    edge = getEdge(node.second.edge_index, node.second.edge_length);
+                }
+            } else {
+                edge = getEdge(node.second.edge_index, node.second.edge_length);
+            }
+
+            general_map[node.first].edge = edge;
+
+        }
+
+    }
+
+
+
     //Print svg file
     for (std::pair<unsigned long, plotting_info> node : plot_map) {
 
 
         switch (modality_type) {
-            case MODALITY_TYPE ::BASIC:
+            case MODALITY_TYPE::BASIC:
 
-                SvgUtils::printSvgNodeBlock(&svg_out, to_string(general_map[node.first].frequency), node.second.w, node.second.posX, node.second.posY, H,
+                SvgUtils::printSvgNodeBlock(&svg_out, general_map[node.first].edge, node.second.w,
+                                            node.second.posX, node.second.posY, H,
                                             node.second.color, node.second.opacity);
                 break;
 
 
-            case MODALITY_TYPE ::STATISTIC:
+            case MODALITY_TYPE::STATISTIC:
 
-                SvgUtils::printSvgNodeBlock2(&svg_out, "todo", node.second.w, node.second.posX, node.second.posY, H,
-                                            "red", node.second.opacity);
+                SvgUtils::printSvgNodeBlock2(&svg_out, general_map[node.first].edge, node.second.w, node.second.posX, node.second.posY, H,
+                                             "red", node.second.opacity);
                 break;
 
-            case MODALITY_TYPE ::MAXREP:
-                SvgUtils::printSvgNodeBlock2(&svg_out, "todo", node.second.w, node.second.posX, node.second.posY, H,
+            case MODALITY_TYPE::MAXREP:
+                SvgUtils::printSvgNodeBlock2(&svg_out, general_map[node.first].edge, node.second.w, node.second.posX, node.second.posY, H,
                                              node.second.colorString, node.second.opacity);
                 break;
 

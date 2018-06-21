@@ -102,6 +102,8 @@ private:
 
         unsigned long suffixLink; //usefull only in statistic mod
 
+        string edge;
+
     };
 
     /**
@@ -372,7 +374,7 @@ private:
         tmpNode.wlId = nodeInfoObj->getWlId();
         tmpNode.is_leaf = (nodeInfoObj->getNumbrOfChildren() == 0);
         tmpNode.maxrep_type = (tmpNode.numberOfWl > 1) ? MAXREP_TYPE::maxrep : MAXREP_TYPE::non_supermaximal;
-
+        tmpNode.edge = "not s";
         return tmpNode;
     }
 
@@ -649,6 +651,20 @@ private:
     void closeOpenFile(std::ifstream * bin_in, std::ofstream * svg_out){
         bin_in->close(); //Close the input file
         svg_out->close(); //chiudo il file on output*/
+    }
+
+    string getEdge(unsigned long idx, unsigned long length){
+        string edge = "";
+
+        for (unsigned long j = idx; j < idx + length; j++) {
+            if ( j == this->originalString.length()) {
+                edge += "$";
+            } else {
+                edge += this->originalString.at(j);
+            }
+        }
+
+        return edge;
     }
 
 };
