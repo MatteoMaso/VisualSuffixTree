@@ -8,8 +8,11 @@
 #include <string>
 #include "../Include/NodeInfo.h"
 #include "../Include/Utils.h"
+#include "../Include/Utils.h"
 
 using namespace std;
+
+
 
 NodeInfo::NodeInfo(NodeInfoStructure *nodeInfoStructure, string * originalString) {
     //Save the address oh the structure to avoid multiple copies
@@ -55,10 +58,99 @@ string NodeInfo::getNodeField() {
         }
     }
 
+    temp.append(kl_divergence);
+    temp.append(p_norm);
+    temp.append(p_normNoParam);
+    temp.append(h_entropy);
+    temp.append(h_entropySpecial);
+
     return temp;
 }
 
+
 bool NodeInfo::setNodeField(string * nodeField) {
+
+//    int from = 0;
+//    int to = from + infoStructure->getBitDepth() - 1;
+//    setDepth(stoi(partitioner(nodeField, from, to), nullptr, 2));
+//
+//    from = to + 1;
+//    to = from + infoStructure->getBitNodeDepth() - 1;
+//    setNodeDepth(stoi(partitioner(nodeField, from, to), nullptr, 2));
+//
+//    from = to + 1;
+//    to = from + infoStructure->getBitLb() - 1;
+//    setLb(stoi(partitioner(nodeField, from, to), nullptr, 2));
+//
+//    from = to + 1;
+//    to = from + infoStructure->getBitRb() - 1;
+//    setRb(stoi(partitioner(nodeField, from, to), nullptr, 2));
+//
+//    if (infoStructure->OPT_LABEL) {
+//        from = to + 1;
+//        to = from + infoStructure->getBitLabel() - 1;
+//        setLabel(stoi(partitioner(nodeField, from, to), nullptr, 2));
+//    }
+//
+//    if (infoStructure->OPT_FATHERLABLE) {
+//        from = to + 1;
+//        to = from + infoStructure->getBitFatherLabel() - 1;
+//        setFatherLabel(stoi(partitioner(nodeField, from, to), nullptr, 2));
+//    }
+//
+//    if (infoStructure->OPT_EDGEINFO) {
+//        from = to + 1;
+//        to = from + infoStructure->getBitEdgeLength() - 1;
+//        setEdgeLength(stoi(partitioner(nodeField, from, to), nullptr, 2));
+//        from = to + 1;
+//        to = from + 32 - 1;
+//        edge_idx = partitioner(nodeField, from, to);
+//    }
+//
+//    if (infoStructure->OPT_CHILDREN_INFO) {
+//        from = to + 1;
+//        to = from + infoStructure->getBitNumberOfChildren() - 1;
+//        setNumberOfChildren(stoi(partitioner(nodeField, from, to), nullptr, 2));
+//
+//        from = to + 1;
+//        to = from + 32 * getNumbrOfChildren() - 1;
+//        string t = partitioner(nodeField, from, to);
+//        setChildren(&t);
+//    }
+//
+//    if(true){ //GET WINER LINK
+//        from = to + 1;
+//        to = from + infoStructure->getBitNumberOfWinerLink() - 1;
+//        setNumberOfWinerLink(stoi(partitioner(nodeField, from, to), nullptr, 2));
+//
+//        from = to + 1;
+//        to = from + (BIT_WINERLINK + BIT_IDX_WL) * getNumberOfWl() - 1;
+//        string t = partitioner(nodeField, from, to);
+//        setWl(&t);
+//    }
+//
+//
+//    if(true){ //SET STATISTICS
+//        from = to + 1;
+//        to = from + infoStructure->getBitNumberOfStatistics() - 1;
+//        setKl_divergence(strToFLoat(partitioner(nodeField, from, to)));
+//
+//        from = to + 1;
+//        to = from + infoStructure->getBitNumberOfStatistics() - 1;
+//        setP_norm(strToFLoat(partitioner(nodeField, from, to)));
+//
+//        from = to + 1;
+//        to = from + infoStructure->getBitNumberOfStatistics() - 1;
+//        setP_normNoParam(strToFLoat(partitioner(nodeField, from, to)));
+//
+//        from = to + 1;
+//        to = from + infoStructure->getBitNumberOfStatistics() - 1;
+//        setH_entropy(strToFLoat(partitioner(nodeField, from, to)));
+//
+//        from = to + 1;
+//        to = from + infoStructure->getBitNumberOfStatistics() - 1;
+//        setH_entropySpecial(strToFLoat(partitioner(nodeField, from, to)));
+//    }
 
     int from = 0;
     int to = from + infoStructure->getBitDepth() - 1;
@@ -119,6 +211,30 @@ bool NodeInfo::setNodeField(string * nodeField) {
         setWl(&t);
     }
 
+
+    if(true){ //SET STATISTICS
+        from = to + 1;
+        to = from + infoStructure->getBitNumberOfStatistics() - 1;
+        kl_divergence = partitioner(nodeField, from, to);
+
+        from = to + 1;
+        to = from + infoStructure->getBitNumberOfStatistics() - 1;
+        p_norm = partitioner(nodeField, from, to);
+
+        from = to + 1;
+        to = from + infoStructure->getBitNumberOfStatistics() - 1;
+        p_normNoParam = partitioner(nodeField, from, to);
+
+        from = to + 1;
+        to = from + infoStructure->getBitNumberOfStatistics() - 1;
+        h_entropy = partitioner(nodeField, from, to);
+
+        from = to + 1;
+        to = from + infoStructure->getBitNumberOfStatistics() - 1;
+        h_entropySpecial = partitioner(nodeField, from, to);
+    }
+
+
 }
 
 void NodeInfo::setDepth(unsigned long n) {
@@ -159,7 +275,7 @@ void NodeInfo::setEdgeCharacterEncoding(unsigned long n) {
 
 
 unsigned long NodeInfo::getDepth() {
-    return stoi(depth, nullptr, 2);;
+    return stoi(depth, nullptr, 2);
 }
 
 unsigned long NodeInfo::getNodeDepth() {
@@ -167,7 +283,7 @@ unsigned long NodeInfo::getNodeDepth() {
 }
 
 unsigned long NodeInfo::getLb() {
-    return stoi(lb, nullptr, 2);;
+    return stoi(lb, nullptr, 2);
 }
 
 unsigned long NodeInfo::getRb() {
@@ -404,4 +520,47 @@ map<string, unsigned long> NodeInfo::getWlCharacter(vector<string> * alphabet) {
     }
     return tmp;
 }
+
+float NodeInfo::getKl_divergence() {
+    return strToFLoat(kl_divergence);
+}
+
+float NodeInfo::getP_norm() {
+    return strToFLoat(p_norm);
+}
+
+float NodeInfo::getP_normNoParam() {
+    return strToFLoat(p_normNoParam);
+}
+
+float NodeInfo::getH_entropy() {
+    return strToFLoat(h_entropy);
+}
+
+float NodeInfo::getH_entropySpecial() {
+    return strToFLoat(h_entropySpecial);
+}
+
+
+void NodeInfo::setKl_divergence(float n) {
+    kl_divergence = floatToBin(&n);
+}
+
+void NodeInfo::setP_norm(float n) {
+    p_norm = floatToBin(&n);
+}
+
+void NodeInfo::setP_normNoParam(float n) {
+    p_normNoParam = floatToBin(&n);
+}
+
+void NodeInfo::setH_entropy(float n) {
+    h_entropy = floatToBin(&n);
+}
+
+void NodeInfo::setH_entropySpecial(float n) {
+    h_entropySpecial = floatToBin(&n);
+}
+
+
 

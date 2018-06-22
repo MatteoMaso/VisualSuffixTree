@@ -15,6 +15,17 @@
 #include "../Include/ObjNode.h"
 #include "../Include/SvgUtils.h"
 
+float strToFLoat(string s){
+
+    int n = 0;
+//        for(int i = 0; i < 32; ++i)
+    for(int i = 31; i >= 0; --i)
+    {
+        n |= (s[i] - 48) << i;
+    }
+
+    return *(float *)&n;
+}
 
 using namespace std;
 
@@ -82,8 +93,8 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
         nodeInfoObj.setNodeField(&nodeInfo);
 
         tmp_basic_nodeInfo tmpNode = createTmpNode(&nodeInfoObj);
-        general_map.insert({nodeInfoObj.getLabel(), tmpNode});
 
+        general_map.insert({nodeInfoObj.getLabel(), tmpNode});
     }
 
     //todo chiudere il file in input
@@ -138,78 +149,6 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
             break;
         case MODALITY_TYPE::STATISTIC:
 
-            //Set the suffix link
-            for (std::pair<unsigned long, tmp_basic_nodeInfo> node : general_map) {
-
-                for (std::pair<int, unsigned long> wlNode : node.second.wlId) {
-                    general_map[wlNode.second].suffixLink = node.first;
-                }
-            }
-
-
-            for (std::pair<unsigned long, tmp_basic_nodeInfo> node : general_map) {
-
-                statistic_info tmpNode;
-                if (node.second.is_leaf || node.second.nodeDepth == 0) {
-                    statistic_map.insert({node.first, tmpNode});
-                    continue;
-                }
-
-
-                //todo check cosa succede se i figli non esistono
-
-                //KL divergence
-
-                double kl = 0;
-
-                for (std::pair<int, unsigned long> wlNode : node.second.wlId) {
-                    kl += f(&wlNode.second) * log(((double(f(&wlNode.second)) / double(f(&node.first))) /
-                                                   (double(f(&node.second.suffixLink)) / double(f(
-                                                           &general_map[node.second.suffixLink].wlId[wlNode.first])))));
-                }
-                tmpNode.kl = kl;
-
-
-                //P-norm without paramenter
-                double pnorm = 0;
-
-                for (std::pair<int, unsigned long> wlNode : node.second.wlId) {
-                    pnorm += pow(abs(double((f(&wlNode.second)) / (f(&node.first))) -
-                                     double((f(&general_map[node.second.suffixLink].wlId[wlNode.first])) /
-                                            (f(&node.second.suffixLink)))), p_pnorm_parameter);
-                }
-
-                pnorm = pow(pnorm, 1 / p_pnorm_parameter);
-
-                tmpNode.pNormNoF = pnorm;
-
-                //P-norm
-                tmpNode.pNormNoF = pnorm * f(&node.first);
-
-
-                //Entropy
-                double entropy = 0;
-
-                for (std::pair<int, unsigned long> wlNode : node.second.wlId) {
-                    entropy += ((double(f(&wlNode.second)) / (f(&node.first))) *
-                                (log(double(f(&wlNode.second)) / (f(&node.first)))));
-                }
-
-                tmpNode.H = -entropy;
-
-
-                //f(W)H(w) - sum(f(aw)H(aw))
-//                double entropy2 = 0;
-//
-//                entropy2 = f(&node.first)*entropy - f(&node.second.suffixLink)*;
-//                //todo aspettare la risposta di fc per questo parametro altrimenti non posso procedere ...in caso fare due passate prima H(w) poi quella completa
-//
-//                //add into info parameter into the node
-
-
-                statistic_map.insert({node.first, tmpNode});
-            }
-
 
             //set color according to the option chosen
             RgbColor gray;
@@ -222,25 +161,25 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                             "    StringLength: " +
                             to_string(stringLength) + "         #Nodes: " + to_string(numberOfNode) + "";
 
-            for (std::pair<unsigned long, statistic_info> statNode : statistic_map) {
+            for (std::pair<unsigned long, tmp_basic_nodeInfo> node : general_map) {
 
                 switch (statistics_type) {
                     case 1:
 
-                        if (statNode.second.kl >= tau_i) {
-                            plot_map[statNode.first].color = rgbColor;
+                        if (node.second.kl_divergence >= tau_i) {
+                            plot_map[node.first].colorString = "red";
                         } else {
-                            plot_map[statNode.first].color = gray;
+                            plot_map[node.first].colorString = "gray";
                         }
 
                         break;
 
                     case 2:
 
-                        if (statNode.second.pNorm >= stod(configParameter->at(tau))) {
-                            plot_map[statNode.first].color = rgbColor;
+                        if (node.second.p_norm >= stod(configParameter->at(tau))) {
+                            plot_map[node.first].colorString = "red";
                         } else {
-                            plot_map[statNode.first].color = gray;
+                            plot_map[node.first].colorString = "gray";
                         }
 
 
@@ -248,26 +187,38 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
                     case 3:
 
-                        if (statNode.second.pNormNoF >= stod(configParameter->at(tau))) {
-                            plot_map[statNode.first].color = rgbColor;
+                        if (node.second.p_normNoParam >= stod(configParameter->at(tau))) {
+                            plot_map[node.first].colorString = "red";
                         } else {
-                            plot_map[statNode.first].color = gray;
+                            plot_map[node.first].colorString = "gray";
                         }
 
 
                         break;
 
 
-                    case 4: //todo the entropy function according to fc mail
+                    case 4:
 
-                        if (statNode.second.H >= stod(configParameter->at(tau))) {
-                            plot_map[statNode.first].color = rgbColor;
+                        if (node.second.h_entropy >= stod(configParameter->at(tau))) {
+                            plot_map[node.first].colorString = "red";
                         } else {
-                            plot_map[statNode.first].color = gray;
+                            plot_map[node.first].colorString = "gray";
                         }
 
 
                         break;
+
+                    case 5:
+
+                        if (node.second.h_entropySpecial >= stod(configParameter->at(tau))) {
+                            plot_map[node.first].colorString = "red";
+                        } else {
+                            plot_map[node.first].colorString = "gray";
+                        }
+
+
+                        break;
+
 
                     default:
                         //error todo some error
@@ -355,7 +306,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
             case MODALITY_TYPE::STATISTIC:
 
                 SvgUtils::printSvgNodeBlock2(&svg_out, general_map[node.first].edge, node.second.w, node.second.posX, node.second.posY, H,
-                                             "red", node.second.opacity);
+                                             node.second.colorString , node.second.opacity);
                 break;
 
             case MODALITY_TYPE::MAXREP:

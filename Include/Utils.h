@@ -10,6 +10,7 @@
 
 using namespace std;
 
+
 string toBinFormat(int numberOfBit, unsigned long n) {
 
     //Todo cercare un metodo più, usando gli shift probabilmente
@@ -179,7 +180,7 @@ string toBinFormat(int numberOfBit, unsigned long n) {
 
 
         default:
-        std::cout << "troppi bit nella rappresentazione! modificare toBinFormat in utils.h" << std::endl;
+            std::cout << "troppi bit nella rappresentazione! modificare toBinFormat in utils.h" << std::endl;
             break;
     }
 

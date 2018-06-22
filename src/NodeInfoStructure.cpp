@@ -32,7 +32,7 @@ NodeInfoStructure::NodeInfoStructure(map<string, string> *configParameter, char 
     this->parameter[INDEX_BIT_NUMBEROFCHILDREN] = stoi(configParameter->at("bitNumberOfChildren"));
     this->parameter[INDEX_BIT_CHILDRENID] = BIT_ID_NODE; //stoi(configParameter->at("bitChildrenId")); //se lo metto variabile devo cambiare sotto
     this->parameter[INDEX_BIT_NUMBEROFWL] = 8; //todo metterlo = ai bit usati per il charEncoding
-
+    this->parameter[INDEX_BIT_STATISTICS] = 32;
 
     //AQUIRE THE INFO THAT I WANT TO REPRESENT FROM THE CONFIG FILE
     this->OPT_DEPTH = true;
@@ -56,7 +56,7 @@ NodeInfoStructure::NodeInfoStructure(map<string, string> *configParameter, char 
 }
 
 //FOR DECODER
-NodeInfoStructure::NodeInfoStructure(string headerInfo, map<string, string> *configParameter, char *stringFileName) {
+NodeInfoStructure:: NodeInfoStructure(string headerInfo, map<string, string> *configParameter, char *stringFileName) {
 
     setField(headerInfo);
 

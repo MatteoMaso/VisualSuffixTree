@@ -69,18 +69,18 @@ public:
 private:
 
     enum MAXREP_TYPE {
-        non_supermaximal = 0 , maxrep = 1, nearsupermaximal = 2 , supermaximalrep = 3
+        non_supermaximal = 0, maxrep = 1, nearsupermaximal = 2, supermaximalrep = 3
     };
 
 
-    enum MODALITY_TYPE{
+    enum MODALITY_TYPE {
         BASIC = 0, STATISTIC = 1, MAXREP = 2
     };
 
-    MODALITY_TYPE modality_type = MODALITY_TYPE ::BASIC;
+    MODALITY_TYPE modality_type = MODALITY_TYPE::BASIC;
 
     //Struttura inizializzata comune a tutte le modalità contiene poco più delle info contenute nel file iniziale
-    struct tmp_basic_nodeInfo{
+    struct tmp_basic_nodeInfo {
 
         unsigned long label;
         unsigned long nodeDepth;
@@ -104,13 +104,19 @@ private:
 
         string edge;
 
+        float kl_divergence;
+        float p_norm;
+        float p_normNoParam;
+        float h_entropy;
+        float h_entropySpecial; //to change
+
     };
 
     /**
      * @param nodeLabel the lable of a node
      * @return the frequncy of that node
      */
-    unsigned long f(unsigned long  * nodeLabel){
+    unsigned long f(unsigned long *nodeLabel) {
 
         return general_map[*nodeLabel].frequency;
 
@@ -118,7 +124,7 @@ private:
 
     std::map<unsigned long, tmp_basic_nodeInfo> general_map; //First map with the initial data, id = label nodo
 
-    struct plotting_info{
+    struct plotting_info {
 
         //PLOTTING INFORMATION
         double posX;
@@ -134,7 +140,7 @@ private:
     std::map<unsigned long, plotting_info> plot_map; //Contain information reguarding plotting
 
     //Structure used to store statistic information used only in statistic modality
-    struct statistic_info{
+    struct statistic_info {
 
         //todo check type of this number
         double H = 0;
@@ -149,37 +155,36 @@ private:
 
 
     //passo un node di tipo tmp_basic_nodeInfo e lui salva la posizione nella struttura designata
-    void setNodePosition(tmp_basic_nodeInfo * node){
+    void setNodePosition(tmp_basic_nodeInfo *node) {
 
         plotting_info position;
 
         //Search if father already set
-        if(plot_map.count(node->fatherLabel) == 0){
+        if (plot_map.count(node->fatherLabel) == 0) {
             setNodePosition(&general_map[node->fatherLabel]);
         }
 
-        plotting_info *  father = &plot_map[node->fatherLabel];
+        plotting_info *father = &plot_map[node->fatherLabel];
 
-        switch (stoi(configParameter->at("TYPE_NODE_DIMENSION")))
-        {
+        switch (stoi(configParameter->at("TYPE_NODE_DIMENSION"))) {
             case 1:
                 //means each children have the same dimension of their brother
                 position.w = father->w / general_map[node->fatherLabel].numberOfChildren;
                 position.posX = father->posX + (father->child_set * position.w);
                 father->child_set++; //incrementa il numero di figli già settati
-            break;
+                break;
 
             case 2:
                 //means the dimensions of a node is proportional with the frequency
 
-                    position.w = scaleUnit * (node->frequency);
+                position.w = scaleUnit * (node->frequency);
 
 //                    position.w = scaleUnit * (node->frequency+1);
 
 
 
                 position.posX = x0 + node->lb * scaleUnit;
-            break;
+                break;
 
             default:
                 // istruzioni
@@ -188,7 +193,7 @@ private:
                 break;
         }
 
-        switch (stoi(configParameter->at("SVG_FROM_TOP"))){
+        switch (stoi(configParameter->at("SVG_FROM_TOP"))) {
             case 1: //from top
                 position.posY = y0 + node->nodeDepth * (H + 0.7);
                 break;
@@ -207,7 +212,7 @@ private:
         this->plot_map.insert({node->label, position}); //insert position in the map
     }
 
-    void basicMod_depth(tmp_basic_nodeInfo * node, RgbColor rgbColor){
+    void basicMod_depth(tmp_basic_nodeInfo *node, RgbColor rgbColor) {
 
         long depthThreshold = stoi(configParameter->at("BASIC_DEPTH_THRESHOLD"));
         if (stoi(configParameter->at("BASIC_DEPTH_WITH_THRESHOLD")) == 1) {
@@ -224,10 +229,10 @@ private:
         }
     }
 
-    void basicMod_kmer(tmp_basic_nodeInfo * node, RgbColor rgbColor){
+    void basicMod_kmer(tmp_basic_nodeInfo *node, RgbColor rgbColor) {
 
-        if (node->depth >= BASIC_KVALUE_KMER && general_map[node->fatherLabel].nodeDepth < BASIC_KVALUE_KMER)
-        { //Full color
+        if (node->depth >= BASIC_KVALUE_KMER &&
+            general_map[node->fatherLabel].nodeDepth < BASIC_KVALUE_KMER) { //Full color
             plot_map[node->label].color = rgbColor;
         } else { //Blenched
             plot_map[node->label].color = rgbColor;
@@ -235,7 +240,7 @@ private:
         }
     }
 
-    void basicMod_frequency(tmp_basic_nodeInfo * node, RgbColor rgbColor){
+    void basicMod_frequency(tmp_basic_nodeInfo *node, RgbColor rgbColor) {
 
         if (stoi(configParameter->at("BASIC_FREQUENCY_COLOR_TYPE")) == 1) {
             //the frequency is representing with a gradient color
@@ -262,7 +267,7 @@ private:
     }
 
 
-    void maxrep_frequency(tmp_basic_nodeInfo * node, int charNumber){
+    void maxrep_frequency(tmp_basic_nodeInfo *node, int charNumber) {
 
         double s = ((charNumber) - node->numberOfWl) * (1.0 / (charNumber));
         plot_map[node->label].opacity = 1 - s;
@@ -276,7 +281,8 @@ private:
     }
 
 
-    void maxrep_type(tmp_basic_nodeInfo * node, unsigned long * maxrep_counter, unsigned long * supermaxrep_counter, unsigned long * nearsupermax_counter){
+    void maxrep_type(tmp_basic_nodeInfo *node, unsigned long *maxrep_counter, unsigned long *supermaxrep_counter,
+                     unsigned long *nearsupermax_counter) {
 
         //Find different type of maximal repeat
         if (node->maxrep_type == MAXREP_TYPE::maxrep) {
@@ -304,7 +310,7 @@ private:
 
             if (is_nearSupMax) {
                 node->maxrep_type = MAXREP_TYPE::nearsupermaximal;
-                *nearsupermax_counter = *nearsupermax_counter +1;
+                *nearsupermax_counter = *nearsupermax_counter + 1;
             }
 
             if (leafNumber == node->childrenId.size()) {
@@ -340,7 +346,7 @@ private:
 
     }
 
-    void setRootPosition(tmp_basic_nodeInfo * node){
+    void setRootPosition(tmp_basic_nodeInfo *node) {
         plotting_info root;
 
         root.w = rootNodeWidth;
@@ -355,28 +361,7 @@ private:
         this->plot_map.insert({node->label, root}); //insert position in the map
     }
 
-    tmp_basic_nodeInfo createTmpNode(NodeInfo * nodeInfoObj){
 
-        tmp_basic_nodeInfo tmpNode;
-
-        tmpNode.label = nodeInfoObj->getLabel();
-        tmpNode.nodeDepth = nodeInfoObj->getNodeDepth();
-        tmpNode.depth = nodeInfoObj->getDepth();
-        tmpNode.lb = nodeInfoObj->getLb();
-        tmpNode.rb = nodeInfoObj->getRb();
-        tmpNode.frequency = tmpNode.rb - tmpNode.lb + 1;
-        tmpNode.fatherLabel = nodeInfoObj->getFatherLabel();
-        tmpNode.numberOfChildren = nodeInfoObj->getNumbrOfChildren();
-        tmpNode.numberOfWl = nodeInfoObj->getNumberOfWl();
-        tmpNode.edge_index = nodeInfoObj->getEdgeIndex();
-        tmpNode.edge_length = nodeInfoObj->getEdgeLength();
-        tmpNode.childrenId = nodeInfoObj->getChildrenId();
-        tmpNode.wlId = nodeInfoObj->getWlId();
-        tmpNode.is_leaf = (nodeInfoObj->getNumbrOfChildren() == 0);
-        tmpNode.maxrep_type = (tmpNode.numberOfWl > 1) ? MAXREP_TYPE::maxrep : MAXREP_TYPE::non_supermaximal;
-        tmpNode.edge = "not s";
-        return tmpNode;
-    }
 
 
     //old parameter%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -406,8 +391,6 @@ private:
         double w;
         double opacity = 1;
     };
-
-
 
 
     map<string, string> *configParameter;
@@ -598,7 +581,7 @@ private:
 
 
         if (modality.compare("BASIC") == 0) {
-            modality_type = MODALITY_TYPE ::BASIC;
+            modality_type = MODALITY_TYPE::BASIC;
             //If I want to use the same dimension for each brother
             int TYPE_NODE_DIMENSION = stoi(configParameter->at("TYPE_NODE_DIMENSION"));
             if (TYPE_NODE_DIMENSION == 1 || TYPE_NODE_DIMENSION == 2) {
@@ -633,10 +616,10 @@ private:
                 //ok
             }
         } else if (modality.compare("STATISTIC") == 0) {
-            modality_type = MODALITY_TYPE ::STATISTIC;
+            modality_type = MODALITY_TYPE::STATISTIC;
 
         } else if (modality.compare("MAXREP") == 0) {
-            modality_type = MODALITY_TYPE ::MAXREP;
+            modality_type = MODALITY_TYPE::MAXREP;
 
         } else {
             //error
@@ -648,16 +631,16 @@ private:
         return true;
     }
 
-    void closeOpenFile(std::ifstream * bin_in, std::ofstream * svg_out){
+    void closeOpenFile(std::ifstream *bin_in, std::ofstream *svg_out) {
         bin_in->close(); //Close the input file
         svg_out->close(); //chiudo il file on output*/
     }
 
-    string getEdge(unsigned long idx, unsigned long length){
+    string getEdge(unsigned long idx, unsigned long length) {
         string edge = "";
 
         for (unsigned long j = idx; j < idx + length; j++) {
-            if ( j == this->originalString.length()) {
+            if (j == this->originalString.length()) {
                 edge += "$";
             } else {
                 edge += this->originalString.at(j);
@@ -666,6 +649,37 @@ private:
 
         return edge;
     }
+
+
+    tmp_basic_nodeInfo createTmpNode(NodeInfo *nodeInfoObj) {
+
+        tmp_basic_nodeInfo tmpNode;
+
+        tmpNode.label = nodeInfoObj->getLabel();
+        tmpNode.nodeDepth = nodeInfoObj->getNodeDepth();
+        tmpNode.depth = nodeInfoObj->getDepth();
+        tmpNode.lb = nodeInfoObj->getLb();
+        tmpNode.rb = nodeInfoObj->getRb();
+        tmpNode.frequency = tmpNode.rb - tmpNode.lb + 1;
+        tmpNode.fatherLabel = nodeInfoObj->getFatherLabel();
+        tmpNode.numberOfChildren = nodeInfoObj->getNumbrOfChildren();
+        tmpNode.numberOfWl = nodeInfoObj->getNumberOfWl();
+        tmpNode.edge_index = nodeInfoObj->getEdgeIndex();
+        tmpNode.edge_length = nodeInfoObj->getEdgeLength();
+        tmpNode.childrenId = nodeInfoObj->getChildrenId();
+        tmpNode.wlId = nodeInfoObj->getWlId();
+        tmpNode.is_leaf = (tmpNode.numberOfChildren == 0);
+        tmpNode.maxrep_type = (tmpNode.numberOfWl > 1) ? MAXREP_TYPE::maxrep : MAXREP_TYPE::non_supermaximal;
+        tmpNode.edge = "not s";
+        tmpNode.kl_divergence = nodeInfoObj->getKl_divergence();
+        tmpNode.p_norm = nodeInfoObj->getP_norm();
+        tmpNode.p_normNoParam = nodeInfoObj->getP_normNoParam();
+        tmpNode.h_entropy = nodeInfoObj->getH_entropy();
+        tmpNode.h_entropySpecial = nodeInfoObj->getH_entropySpecial();
+
+        return tmpNode;
+    }
+
 
 };
 

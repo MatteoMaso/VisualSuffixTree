@@ -10,16 +10,18 @@
 #include "../Include/ConfigParser.h"
 #include "../Include/Header.h"
 #include "../Include/NodeInfo.h"
+//#include "../Include/Utils.h"
 
 using namespace std;
 using namespace sdsl;
 
 typedef cst_sct3<> cst_t;
 
+
 TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, string> *configParameter) {
 
     //SUFFIX TREE STRUCTURE
-    cst_t cst;                              //declare the suffix tree
+//    cst_t cst;                              //declare the suffix tree
     construct(cst, inputFileName, 1);       //initialize the suffix tree
     typedef cst_bfs_iterator<cst_t> iterator;
     iterator begin = iterator(&cst, cst.root());
@@ -39,6 +41,8 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
 
     //SET VERBOSE
     VERBOSE = (stoi(configParameter->at("VERBOSE"))) == 1;
+
+    p_pnorm_parameter = stod(configParameter->at("STATISTIC_PNORM_PARAMETER")); //P-parameter user set;
 
     //PREPARE THE OUTPUT FILE AND PARAMETER
     std::ofstream bin_out(outputFileName, std::ios::out | std::ios::binary);
@@ -61,7 +65,7 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
         exit(-1);
     }
 
-    long numberOfNode = cst.id(cst.root());
+    numberOfNode = cst.id(cst.root());
     std::cout << "Number of Node: " << numberOfNode << std::endl;
 
 
@@ -73,26 +77,18 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
     map<int, unsigned long> wl;
 
     long counter = 0;
-    int percentage, percentareOld;
+    int percentage, percentageOld;
     for (iterator1 it = begin; it != end; ++it) {
-        counter++;
-        percentareOld = percentage;
-        percentage = (counter * 100) / numberOfNode;
-        if (percentage != percentareOld) {
-            std::cout << percentage << "%" << std::endl;
-        }
+
+        print_percentage(&counter, &percentage, &percentageOld, &numberOfNode);
+
         nodeInfoObj.setDepth(cst.depth(*it));
         nodeInfoObj.setNodeDepth(cst.node_depth(*it));
         nodeInfoObj.setLb(cst.lb(*it));
         nodeInfoObj.setRb(cst.rb(*it));
+        nodeInfoObj.setLabel(cst.id(*it));
+        nodeInfoObj.setFatherLabel(cst.id(cst.parent(*it)));
 
-        if (nodeInfoStructure.OPT_LABEL) {
-            nodeInfoObj.setLabel(cst.id(*it));
-        }
-
-        if (nodeInfoStructure.OPT_FATHERLABLE) {
-            nodeInfoObj.setFatherLabel(cst.id(cst.parent(*it)));
-        }
 
         if (nodeInfoStructure.OPT_EDGEINFO) {
             nodeInfoObj.setEdgeLength(cst.depth(*it)-cst.depth(cst.parent(*it)));
@@ -131,13 +127,15 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
         }
         nodeInfoObj.setWinerLinkId(&wl);
 
-        if (VERBOSE) {
-            std::cout << "\n\n\nNodeDepth: " << cst.node_depth(*it) << " Depth: " << cst.depth(*it) << "-["
-                      << cst.lb(*it)
-                      << "-"
-                      << cst.rb(*it) << "]"
-                      << std::endl;//<< "\nAll String length: " << allstring_length << " parent length: " << parent_strLength << "\nEdge: " << edge <<"\nEdge coded: " << e.edgeToString(&edge) << std::endl;
+//        ADD SET STATISTIC
+        nodeInfoObj.setKl_divergence(kl_divergence(&it));
+        nodeInfoObj.setP_norm(p_norm(&it));
+        nodeInfoObj.setP_normNoParam(p_normNoparam(&it));
+        nodeInfoObj.setH_entropy(entropy(&it));
+        nodeInfoObj.setH_entropySpecial(entropySpecial(&it));
 
+        if (VERBOSE) {
+            std::cout << print_node_info(&cst, &it) << std::endl;
             std::cout << "NodeInfoobj.print()" << nodeInfoObj.print(&nodeInfoStructure.alphabet) << std::endl;
         }
 
@@ -147,12 +145,13 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
     }
 
     if (true){
-        //todo inserire ma tree max depth nell'header e rendere l'albero con i nodi alti in modo proporzionale alla profondità max
         std::cout << "Tree max depth: " << tree_max_depth << std::endl;
     }
 
     bin_out.close();
 };
+
+
 
 void TreeParser::printBinFile(string &s, std::ofstream &bin_out) {
 
