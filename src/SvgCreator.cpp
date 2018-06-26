@@ -146,7 +146,31 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                     exit(-1);
                 }
             }
+
+
+            if (configParameter->at("BASIC_INFO_TO_VISUALIZE") == "DEPTH") {
+
+                infoStatusBar = "BASIC  DEPTH, threshold: " + configParameter->at("BASIC_DEPTH_THRESHOLD");
+
+            } else if (configParameter->at("BASIC_INFO_TO_VISUALIZE") == "KMER") {
+
+                infoStatusBar = "BASIC  KMER, kvalue: " + configParameter->at("BASIC_KVALUE_KMER");
+
+            } else if (configParameter->at("BASIC_INFO_TO_VISUALIZE") == "FREQUENCY") {
+
+                infoStatusBar = "BASIC  FREQUENCY, freq threshold: " + configParameter->at("BASIC_FREQUENCY_THRESHOLD") + " depth threshold: " + configParameter->at("BASIC_DEPTH_THRESHOLD");
+
+
+            } else {
+                //default
+                infoStatusBar = "ERROR!! ";
+            }
+
+            infoStatusBar +=  "    StringLength: " + to_string(stringLength) + "   #Nodes: " + to_string(numberOfNode) + "";
+
             break;
+
+
         case MODALITY_TYPE::STATISTIC:
 
 

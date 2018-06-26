@@ -35,7 +35,7 @@ public:
                       "\" fill=\"url(#background)\"/>";
         temp += "<text text-anchor=\"middle\" x=\""+ to_string(width/2 - 20)+"\" y=\"24\" font-size=\"17\" font-family=\"Verdana\" fill=\"rgb(0,0,0)\">Flame Graph</text>\n"
                 "<text text-anchor=\"\" x=\"10.00\" y=\"24\" font-size=\"12\" font-family=\"Verdana\" fill=\"rgb(0,0,0)\" id=\"unzoom\" onclick=\"unzoom()\" style=\"opacity: 0; cursor: pointer;\">Reset Zoom</text>\n"
-                "<text text-anchor=\"\" x=\""+ to_string(width - 70)+"\" y=\"24\" font-size=\"12\" font-family=\"Verdana\" fill=\"rgb(0,0,0)\" id=\"search\" onmouseover=\"searchover()\" onmouseout=\"searchout()\" onclick=\"search_prompt()\" style=\"opacity: 0.1; cursor: pointer;\">Search</text>\n"
+                "<text text-anchor=\"\" x=\""+ to_string(width - 70)+"\" y=\"24\" font-size=\"12\" font-family=\"Verdana\" fill=\"rgb(0,0,0)\" id=\"search\" onmouseover=\"searchover()\" onmouseout=\"searchout()\" onclick=\"search_prompt()\" style=\"opacity: 0.7; cursor: pointer;\">Search</text>\n"
                 "<text text-anchor=\"\" x=\"10.00\" y=\""+to_string(45)+"\" font-size=\"12\" font-family=\"Verdana\" fill=\"rgb(0,0,0)\" id=\"matched\"> </text>\n"
                 "\n"
                 "<text text-anchor=\"\" x=\"10.00\" y=\""+to_string(45)+"\" font-size=\"12\" font-family=\"Verdana\" fill=\"rgb(0,0,0)\" id=\"details\"> </text>";
@@ -379,7 +379,7 @@ public:
                 "\t\tif (searching) {\n"
                 "\t\t\tsearchbtn.style[\"opacity\"] = \"1.0\";\n"
                 "\t\t} else {\n"
-                "\t\t\tsearchbtn.style[\"opacity\"] = \"0.1\";\n"
+                "\t\t\tsearchbtn.style[\"opacity\"] = \"0.7\";\n"
                 "\t\t}\n"
                 "\t}\n"
                 "\t\n"
