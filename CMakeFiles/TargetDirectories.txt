@@ -1,0 +1,3 @@
+/root/Desktop/Progetti/VisualSuffixTree/CMakeFiles/rebuild_cache.dir
+/root/Desktop/Progetti/VisualSuffixTree/CMakeFiles/VisualSuffixTree.dir
+/root/Desktop/Progetti/VisualSuffixTree/CMakeFiles/edit_cache.dir

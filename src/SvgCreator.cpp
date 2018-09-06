@@ -122,8 +122,9 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
     //some statistic parameter to initialize
     double p_pnorm_parameter = stod(configParameter->at("STATISTIC_PNORM_PARAMETER")); //P-parameter user set;
     int statistics_type = stoi(configParameter->at("STATISTIC_TYPE"));
-    string tau = "STATISTIC_TAU_" + to_string(statistics_type);
-    double tau_i = stod(configParameter->at(tau));
+//    string tau = "STATISTIC_TAU_" + to_string(statistics_type);
+    string tau = "STATISTIC_TAU";
+    double tau_i = stod(configParameter->at("STATISTIC_TAU"));
 
     switch (modality_type) {
         case MODALITY_TYPE::BASIC:
