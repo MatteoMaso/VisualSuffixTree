@@ -51,12 +51,19 @@ private:
                      "-[" + to_string(cst->lb(**it)) +
                      "-" + to_string(cst->rb(**it)) +
                      "]";//<< "\nAll String length: " << allstring_length << " parent length: " << parent_strLength << "\nEdge: " << edge <<"\nEdge coded: " << e.edgeToString(&edge) << std::endl;
+
+        return msg;
     }
 
+    //todo
+    ///* ogni tanto lancia arithmetic exeptio... sistemare probabilemente aggiungere controlli sulla divisione*/
     void print_percentage(long *counter, int *percentage, int *percentageOld, long *numberOfNode) {
 
 
         *percentageOld = *percentage;
+        if(*numberOfNode < 1){
+            std::cout << "ooooooo è minore di 1!!!" << std::endl;
+        }
         *percentage = (*counter * 100) / *numberOfNode;
 
 

@@ -80,7 +80,7 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
     int percentage, percentageOld;
     for (iterator1 it = begin; it != end; ++it) {
 
-        print_percentage(&counter, &percentage, &percentageOld, &numberOfNode);
+        //print_percentage(&counter, &percentage, &percentageOld, &numberOfNode);
 
         nodeInfoObj.setDepth(cst.depth(*it));
         nodeInfoObj.setNodeDepth(cst.node_depth(*it));
