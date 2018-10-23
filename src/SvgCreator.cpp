@@ -18,7 +18,7 @@
 float strToFLoat(string s){
 
     int n = 0;
-//        for(int i = 0; i < 32; ++i)
+    //for(int i = 0; i < 32; ++i)
     for(int i = 31; i >= 0; --i)
     {
         n |= (s[i] - 48) << i;
@@ -29,9 +29,9 @@ float strToFLoat(string s){
 
 using namespace std;
 
-SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string> *configParameter,
-                       char *stringFileName) {
+SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string> *configParameter, char *stringFileName) {
 
+    int error_counter = 0;
     this->configParameter = configParameter;
     //READ BINARY FILE
     std::ifstream bin_in(inputFileName, std::ios::binary);
@@ -109,16 +109,6 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
         }
     };
 
-
-    //BASIC CUT NODE
-    /*if (stoi(configParameter->at("BASIC_CUT_NODE")) == 1) {
-                if (frequency < stoi(configParameter->at("NODE_FREQUENCY_THRESHOLD"))) {
-                    continue;
-                }
-    }*/
-
-
-
     //some statistic parameter to initialize
     double p_pnorm_parameter = stod(configParameter->at("STATISTIC_PNORM_PARAMETER")); //P-parameter user set;
     int statistics_type = stoi(configParameter->at("STATISTIC_TYPE"));
@@ -126,8 +116,16 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
     string tau = "STATISTIC_TAU";
     double tau_i = stod(configParameter->at("STATISTIC_TAU"));
 
+
+    /*
+     * Here there's the modality selection. So we have 3 different code sections according to the parameter that we want to analyze.
+     * Basic, Statistic and MaxRep
+     */
     switch (modality_type) {
         case MODALITY_TYPE::BASIC:
+            /**
+             * Iter over all the tree's nodes to extract the informations.
+             */
             for (std::pair<unsigned long, tmp_basic_nodeInfo> node : general_map) {
 
                 if (configParameter->at("BASIC_INFO_TO_VISUALIZE") == "DEPTH") {
@@ -148,7 +146,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                 }
             }
 
-
+            //Set the status bar
             if (configParameter->at("BASIC_INFO_TO_VISUALIZE") == "DEPTH") {
 
                 infoStatusBar = "BASIC  DEPTH, threshold: " + configParameter->at("BASIC_DEPTH_THRESHOLD");
@@ -191,9 +189,17 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                 switch (statistics_type) {
                     case 1:
 
-                        if (node.second.kl_divergence >= tau_i) {
-                            plot_map[node.first].colorString = "red";
-                        } else {
+                        //Patch  because a node that it is not a maximal repeat can't have an hight kl_divergence
+                        //TODO check why there's this problem
+                        //fix the form
+                        if( node.second.maxrep_type != MAXREP_TYPE::non_supermaximal  ){
+                            if (node.second.kl_divergence >= tau_i) {
+                                plot_map[node.first].colorString = "red";
+                            }else {
+                                plot_map[node.first].colorString = "gray";
+                            }
+                        }else {
+                            error_counter++;
                             plot_map[node.first].colorString = "gray";
                         }
 
@@ -289,7 +295,9 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
     }
 
 
-    //SETTINGS EDGE INFO
+    /**
+     * For all the category there's the Node info option, so if the user select SHOW_EDGE_INFO we add the string to the edge.
+     */
     if (stoi(configParameter->at("SHOW_EDGE_INFO")) == 1) {
 
         int max_char = stoi(configParameter->at("MAX_LEAF_CHAR"));
@@ -313,11 +321,12 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
     }
 
-
-
-    //Print svg file
+    /**
+     * PRINT SVG FILE
+     * Iterator over all the node information. For each node print the output in a different way according to the
+     * selected modality.
+     */
     for (std::pair<unsigned long, plotting_info> node : plot_map) {
-
 
         switch (modality_type) {
             case MODALITY_TYPE::BASIC:
@@ -326,7 +335,6 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                                             node.second.posX, node.second.posY, H,
                                             node.second.color, node.second.opacity);
                 break;
-
 
             case MODALITY_TYPE::STATISTIC:
 
@@ -338,7 +346,6 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
                 SvgUtils::printSvgNodeBlock2(&svg_out, general_map[node.first].edge, node.second.w, node.second.posX, node.second.posY, H,
                                              node.second.colorString, node.second.opacity);
                 break;
-
         }
     };
 
@@ -668,7 +675,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 //        exit(-1);
 //    }
 
-
+    std::cout << "Error counter" << error_counter << std::endl;
     printStatusBar(&svg_out, configParameter, infoStatusBar);
     char svgEnd[] = {"</svg>"};  //Close the SVG File
     svg_out << svgEnd;

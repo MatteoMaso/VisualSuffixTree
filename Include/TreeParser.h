@@ -87,9 +87,9 @@ private:
 
         float kl = 0;
 
-        float f_aWb = 0; //frequenza figlio
-        float f_aW = nF(it); //frequenza nodo
-        float f_Wb = 0; //frequenza figlio suffix link
+        float f_aWb = 0;        //frequenza figlio
+        float f_aW = nF(it);    //frequenza nodo
+        float f_Wb = 0;         //frequenza figlio suffix link
         float f_W = (cst.rb( cst.sl(**it))) - (cst.lb( cst.sl(**it))) + 1; //frequenza suffix link
 
         for (auto &child: cst.children(**it)) {

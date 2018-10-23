@@ -10,18 +10,15 @@
 #include "../Include/ConfigParser.h"
 #include "../Include/Header.h"
 #include "../Include/NodeInfo.h"
-//#include "../Include/Utils.h"
 
 using namespace std;
 using namespace sdsl;
 
 typedef cst_sct3<> cst_t;
 
-
 TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, string> *configParameter) {
 
     //SUFFIX TREE STRUCTURE
-//    cst_t cst;                              //declare the suffix tree
     construct(cst, inputFileName, 1);       //initialize the suffix tree
     typedef cst_bfs_iterator<cst_t> iterator;
     iterator begin = iterator(&cst, cst.root());
@@ -80,7 +77,7 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
     int percentage, percentageOld;
     for (iterator1 it = begin; it != end; ++it) {
 
-        //print_percentage(&counter, &percentage, &percentageOld, &numberOfNode);
+        print_percentage(&counter, &percentage, &percentageOld, &numberOfNode);
 
         nodeInfoObj.setDepth(cst.depth(*it));
         nodeInfoObj.setNodeDepth(cst.node_depth(*it));
@@ -127,7 +124,7 @@ TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, st
         }
         nodeInfoObj.setWinerLinkId(&wl);
 
-//        ADD SET STATISTIC
+        //ADD SET STATISTIC
         nodeInfoObj.setKl_divergence(kl_divergence(&it));
         nodeInfoObj.setP_norm(p_norm(&it));
         nodeInfoObj.setP_normNoParam(p_normNoparam(&it));
