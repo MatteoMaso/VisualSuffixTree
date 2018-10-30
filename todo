@@ -1,0 +1,4 @@
+-  provide a different config fiel
+-  save into a levelDB the temporary file into the memory of the first output
+-  fix the exampe folder
+-  move the include folder
