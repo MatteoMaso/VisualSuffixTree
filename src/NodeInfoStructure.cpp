@@ -7,8 +7,8 @@
 #include <sstream>
 #include <map>
 #include <fstream>
-#include "../Include/ConfigParser.h"
-#include "../Include/NodeInfoStructure.h"
+#include "ConfigParser.h"
+#include "NodeInfoStructure.h"
 
 
 //FOR ENCODER

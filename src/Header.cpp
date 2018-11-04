@@ -5,8 +5,8 @@
 #include <iostream>
 #include <bitset>
 
-#include "../Include/Header.h"
-#include "../Include/NodeInfoStructure.h"
+#include "Header.h"
+#include "NodeInfoStructure.h"
 
 using namespace std;
 

@@ -2,7 +2,10 @@ tasks.xml
 out/
 .idea/
 build/
-Example/
+CMakeFiles/
+bin/
+lib/
+example/
 cmake-build-debug-mingw/
 cmake-build-debug/
 *.bin
@@ -12,3 +15,10 @@ cmake-build-debug/
 PresentationFile/
 statistiche/
 *.o
+todo
+MakeFile
+CMakeCache.txt
+cmake_install.cmake
+VisualSuffixTree
+CMakeModules/
+cmake-build-debug/

@@ -7,9 +7,9 @@
 #include <fstream>
 #include <sys/stat.h>
 
-#include "Include/TreeParser.h"
-#include "Include/SvgCreator.h"
-#include "Include/ConfigParser.h"
+#include "TreeParser.h"
+#include "SvgCreator.h"
+#include "ConfigParser.h"
 
 
 #ifdef WINDOWS

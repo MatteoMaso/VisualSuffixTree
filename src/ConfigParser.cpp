@@ -6,7 +6,7 @@
 #include <fstream>
 #include <algorithm>
 #include <iostream>
-#include "../Include/ConfigParser.h"
+#include "ConfigParser.h"
 
 ConfigParser::ConfigParser(string configFileName, map<string, string> *configParameter){
 
