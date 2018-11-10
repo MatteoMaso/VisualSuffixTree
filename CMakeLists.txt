@@ -17,8 +17,11 @@ set(CMAKE_CXX_STANDARD 11)
 include_directories($ENV{HOME}/include)
 link_directories($ENV{HOME}/lib)
 
-#set(SOURCE_FILE src/main.cpp)
 
-add_executable(VisualSuffixTree src/main.cpp src/SvgCreator.cpp src/SvgCreator.h src/TreeParser.cpp src/TreeParser.h src/ConfigParser.cpp src/ConfigParser.h src/NodeInfoStructure.cpp src/NodeInfoStructure.h src/NodeInfo.cpp src/NodeInfo.h src/Header.cpp src/Header.h src/Header.h src/TreeParser.h src/SvgCreator.h src/NodeInfo.h src/NodeInfoStructure.h src/ConfigParser.h src/BitIo.h src/ObjNode.h src/ObjNode.cpp src/Utils.h src/SvgUtils.h src/SvgObject/StatusBar.cpp src/SvgObject/StatusBar.h)
+#add_executable(VisualSuffixTree src/main.cpp src/SvgCreator.cpp src/SvgCreator.h src/TreeParser.cpp src/TreeParser.h src/ConfigParser.cpp src/ConfigParser.h src/NodeInfoStructure.cpp src/NodeInfoStructure.h src/NodeInfo.cpp src/NodeInfo.h src/Header.cpp src/Header.h src/Header.h src/TreeParser.h src/SvgCreator.h src/NodeInfo.h src/NodeInfoStructure.h src/ConfigParser.h src/BitIo.h src/ObjNode.h src/ObjNode.cpp src/Utils.h src/SvgUtils.h src/SvgObject/StatusBar.cpp src/SvgObject/StatusBar.h)
+add_executable(Parser src/parser.cpp src/SvgCreator.cpp src/SvgCreator.h src/TreeParser.cpp src/TreeParser.h src/ConfigParser.cpp src/ConfigParser.h src/NodeInfoStructure.cpp src/NodeInfoStructure.h src/NodeInfo.cpp src/NodeInfo.h src/Header.cpp src/Header.h src/Header.h src/TreeParser.h src/SvgCreator.h src/NodeInfo.h src/NodeInfoStructure.h src/ConfigParser.h src/BitIo.h src/ObjNode.h src/ObjNode.cpp src/Utils.hpp src/SvgUtils.h src/SvgObject/StatusBar.cpp src/SvgObject/StatusBar.h src/Utils.cpp)
+add_executable(SVG_plotter src/svg_plotter src/SvgCreator.cpp src/SvgCreator.h src/TreeParser.cpp src/TreeParser.h src/ConfigParser.cpp src/ConfigParser.h src/NodeInfoStructure.cpp src/NodeInfoStructure.h src/NodeInfo.cpp src/NodeInfo.h src/Header.cpp src/Header.h src/Header.h src/TreeParser.h src/SvgCreator.h src/NodeInfo.h src/NodeInfoStructure.h src/ConfigParser.h src/BitIo.h src/ObjNode.h src/ObjNode.cpp src/Utils.hpp src/SvgUtils.h src/SvgObject/StatusBar.cpp src/SvgObject/StatusBar.h src/Utils.cpp)
 
-target_link_libraries(VisualSuffixTree sdsl divsufsort divsufsort64)
+#target_link_libraries(VisualSuffixTree sdsl divsufsort divsufsort64)
+target_link_libraries(Parser sdsl divsufsort divsufsort64)
+target_link_libraries(SVG_plotter sdsl divsufsort divsufsort64)

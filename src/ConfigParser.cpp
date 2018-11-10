@@ -10,6 +10,7 @@
 
 ConfigParser::ConfigParser(string configFileName, map<string, string> *configParameter){
 
+    std::cout << configFileName << std::endl;
     std::ifstream cFile (configFileName);
     if (cFile.is_open())
     {

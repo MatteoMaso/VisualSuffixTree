@@ -7,8 +7,8 @@
 #include <iostream>
 #include <string>
 #include "NodeInfo.h"
-#include "Utils.h"
-#include "Utils.h"
+#include "Utils.hpp"
+#include "Utils.hpp"
 
 using namespace std;
 
@@ -234,7 +234,7 @@ bool NodeInfo::setNodeField(string * nodeField) {
         h_entropySpecial = partitioner(nodeField, from, to);
     }
 
-
+    return true; //todo fix
 }
 
 void NodeInfo::setDepth(unsigned long n) {

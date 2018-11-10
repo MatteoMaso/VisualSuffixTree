@@ -1,21 +1,89 @@
 //
-// Created by root on 5/8/18.
+// Created by root on 11/10/18.
 //
 #include <string>
-#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <fstream>
 
 
-#ifndef VISUALSUFFIXTREE_UTILS_H
-#define VISUALSUFFIXTREE_UTILS_H
 
-using namespace std;
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <cstring>
+#include <bitset>
+#include "Utils.hpp"
 
 
-string toBinFormat(int numberOfBit, unsigned long n) {
+InputParser::InputParser (int &argc, char **argv){
+    for (int i=1; i < argc; ++i)
+        this->tokens.push_back(std::string(argv[i]));
+}
+
+/// @author iain
+const std::string& InputParser::getCmdOption(const std::string &option) const{
+    std::vector<std::string>::const_iterator itr;
+    itr =  std::find(this->tokens.begin(), this->tokens.end(), option);
+    if (itr != this->tokens.end() && ++itr != this->tokens.end()){
+        return *itr;
+    }
+    static const std::string empty_string("");
+    return empty_string;
+}
+    /// @author iain
+bool InputParser::cmdOptionExists(const std::string &option) const{
+    return std::find(this->tokens.begin(), this->tokens.end(), option)
+        != this->tokens.end();
+}
+
+
+bool fexists(const std::string& filename){
+    std::ifstream ifile(filename.c_str());
+    return (bool)ifile;
+}
+
+
+bool pexists(const std::string& pathname){
+    struct stat info;
+
+    char * tab2 = new char [pathname.length()+1];
+    strcpy (tab2, pathname.c_str());
+
+    if( stat( tab2, &info ) != 0 )
+        //printf( "cannot access %s\n", pathname );
+        return false;
+    else if( info.st_mode & S_IFDIR )  // S_ISDIR() doesn't exist on my windows
+        //printf( "%s is a directory\n", pathname );
+        return true;
+    else
+        //printf( "%s is no directory\n", pathname );
+        return false;
+}
+
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
+
+void getHomePath(char ** homedir){
+
+    struct passwd *pw = getpwuid(getuid());
+
+    *homedir = pw->pw_dir;
+    printf(*homedir);
+}
+
+bool p_create(std::string path_name){
+    std::cout << path_name << " creation of this path" << std::endl;
+    mkdir(path_name.c_str(), 777);
+    return true;
+}
+
+//old methods...
+std::string toBinFormat(int numberOfBit, unsigned long n) {
 
     //Todo cercare un metodo più, usando gli shift probabilmente
 
-    string tmp;
+    std::string tmp;
 
     switch (numberOfBit) {
         case 1:
@@ -187,6 +255,3 @@ string toBinFormat(int numberOfBit, unsigned long n) {
 
     return tmp;
 }
-
-
-#endif //VISUALSUFFIXTREE_UTILS_H
