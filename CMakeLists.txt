@@ -2,7 +2,6 @@
 cmake_minimum_required(VERSION 3.10)
 SET(CMAKE_C_FLAGS_DEBUG "-D_DEBUG")
 
-
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules")
 
 ## Project information ##
@@ -14,12 +13,12 @@ set(PROJECT_DESCRIPTION "VisualSuffixTree: Visual tool for Suffix Tree visualiza
 
 set(CMAKE_CXX_STANDARD 11)
 
-#used for header library file
+#Used for the sdsl library
 include_directories($ENV{HOME}/include)
 link_directories($ENV{HOME}/lib)
 
-set(SOURCE_FILE main.cpp)
+#set(SOURCE_FILE src/main.cpp)
 
-add_executable(VisualSuffixTree main.cpp src/SvgCreator.cpp Include/SvgCreator.h src/TreeParser.cpp Include/TreeParser.h  src/ConfigParser.cpp Include/ConfigParser.h src/NodeInfoStructure.cpp Include/NodeInfoStructure.h src/NodeInfo.cpp Include/NodeInfo.h src/Header.cpp Include/Header.h Include/Header.h Include/TreeParser.h Include/SvgCreator.h Include/NodeInfo.h Include/NodeInfoStructure.h Include/ConfigParser.h Include/BitIo.h Include/ObjNode.h src/ObjNode.cpp Include/Utils.h Include/SvgUtils.h src/SvgObject/StatusBar.cpp Include/SvgObject/StatusBar.h)
+add_executable(VisualSuffixTree src/main.cpp src/SvgCreator.cpp src/SvgCreator.h src/TreeParser.cpp src/TreeParser.h src/ConfigParser.cpp src/ConfigParser.h src/NodeInfoStructure.cpp src/NodeInfoStructure.h src/NodeInfo.cpp src/NodeInfo.h src/Header.cpp src/Header.h src/Header.h src/TreeParser.h src/SvgCreator.h src/NodeInfo.h src/NodeInfoStructure.h src/ConfigParser.h src/BitIo.h src/ObjNode.h src/ObjNode.cpp src/Utils.h src/SvgUtils.h src/SvgObject/StatusBar.cpp src/SvgObject/StatusBar.h)
 
 target_link_libraries(VisualSuffixTree sdsl divsufsort divsufsort64)

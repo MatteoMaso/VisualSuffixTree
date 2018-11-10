@@ -6,9 +6,9 @@
 #include <vector>
 #include <iostream>
 #include <string>
-#include "../Include/NodeInfo.h"
-#include "../Include/Utils.h"
-#include "../Include/Utils.h"
+#include "NodeInfo.h"
+#include "Utils.h"
+#include "Utils.h"
 
 using namespace std;
 

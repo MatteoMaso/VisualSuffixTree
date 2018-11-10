@@ -3,7 +3,7 @@
 //
 #include <string>
 
-#include "../Include/NodeInfoStructure.h"
+#include "NodeInfoStructure.h"
 #include "BitIo.h"
 
 

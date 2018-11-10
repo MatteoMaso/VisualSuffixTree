@@ -7,13 +7,13 @@
 #include <iosfwd>
 #include <bits/ios_base.h>
 
-#include "../Include/SvgCreator.h"
-#include "../Include/ConfigParser.h"
-#include "../Include/NodeInfoStructure.h"
-#include "../Include/Header.h"
-#include "../Include/NodeInfo.h"
-#include "../Include/ObjNode.h"
-#include "../Include/SvgUtils.h"
+#include "SvgCreator.h"
+#include "ConfigParser.h"
+#include "NodeInfoStructure.h"
+#include "Header.h"
+#include "NodeInfo.h"
+#include "ObjNode.h"
+#include "SvgUtils.h"
 
 float strToFLoat(string s){
 

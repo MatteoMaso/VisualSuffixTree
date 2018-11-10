@@ -1,8 +1,7 @@
-#This is the configuration file for 
+#This is the configuration file for
 #the general settings of the program
 
 #Output path
 #outputFile=/home/matteo/output/tmp/
 #outputSvg=/home/matteo/output/svg/
-
 

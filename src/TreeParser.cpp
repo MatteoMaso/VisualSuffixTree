@@ -5,11 +5,11 @@
 #include <vector>
 #include <fstream>
 
-#include "../Include/TreeParser.h"
-#include "../Include/BitIo.h"
-#include "../Include/ConfigParser.h"
-#include "../Include/Header.h"
-#include "../Include/NodeInfo.h"
+#include "TreeParser.h"
+#include "BitIo.h"
+#include "ConfigParser.h"
+#include "Header.h"
+#include "NodeInfo.h"
 
 using namespace std;
 using namespace sdsl;
