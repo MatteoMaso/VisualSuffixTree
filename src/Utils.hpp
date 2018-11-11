@@ -3,6 +3,7 @@
 //
 #include <string>
 #include <iostream>
+#include <vector>
 
 #ifndef VISUALSUFFIXTREE_UTILS_H
 #define VISUALSUFFIXTREE_UTILS_H
@@ -27,12 +28,15 @@ bool fexists(const std::string& filename);
 
 bool pexists(const std::string& pathname);
 
-void getHomePath(char ** homedir);
+void getHomePath(char * homedir);
 
 std::string toBinFormat(int numberOfBit, unsigned long n);
 
 #include <sys/stat.h>
 
 bool p_create(std::string path_name);
+
+std::string CurrentTime();
+
 
 #endif //VISUALSUFFIXTREE_UTILS_H

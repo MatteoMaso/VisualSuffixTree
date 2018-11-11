@@ -13,6 +13,7 @@
 #include <cstring>
 #include <bitset>
 #include "Utils.hpp"
+#include "Logger.h"
 
 
 InputParser::InputParser (int &argc, char **argv){
@@ -64,18 +65,27 @@ bool pexists(const std::string& pathname){
 #include <sys/types.h>
 #include <pwd.h>
 
-void getHomePath(char ** homedir){
+void getHomePath(char * homedir){
 
     struct passwd *pw = getpwuid(getuid());
-
-    *homedir = pw->pw_dir;
-    printf(*homedir);
+    strcpy(homedir, (pw->pw_dir));
 }
 
 bool p_create(std::string path_name){
-    std::cout << path_name << " creation of this path" << std::endl;
+    //std::cout << path_name << " creation of this path" << std::endl;
     mkdir(path_name.c_str(), 777);
     return true;
+}
+
+std::string CurrentTime() {
+    time_t rawtime;
+    struct tm * ptm;
+
+    //time ( &rawtime );
+
+    //ptm = gmtime ( &rawtime );
+
+    return "Time"; //todo from clion doesn't work
 }
 
 //old methods...

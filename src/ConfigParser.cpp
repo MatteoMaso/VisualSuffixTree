@@ -12,6 +12,7 @@ ConfigParser::ConfigParser(string configFileName, map<string, string> *configPar
 
     std::cout << configFileName << std::endl;
     std::ifstream cFile (configFileName);
+
     if (cFile.is_open())
     {
         std::string line;
