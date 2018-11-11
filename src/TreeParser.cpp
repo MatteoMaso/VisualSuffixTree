@@ -16,10 +16,10 @@ using namespace sdsl;
 
 typedef cst_sct3<> cst_t;
 
-TreeParser::TreeParser(char *inputFileName, char *outputFileName, map<string, string> *configParameter) {
+TreeParser::TreeParser(char * inputFileName, char * outputFileName, map<string, string> * configParameter) {
 
     //SUFFIX TREE STRUCTURE
-    construct(cst, inputFileName, 1);       //initialize the suffix tree
+    construct(cst, inputFileName, 1);                       //initialize the suffix tree
     typedef cst_bfs_iterator<cst_t> iterator;
     iterator begin = iterator(&cst, cst.root());
     iterator end = iterator(&cst, cst.root(), true, true);

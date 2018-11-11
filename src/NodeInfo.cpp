@@ -234,7 +234,7 @@ bool NodeInfo::setNodeField(string * nodeField) {
         h_entropySpecial = partitioner(nodeField, from, to);
     }
 
-    return true; //todo fix
+    return true;
 }
 
 void NodeInfo::setDepth(unsigned long n) {
