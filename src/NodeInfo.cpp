@@ -7,8 +7,8 @@
 #include <iostream>
 #include <string>
 #include "NodeInfo.h"
-#include "Utils.hpp"
-#include "Utils.hpp"
+#include "utils/Utils.hpp"
+#include "utils/Utils.hpp"
 
 using namespace std;
 

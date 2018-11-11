@@ -4,11 +4,11 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <sys/stat.h>
+#include <cstring>
 
 #ifndef VISUALSUFFIXTREE_UTILS_H
 #define VISUALSUFFIXTREE_UTILS_H
-
-//using namespace std;
 
 class InputParser{
 public:
@@ -31,8 +31,6 @@ bool pexists(const std::string& pathname);
 void getHomePath(char * homedir);
 
 std::string toBinFormat(int numberOfBit, unsigned long n);
-
-#include <sys/stat.h>
 
 bool p_create(std::string path_name);
 

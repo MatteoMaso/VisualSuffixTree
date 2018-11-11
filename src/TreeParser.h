@@ -3,6 +3,7 @@
 //
 #include <string>
 #include "NodeInfo.h"
+#include <sdsl/suffix_trees.hpp>
 
 #ifndef VISUALSUFFIXTREE_TREEPARSER_H
 #define VISUALSUFFIXTREE_TREEPARSER_H

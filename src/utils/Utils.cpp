@@ -5,15 +5,14 @@
 #include <vector>
 #include <algorithm>
 #include <fstream>
-
-
-
+#include <unistd.h>
+#include <pwd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <cstring>
 #include <bitset>
 #include "Utils.hpp"
-#include "Logger.h"
+#include "../logger/Logger.h"
 
 
 InputParser::InputParser (int &argc, char **argv){
@@ -61,10 +60,6 @@ bool pexists(const std::string& pathname){
         return false;
 }
 
-#include <unistd.h>
-#include <sys/types.h>
-#include <pwd.h>
-
 void getHomePath(char * homedir){
 
     struct passwd *pw = getpwuid(getuid());
@@ -82,10 +77,9 @@ std::string CurrentTime() {
     struct tm * ptm;
 
     //time ( &rawtime );
-
     //ptm = gmtime ( &rawtime );
 
-    return "Time"; //todo from clion doesn't work
+    return "Time"; //todo from clion doesn't work with time ... from terminal it works
 }
 
 //old methods...

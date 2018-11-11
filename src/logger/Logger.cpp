@@ -1,16 +1,11 @@
 //
 // Created by root on 11/11/18.
 //
-
 #include "Logger.h"
-//#include"Utilities.h"
-#include "Utils.hpp"
+#include "../utils/Utils.hpp"
 #include <iostream>
 #include <string>
 #include <time.h>
-//#include <stdio.h>
-//#include <fstream>      // std::ofstream
-
 
 const string CLogger::m_sFileName = "Log.txt";
 bool VERBOSE_LOGGER;

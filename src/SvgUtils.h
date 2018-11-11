@@ -8,7 +8,9 @@
 #include <fstream>
 #include <string>
 #include <iostream>
+#include <cstring>
 #include "SvgCreator.h"
+#include "utils/Utils.hpp"
 
 using namespace std;
 

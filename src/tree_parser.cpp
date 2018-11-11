@@ -1,13 +1,8 @@
 //
 // Created by matteolus on 04/11/18.
 //
-
 #include <sdsl/suffix_trees.hpp>
-
 #include <iostream>
-
-#include "Utils.hpp"
-
 #include <bitset> //to use quickly bit representation
 #include <vector>
 #include <fstream>
@@ -17,8 +12,8 @@
 #include "TreeParser.h"
 #include "SvgCreator.h"
 #include "ConfigParser.h"
-
-#include "Logger.h"
+#include "utils/Utils.hpp"
+#include "logger/Logger.h"
 
 
 /**
@@ -37,11 +32,10 @@ void printHelp();
 int main(int argc, char **argv) {
 
     char * homedir = (char*)malloc(100 * sizeof(char));
-    getHomePath(homedir);
-
     char * input_file_path = (char*)malloc(256 * sizeof(char));
     char * output_folder = (char*)malloc(256 * sizeof(char));
     char * output_filename_path = (char*)malloc(256 * sizeof(char));
+    getHomePath(homedir);
 
 	//PARSE THE ARGUMENTS
     InputParser input =  InputParser(argc, argv);
@@ -152,7 +146,6 @@ int main(int argc, char **argv) {
 
 	//ConfigParser cfPars("/root/Desktop/Progetti/visualSuffixTree/VisualSuffixTree/Settings/config.cfg", &configParameter); //Initialize the configurations Parameter
 	ConfigParser cfPars(config_path, &configParameter); //Initialize the configurations Parameter
-
 
     TreeParser(input_file_path, output_filename_path, &configParameter);
 

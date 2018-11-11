@@ -132,6 +132,8 @@ bool NodeInfoStructure::setField(string headerInfo) {
     OPT_EDGEINFO = getParameter(headerInfo, pippo++);
     OPT_CHILDREN_INFO = getParameter(headerInfo, pippo++);
 
+
+    return true;
 }
 
 
