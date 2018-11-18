@@ -259,3 +259,44 @@ std::string toBinFormat(int numberOfBit, unsigned long n) {
 
     return tmp;
 }
+
+
+bool contains2(std::vector<char> *character, char c) {
+    for (int i = 0; i < character->size(); i++) {
+        if (character->at(i) == c) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool getAlphabet(char *inputFileName, std::vector<char> * alphabet) {
+
+    string txt;
+    ifstream file(inputFileName);
+
+    if (file.is_open())
+        while (file.good())
+            getline(file, txt);
+    file.close();
+
+    //vector<char> character = {};
+    char c;
+    for (int i = 0; i < txt.length(); i++) {
+        c = txt[i];
+        if (!contains2(alphabet, c)) {
+            alphabet->push_back(c);
+        }
+    }
+
+
+    /*
+    for (int j = 0; j < alphabet->size(); j++) {
+        cst_t::char_type c = alphabet->at(j);
+        treeParser->alphabet.push_back(c);
+    }
+    */
+    return true; //todo (add some control)
+    //check if the file exist and something like this
+    //check if there's no letter inside or something like this
+}

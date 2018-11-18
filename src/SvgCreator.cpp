@@ -431,7 +431,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 //
 //            //SETTINGS EDGE INFO
 //            if (stoi(configParameter->at("SHOW_EDGE_INFO")) == 1) {
-//                edge = nodeInfoObj.getEdge(nodeInfoObj.getEdgeIndex(), nodeInfoObj.getEdgeLength());
+//                edgeIdx = nodeInfoObj.getEdge(nodeInfoObj.getEdgeIndex(), nodeInfoObj.getEdgeLength());
 //            }
 //
 //            //SETTING COLOR ACCORDING WITH WHAT I WANT TO SHOW
@@ -440,9 +440,9 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 //                long depthThreshold = stoi(configParameter->at("BASIC_DEPTH_THRESHOLD"));
 //                if (stoi(configParameter->at("BASIC_DEPTH_WITH_THRESHOLD")) == 1) {
 //                    if (nodeInfoObj.getDepth() > depthThreshold) {
-//                        SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, blenchedRgbColor);
+//                        SvgUtils::printSvgNodeBlock(&svg_out, edgeIdx, w, x, y, H, blenchedRgbColor);
 //                    } else {
-//                        SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, rgbColor);
+//                        SvgUtils::printSvgNodeBlock(&svg_out, edgeIdx, w, x, y, H, rgbColor);
 //                    }
 //                } else {
 //                    //COLOR WITH A DEPTH GRADIENT
@@ -455,9 +455,9 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 //
 //                if (nodeInfoObj.getDepth() >= BASIC_KVALUE_KMER &&
 //                    hashmap[nodeInfoObj.getFatherLabel()].getObjNodeDepth() < BASIC_KVALUE_KMER) { //Full color
-//                    SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, rgbColor);
+//                    SvgUtils::printSvgNodeBlock(&svg_out, edgeIdx, w, x, y, H, rgbColor);
 //                } else { //Blenched
-//                    SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, blenchedRgbColor);
+//                    SvgUtils::printSvgNodeBlock(&svg_out, edgeIdx, w, x, y, H, blenchedRgbColor);
 //                }
 //
 //
@@ -467,15 +467,15 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 //                    blenchedHsvColor.v = 100;
 //                    blenchedHsvColor.s = (100 * frequency) / maxSuffixArrayLength + 40;
 //
-//                    SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, SvgUtils::HsvToRgb(blenchedHsvColor));
+//                    SvgUtils::printSvgNodeBlock(&svg_out, edgeIdx, w, x, y, H, SvgUtils::HsvToRgb(blenchedHsvColor));
 //
 //                } else if (stoi(configParameter->at("BASIC_FREQUENCY_COLOR_TYPE")) == 2) {
 //                    //the node with a frequency lower than a setted thresold are bleached.
 //                    if ((frequency >= stoi(configParameter->at("BASIC_FREQUENCY_THRESHOLD"))) &&
 //                        (depth >= stoi(configParameter->at("BASIC_DEPTH_THRESHOLD")))) { //Full color
-//                        SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, rgbColor);
+//                        SvgUtils::printSvgNodeBlock(&svg_out, edgeIdx, w, x, y, H, rgbColor);
 //                    } else { //Blenched
-//                        SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, blenchedRgbColor);
+//                        SvgUtils::printSvgNodeBlock(&svg_out, edgeIdx, w, x, y, H, blenchedRgbColor);
 //                    }
 //                } else {
 //                    //deault
@@ -484,7 +484,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 //
 //            } else {
 //                //default
-//                SvgUtils::printSvgNodeBlock(&svg_out, edge, w, x, y, H, rgbColor);
+//                SvgUtils::printSvgNodeBlock(&svg_out, edgeIdx, w, x, y, H, rgbColor);
 //            }
 //
 //
@@ -603,13 +603,13 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 //            if (stoi(configParameter->at("SHOW_EDGE_INFO")) == 1) {
 //                if (V.is_leaf) {
 //                    if (V.edge_length > stoi(configParameter->at("MAX_LEAF_CHAR"))) {
-//                        edge = nodeInfoObj.getEdge(V.edge_index, stoul(configParameter->at("MAX_LEAF_CHAR")));
-//                        edge += "...";
+//                        edgeIdx = nodeInfoObj.getEdge(V.edge_index, stoul(configParameter->at("MAX_LEAF_CHAR")));
+//                        edgeIdx += "...";
 //                    } else {
-//                        edge = nodeInfoObj.getEdge(V.edge_index, V.edge_length);
+//                        edgeIdx = nodeInfoObj.getEdge(V.edge_index, V.edge_length);
 //                    }
 //                } else {
-//                    edge = nodeInfoObj.getEdge(V.edge_index, V.edge_length);
+//                    edgeIdx = nodeInfoObj.getEdge(V.edge_index, V.edge_length);
 //                }
 //            }
 //
@@ -618,29 +618,29 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 //            //SETTING COLOR ACCORDING WITH WHAT I WANT TO SHOW
 //            if (configParameter->at("MAXREP_MODALITY") == "frequency") {
 //                if (V.maxrep_type == MAXREP_TYPE::non_supermaximal) {
-//                    SvgUtils::printSvgNodeBlock2(&svg_out, edge, V.w, V.posX, V.posY, H,
+//                    SvgUtils::printSvgNodeBlock2(&svg_out, edgeIdx, V.w, V.posX, V.posY, H,
 //                                                 configParameter->at("MAXREP_NONMAXREP_COLOR"), 1);
 //                } else {
-//                    SvgUtils::printSvgNodeBlock2(&svg_out, edge, V.w, V.posX, V.posY, H,
+//                    SvgUtils::printSvgNodeBlock2(&svg_out, edgeIdx, V.w, V.posX, V.posY, H,
 //                                                 configParameter->at("MAXREP_MAXREP_COLOR"), V.opacity);
 //                }
 //            } else if (configParameter->at("MAXREP_MODALITY") == "type") {
 //
 //                switch (V.maxrep_type) {
 //                    case MAXREP_TYPE::non_supermaximal :
-//                        SvgUtils::printSvgNodeBlock2(&svg_out, edge, V.w, V.posX, V.posY, H,
+//                        SvgUtils::printSvgNodeBlock2(&svg_out, edgeIdx, V.w, V.posX, V.posY, H,
 //                                                     configParameter->at("MAXREP_NONMAXREP_COLOR"), V.opacity);
 //                        break;
 //                    case MAXREP_TYPE::maxrep :
-//                        SvgUtils::printSvgNodeBlock2(&svg_out, edge, V.w, V.posX, V.posY, H,
+//                        SvgUtils::printSvgNodeBlock2(&svg_out, edgeIdx, V.w, V.posX, V.posY, H,
 //                                                     configParameter->at("MAXREP_MAXREP_COLOR"), V.opacity);
 //                        break;
 //                    case MAXREP_TYPE::nearsupermaximal :
-//                        SvgUtils::printSvgNodeBlock2(&svg_out, edge, V.w, V.posX, V.posY, H,
+//                        SvgUtils::printSvgNodeBlock2(&svg_out, edgeIdx, V.w, V.posX, V.posY, H,
 //                                                     configParameter->at("MAXREP_NEARSUPERMAXIMAL_COLOR"), V.opacity);
 //                        break;
 //                    case MAXREP_TYPE::supermaximalrep :
-//                        SvgUtils::printSvgNodeBlock2(&svg_out, edge, V.w, V.posX, V.posY, H,
+//                        SvgUtils::printSvgNodeBlock2(&svg_out, edgeIdx, V.w, V.posX, V.posY, H,
 //                                                     configParameter->at("MAXREP_SUPERMAXIMAL_COLOR"), V.opacity);
 //                        break;
 //                    default :

@@ -33,7 +33,7 @@ public:
 
     void setEdgeLength(unsigned long n);
 
-    //codifica l'edge da stringa a binario
+    //codifica l'edgeIdx da stringa a binario
     void setEdge(string *s);
 
     void setEdgeCharacterEncoding(unsigned long n);

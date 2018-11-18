@@ -1,3 +1,5 @@
+
+leveldb/
 *.cbp
 Parser
 SVG_plotter

@@ -16,20 +16,25 @@
 #include "logger/Logger.h"
 
 
+//for the levelDB attempt
+#include <cassert>
+#include "../leveldb/include/leveldb/db.h"
+
 /**
  * This is the entry point for the first parser. The executable is called "Parser"
  */
 
 std::string OUTPUT_DEFAULT_PATH = "/Output";
 
-
 /**
  * This command print the parameters formatting that the program expect
  */
 void printHelp();
 
+void levelDB_test();
 
 int main(int argc, char **argv) {
+    levelDB_test();
 
     char * homedir = (char*)malloc(100 * sizeof(char));
     char * input_file_path = (char*)malloc(256 * sizeof(char));
@@ -115,7 +120,7 @@ int main(int argc, char **argv) {
             LOGGER->Log("ERROR: the file %s already exist!", output_filename_path);
             std::cerr <<  "ERROR: the file "<< output_filename_path << " already exist!" << std::endl;
             //todo (optional) add the option to override the file.
-            return 0;
+            //return 0; //todo remove the commentand let return 0, it was just for test
         }else{
             strcpy(output_filename_path, output_folder);
             strcat(output_filename_path, "/");
@@ -182,6 +187,25 @@ void printHelp(){
 				 "\n\t\tto print this message\n"
 				 "\n\t-v"
 				 "\n\t\tto active the verbose mode.\n\n" << std::endl;
-
 	return;
+}
+
+void levelDB_test() {
+
+    leveldb::DB* db;
+    leveldb::Options options;
+
+    options.create_if_missing = true;
+    leveldb::Status status = leveldb::DB::Open(options, "/root/lDB/", &db);
+    assert(status.ok());
+
+    leveldb::Status s;
+    std::string value = "100ghghghg";
+    std::string key = "ciao";
+    //leveldb::Status s = db->Get(leveldb::ReadOptions(), key1, &value);
+    if (s.ok()) s = db->Put(leveldb::WriteOptions(), key, value);
+    std::string document;
+    db->Get(leveldb::ReadOptions(), "ciao", &document);
+    std::cout << document << std::endl;
+    delete db;
 }

@@ -152,10 +152,7 @@ int main(int argc, char **argv) {
                  "\tInput  File   Name: " << input_file_path << "\n"
                  "\tOutput File   Name: " << output_filename_path  << "\n"
                  "\tOutput Folder Name: " << output_folder    << "\n" << std::endl;
-
-
-
-
+    
     //HUMAN CONFIGURATIONS
     map<string, string> configParameter;
     const std::string &config_path = input.getCmdOption("-c");
@@ -197,11 +194,10 @@ void printHelp(){
                  "\n\t\toutput file name\n"
                  "\n\t-oF"
                  "\n\t\toutput file path, default: " << OUTPUT_DEFAULT_PATH <<
-              "\n"
-              "\n\t-h, -help"
-              "\n\t\tto print this message\n"
-              "\n\t-v"
-              "\n\t\tto active the verbose mode.\n\n" << std::endl;
-
+                  "\n"
+                  "\n\t-h, -help"
+                  "\n\t\tto print this message\n"
+                  "\n\t-v"
+                  "\n\t\tto active the verbose mode.\n\n" << std::endl;
     return;
 }

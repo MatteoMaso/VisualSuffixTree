@@ -55,7 +55,7 @@ public:
     bool OPT_RB;
     bool OPT_LABEL;
     bool OPT_FATHERLABLE;
-    bool OPT_EDGEINFO; //comprende la edge length e la edge characterEncoding
+    bool OPT_EDGEINFO; //comprende la edgeIdx length e la edgeIdx characterEncoding
     bool OPT_CHILDREN_INFO;
 
     int getBitDepth() {

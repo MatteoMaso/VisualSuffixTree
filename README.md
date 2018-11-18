@@ -36,7 +36,16 @@ cd VisualSuffixTree
 ```
 
 Now we shoud be in the project's top folder.
-Build the project:
+
+Download inside the project folder the levelDB library
+```
+git clone https://github.com/google/leveldb.git
+cd leveldb
+mkdir -p build && cd build
+cmake -DCMAKE_BUILD_TYPE=Release .. && cmake --build .
+```
+
+Now build the project:
 ```
 cmake CMakeLists.txt
 make
@@ -62,6 +71,10 @@ example: ./SVG_plotter  -in input_fileName
 [SDSL library](https://github.com/simongog/sdsl.git)
 
 The Succinct Data Structure Library (SDSL) is a powerful and flexible C++11 library implementing succinct data structures. In total, the library contains the highlights of 40 research publications. Succinct data structures can represent an object (such as a bitvector or a tree) in space close to the information-theoretic lower bound of the object while supporting operations of the original object efficiently. The theoretical time complexity of an operation performed on the classical data structure and the equivalent succinct data structure are (most of the time) identical.
+
+[LevelDB library](https://github.com/google/leveldb.git)
+
+LevelDB is a fast key-value storage library written at Google that provides an ordered mapping from string keys to string values.
 
 ### License
 

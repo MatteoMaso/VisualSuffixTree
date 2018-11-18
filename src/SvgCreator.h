@@ -604,12 +604,12 @@ private:
 
             //CHECK EDGE AVAILABILITY
             if (stoi(configParameter->at("SHOW_EDGE_INFO")) == 1) {
-                //show edge info if available
+                //show edgeIdx info if available
                 if (nodeInfoStructure->OPT_EDGEINFO) {
                     //ok
                 } else {
-                    //the edge info is not available
-                    printf("The edge info isn't available");
+                    //the edgeIdx info is not available
+                    printf("The edgeIdx info isn't available");
                     configParameter->at("SHOW_EDGE_INFO") = "0";
                 }
             } else {

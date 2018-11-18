@@ -22,7 +22,11 @@ public:
 
 private:
     std::vector <std::string> tokens;
+
+
 };
+
+bool contains2(std::vector<char> *character, char c);
 
 bool fexists(const std::string& filename);
 
@@ -35,6 +39,14 @@ std::string toBinFormat(int numberOfBit, unsigned long n);
 bool p_create(std::string path_name);
 
 std::string CurrentTime();
+
+/**
+ * This method is useful to extract the alphabet into a txt file
+ * @param inputFileName complete name of a string txt file
+ * @param alphabet it's a vector of char, each is a lecter contained in the file given
+ * @return bool if ok false if some error happens
+ */
+bool getAlphabet(char * inputFileName, std::vector<char> * alphabet);
 
 
 #endif //VISUALSUFFIXTREE_UTILS_H

@@ -10,13 +10,22 @@
 #include "ConfigParser.h"
 #include "Header.h"
 #include "NodeInfo.h"
-
+#include "nodeMap/NodesMap.h"
+#include <iostream>
 using namespace std;
 using namespace sdsl;
 
 typedef cst_sct3<> cst_t;
 
+
 TreeParser::TreeParser(char * inputFileName, char * outputFileName, map<string, string> * configParameter) {
+
+    //new alphabet, i should check if the getAlphabet return true otherwise some error happened
+    vector<char> * new_alphabet = new vector<char>;
+    getAlphabet(inputFileName, new_alphabet);
+    //todo (control) check if the character is ok for a dna or somthing like thet string
+    std::cout << *new_alphabet << std::endl;
+
 
     //SUFFIX TREE STRUCTURE
     construct(cst, inputFileName, 1);                       //initialize the suffix tree
@@ -26,130 +35,117 @@ TreeParser::TreeParser(char * inputFileName, char * outputFileName, map<string, 
 
     std::cout << "finish tree costruction" << std::endl;
 
-    setAlphabet(inputFileName, this);
-
+    /*
     string originalString;
     ifstream file(inputFileName);
-    //todo spostare questa cosa da qualche altra parte
     if (file.is_open())
         while (file.good())
             getline(file, originalString);
     file.close();
-
-    //SET VERBOSE
-    VERBOSE = (stoi(configParameter->at("VERBOSE"))) == 1;
+    */
 
     p_pnorm_parameter = stod(configParameter->at("STATISTIC_PNORM_PARAMETER")); //P-parameter user set;
 
     //PREPARE THE OUTPUT FILE AND PARAMETER
-    std::ofstream bin_out(outputFileName, std::ios::out | std::ios::binary);
+    //std::ofstream bin_out(outputFileName, std::ios::out | std::ios::binary);
 
-    NodeInfoStructure nodeInfoStructure(configParameter, inputFileName);
+    //NodeInfoStructure nodeInfoStructure(configParameter, inputFileName);
 
-    Header header(&nodeInfoStructure);
-    string headerString = header.getString();
-    printBinFile(headerString, bin_out);        //Print the header into binary file
+    //Header header(&nodeInfoStructure);
+    //string headerString = header.getString();
+    //printBinFile(headerString, bin_out);        //Print the header into binary file
 
-    BitIo<16> bio;
+    //BitIo<16> bio;
 
-    string nodeInfo;
-    NodeInfo nodeInfoObj(&nodeInfoStructure, &originalString);
+    //string nodeInfo;
+    //NodeInfo nodeInfoObj(&nodeInfoStructure, &originalString);
 
     //Check se il numero di bit sono sufficienti per rappresentare le informazione
+    /*
     long p = cst.rb(*begin);
     int nBit = log10(p) / log10(2);
     if (!checkNumberOfBit(nBit, &nodeInfoStructure)) {
         exit(-1);
-    }
+    } */
 
     numberOfNode = cst.id(cst.root());
     std::cout << "Number of Node: " << numberOfNode << std::endl;
 
 
     csa_wt<> csa = cst.csa;
-    //tempopary value
-    unsigned long id_mostSx_leaf;
-    unsigned long idx_suffix_array;
-    //MAP OF THE WINER LINK key = index of the alphabet character
-    map<int, unsigned long> wl;
 
-    long counter = 0;
-    int percentage, percentageOld;
+    //MAP OF THE WINER LINK key = index of the alphabet character
+    map<int, nodeNew::index > wl;
+
+    NodesMap my_map = NodesMap();
+
     for (iterator1 it = begin; it != end; ++it) {
 
-        print_percentage(&counter, &percentage, &percentageOld, &numberOfNode);
+        //create the node in this way is memory expensive
+        //maybe I could have one unique node, add the element and in each loop save just his
+        //serialization version.. todo think about
+        NodeNew *  nodeNew1 = new NodeNew(); //todo (optional) non creare inside , it depends
 
-        nodeInfoObj.setDepth(cst.depth(*it));
-        nodeInfoObj.setNodeDepth(cst.node_depth(*it));
-        nodeInfoObj.setLb(cst.lb(*it));
-        nodeInfoObj.setRb(cst.rb(*it));
-        nodeInfoObj.setLabel(cst.id(*it));
-        nodeInfoObj.setFatherLabel(cst.id(cst.parent(*it)));
-
-
-        if (nodeInfoStructure.OPT_EDGEINFO) {
-            nodeInfoObj.setEdgeLength(cst.depth(*it)-cst.depth(cst.parent(*it)));
-            unsigned  long t3 = cst.sn(cst.leftmost_leaf(*it));
-            nodeInfoObj.setEdgeIndex(t3+cst.depth(cst.parent(*it)));
+        //add element
+        nodeNew1->set_index((cst.depth(*it)));
+        nodeNew1->setDepth(cst.depth(*it));
+        nodeNew1->setLb(cst.lb(*it));
+        nodeNew1->setRb(cst.rb(*it));
+        nodeNew1->setLabel(cst.id(*it));
+        nodeNew1->setFatherLabel(cst.id(cst.parent(*it)));
+        nodeNew1->setEdgeLen(cst.depth(*it)-cst.depth(cst.parent(*it)));
+        nodeNew1->setEdgeIdx(cst.sn(cst.leftmost_leaf(*it))+cst.depth(cst.parent(*it)));
+        //SET CHILDREN ID //todo (optional) make it better
+        vector<nodeNew::index> childrenID; //support structure
+        for (auto &child: cst.children(*it)) {
+            childrenID.push_back(cst.id(child));
         }
-
-        //For calculate the max depth of the tree
-        if ( cst.is_leaf(*it)){
-            if ( cst.node_depth(*it) > tree_max_depth){
-                tree_max_depth = cst.node_depth(*it);
-            }
-        }
-
-        if (nodeInfoStructure.OPT_CHILDREN_INFO) {
-            //SET CHILDREN ID
-            vector<unsigned long> childrenID; //support structure
-            for (auto &child: cst.children(*it)) {
-                childrenID.push_back(cst.id(child));
-            }
-            nodeInfoObj.setChildrenId(&childrenID);
-        }
+        nodeNew1->setChildren(&childrenID);
 
         //ADD WINER LINK
         wl.clear();
-        unsigned long t;
-        cst_t::char_type c;
-        for (int i = 0; i < nodeInfoStructure.alphabet.size(); i++) {
-            c = nodeInfoStructure.alphabet.at(i)[0];
-            t = cst.id(cst.wl(*it, c));
+        for (int i = 0; i < new_alphabet->size(); i++) {
+            const cst_t::char_type c = new_alphabet->at(i);
+            nodeNew::index t = cst.id(cst.wl(*it, c));
 
             if (t != numberOfNode) { // == number of node when there isn't a valid wl
                 pair<int, unsigned long> pair = {i, t};
                 wl.insert(pair);
             }
         }
-        nodeInfoObj.setWinerLinkId(&wl);
+        nodeNew1->setWinerLink(&wl);
+
 
         //ADD SET STATISTIC
-        nodeInfoObj.setKl_divergence(kl_divergence(&it));
-        nodeInfoObj.setP_norm(p_norm(&it));
-        nodeInfoObj.setP_normNoParam(p_normNoparam(&it));
-        nodeInfoObj.setH_entropy(entropy(&it));
-        nodeInfoObj.setH_entropySpecial(entropySpecial(&it));
+        nodeNew1->setKlDivergence(kl_divergence(&it));
+        nodeNew1->setPNorm(p_norm(&it));
+        nodeNew1->setPNormNoParam(p_normNoparam(&it));
+        nodeNew1->setHEntropy(entropy(&it));
+        nodeNew1->setHEntropy2(entropySpecial(&it));
 
-        if (VERBOSE) {
-            std::cout << print_node_info(&cst, &it) << std::endl;
-            std::cout << "NodeInfoobj.print()" << nodeInfoObj.print(&nodeInfoStructure.alphabet) << std::endl;
+
+        //For calculate the max depth of the tree
+        //todo (optional) check a smart way to do it
+        if (cst.is_leaf(*it)){
+            if ( cst.node_depth(*it) > tree_max_depth){
+                tree_max_depth = cst.node_depth(*it);
+            }
         }
 
-        //PRINT THE NODE INFO INTO BINARY FILE
-        printNode(&nodeInfoObj, &bin_out);
+
+        my_map.addNode(nodeNew1);
 
     }
 
-    if (true){
-        std::cout << "Tree max depth: " << tree_max_depth << std::endl;
-    }
+    my_map.showContent();
 
-    bin_out.close();
+    std::cout << "Tree max depth: " << tree_max_depth << std::endl;
+
 };
 
 
 
+/*
 void TreeParser::printBinFile(string &s, std::ofstream &bin_out) {
 
     BitIo<16> bio;
@@ -176,8 +172,9 @@ void TreeParser::printBinFile(string &s, std::ofstream &bin_out) {
 
     bin_out << bio;
 };
+*/
 
-
+/*
 void TreeParser::printNode(NodeInfo *nodeInfo, std::ofstream *bin_out) {
 
     string nodeInfoFromObj = nodeInfo->getNodeField();
@@ -192,7 +189,9 @@ void TreeParser::printNode(NodeInfo *nodeInfo, std::ofstream *bin_out) {
 
     printBinFile(completeString, *bin_out);
 }
+ */
 
+/*
 string TreeParser::getEdge(cst_t *cst, iterator1 *it) {
 
     int allstring_length = (int) cst->depth(**it); //Lunghezza dell suffisso dalla radice al nodo interessato
@@ -228,7 +227,9 @@ string TreeParser::getEdge(cst_t *cst, iterator1 *it) {
     return edge;
 
 }
+*/
 
+/*
 bool TreeParser::checkNumberOfBit(int nBit, NodeInfoStructure *nodeInfoStructure) {
     if (
             nodeInfoStructure->getBitDepth() <= nBit ||
@@ -239,12 +240,11 @@ bool TreeParser::checkNumberOfBit(int nBit, NodeInfoStructure *nodeInfoStructure
                   << std::endl;
         return false;
     }
-
-    //todo add check label and father label
-
     return true;
 }
+ */
 
+/*
 bool contains2(vector<char> *character, char c) {
     //todo spostare da qualche altra parte
     for (int i = 0; i < character->size(); i++) {
@@ -255,7 +255,9 @@ bool contains2(vector<char> *character, char c) {
 
     return false;
 }
+ */
 
+/*
 void TreeParser::setAlphabet(char *inputFileName, TreeParser *treeParser) {
     //todo spostare da qualche altra parte
 
@@ -284,3 +286,4 @@ void TreeParser::setAlphabet(char *inputFileName, TreeParser *treeParser) {
     }
 
 }
+*/
