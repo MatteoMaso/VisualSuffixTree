@@ -14,11 +14,8 @@
 #include "ConfigParser.h"
 #include "utils/Utils.hpp"
 #include "logger/Logger.h"
+#include "nodeMap/NodesMap.h"
 
-
-//for the levelDB attempt
-#include <cassert>
-#include "../leveldb/include/leveldb/db.h"
 
 /**
  * This is the entry point for the first parser. The executable is called "Parser"
@@ -34,7 +31,6 @@ void printHelp();
 void levelDB_test();
 
 int main(int argc, char **argv) {
-    levelDB_test();
 
     char * homedir = (char*)malloc(100 * sizeof(char));
     char * input_file_path = (char*)malloc(256 * sizeof(char));
@@ -152,7 +148,13 @@ int main(int argc, char **argv) {
 	//ConfigParser cfPars("/root/Desktop/Progetti/visualSuffixTree/VisualSuffixTree/Settings/config.cfg", &configParameter); //Initialize the configurations Parameter
 	ConfigParser cfPars(config_path, &configParameter); //Initialize the configurations Parameter
 
+    //reading test
+    //NodesMap my_map = NodesMap(output_filename_path);
+    //my_map.readFromMemory();
+    //my_map.showContent();
+
     TreeParser(input_file_path, output_filename_path, &configParameter);
+    //todo check if there's two node with the same index!
 
     //Free allocated memory
     free(homedir); //fix the problem with this pointr
@@ -190,22 +192,4 @@ void printHelp(){
 	return;
 }
 
-void levelDB_test() {
 
-    leveldb::DB* db;
-    leveldb::Options options;
-
-    options.create_if_missing = true;
-    leveldb::Status status = leveldb::DB::Open(options, "/root/lDB/", &db);
-    assert(status.ok());
-
-    leveldb::Status s;
-    std::string value = "100ghghghg";
-    std::string key = "ciao";
-    //leveldb::Status s = db->Get(leveldb::ReadOptions(), key1, &value);
-    if (s.ok()) s = db->Put(leveldb::WriteOptions(), key, value);
-    std::string document;
-    db->Get(leveldb::ReadOptions(), "ciao", &document);
-    std::cout << document << std::endl;
-    delete db;
-}

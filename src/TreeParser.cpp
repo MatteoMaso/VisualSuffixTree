@@ -77,7 +77,7 @@ TreeParser::TreeParser(char * inputFileName, char * outputFileName, map<string, 
     //MAP OF THE WINER LINK key = index of the alphabet character
     map<int, nodeNew::index > wl;
 
-    NodesMap my_map = NodesMap();
+    NodesMap my_map = NodesMap(outputFileName);
 
     for (iterator1 it = begin; it != end; ++it) {
 
@@ -87,8 +87,9 @@ TreeParser::TreeParser(char * inputFileName, char * outputFileName, map<string, 
         NodeNew *  nodeNew1 = new NodeNew(); //todo (optional) non creare inside , it depends
 
         //add element
-        nodeNew1->set_index((cst.depth(*it)));
+        nodeNew1->set_index((cst.id(*it)));
         nodeNew1->setDepth(cst.depth(*it));
+        nodeNew1->setNodeDepth(cst.node_depth(*it));
         nodeNew1->setLb(cst.lb(*it));
         nodeNew1->setRb(cst.rb(*it));
         nodeNew1->setLabel(cst.id(*it));

@@ -47,6 +47,8 @@ public:
 
     int serialize(char * buffer); //put the data of the node in a series of bytes in the buffer and return the length of bytes used
 
+    const unsigned int get_bytes_size();
+
     //GETTER AND SETTER
     nodeNew::index get_index();
 

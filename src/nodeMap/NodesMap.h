@@ -7,20 +7,19 @@
 
 #include <map>
 #include "../node/Node_2.h"
-
+//for the levelDB attempt
+#include <cassert>
+#include "../leveldb/include/leveldb/db.h"
 //todo this is a new class for the Map
 
 /*
  * This class contains all the nodes and manage the memory storage of them
  */
 
-//using namespace nodeNew;
-
 class NodesMap {
 public:
 
-    NodesMap();
-    //NodesMap(const char * fileName);
+    NodesMap(const char * fileName);
     ~NodesMap(); //deconstructor
 
     void showContent();
@@ -31,16 +30,17 @@ public:
 
     NodeNew * getNode(nodeNew::index idx);        //return the Node required
 
-    //todo create an iterator
-
+    bool readFromMemory();
 
 private:
 
+    leveldb::DB* db;
+
     std::map<nodeNew::index, NodeNew *> local_map;
 
-    //todo create the local map with key node and value the node
+    //bool loadFile(const char * fileName); //Load the file from the memory into the local map
 
-    bool loadFile(const char * fileName); //Load the file from the memory into the local map
+
 
     bool writeToMemory();               //This method takes the node from the local map and put into the computer memory
 
@@ -48,3 +48,4 @@ private:
 
 
 #endif //VISUALSUFFIXTREE_NODESMAP_H
+

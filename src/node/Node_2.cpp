@@ -5,6 +5,7 @@
 
 //todo this is a new class for the Node
 #include <iostream>
+#include <cstring>
 #include "Node_2.h"
 
 
@@ -21,9 +22,22 @@ NodeNew::NodeNew(char * raw_data) {
 
 }
 
-int NodeNew::serialize(char *buffer) {
+int NodeNew::serialize(char * buffer) {
+
+    unsigned int pointer = 0;
+
+    memcpy(buffer, &index, sizeof(nodeNew::index));
+
+    pointer += sizeof(nodeNew::depth);
+    memcpy(buffer + pointer, &depth, sizeof(nodeNew::depth));
+
     return 0;
 }
+
+
+
+
+
 
 nodeNew::index NodeNew::get_index() {
     return index;
@@ -170,5 +184,34 @@ nodeNew::hEntropy2 NodeNew::getHEntropy2() const {
 
 void NodeNew::setHEntropy2(nodeNew::hEntropy2 hEntropy2) {
     NodeNew::hEntropy2 = hEntropy2;
+}
+
+const unsigned int NodeNew::get_bytes_size() {
+
+    unsigned int tmp = 0;
+
+    tmp += sizeof(nodeNew::index);
+    tmp += sizeof(nodeNew::depth);
+    tmp += sizeof(nodeNew::nodeDepth);
+    tmp += sizeof(nodeNew::lb);
+    tmp += sizeof(nodeNew::rb);
+
+    /*
+    nodeNew::label label;
+    nodeNew::fatherLabel fatherLabel;
+    nodeNew::edgeLen edgeLen;
+    nodeNew::edgeIdx edgeIdx;
+    nodeNew::numberOfChildren numberOfChildren;
+    nodeNew::children children;
+    nodeNew::numberOfWinerLink numberOfWinerLink;
+    nodeNew::winerLink winerLink;
+    nodeNew::klDivergence klDivergence;
+    nodeNew::pNorm pNorm;
+    nodeNew::pNormNoParam pNormNoParam;
+    nodeNew::hEntropy hEntropy;
+    nodeNew::hEntropy2 hEntropy2;
+    */
+
+    return tmp;
 }
 
