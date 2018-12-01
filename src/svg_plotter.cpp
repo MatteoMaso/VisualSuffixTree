@@ -11,11 +11,9 @@
 #include "utils/Utils.hpp"
 #include "logger/Logger.h"
 
-
 /**
  * This is the entry point for the svg plotter. The executable is called "SVG_parser"
  */
-
 std::string OUTPUT_DEFAULT_PATH = "/Output";
 
 /**
@@ -111,7 +109,7 @@ int main(int argc, char **argv) {
             LOGGER->Log("ERROR: the file %s already exist!", output_filename_path);
             std::cerr <<  "ERROR: the file "<< output_filename_path << " already exist!" << std::endl;
             //todo (optional) add the option to override the file.
-            return 0;
+            //return 0; todo return 0 error , delete just for debug
         }else{
             strcpy(output_filename_path, output_folder);
             strcat(output_filename_path, "/");

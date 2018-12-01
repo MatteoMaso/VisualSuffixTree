@@ -32,7 +32,7 @@ namespace nodeNew{
     typedef float pNormNoParam;
     typedef float hEntropy;
     typedef float hEntropy2;
-
+    typedef unsigned long frequency;
 }
 
 class NodeNew {
@@ -122,6 +122,9 @@ public:
 
     void setHEntropy2(nodeNew::hEntropy2 hEntropy2);
 
+    nodeNew::frequency getFrequency() const;
+    
+    
 private:
 
     nodeNew::index index;

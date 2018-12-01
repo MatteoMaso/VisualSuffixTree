@@ -16,10 +16,12 @@
  * This class contains all the nodes and manage the memory storage of them
  */
 
+
+
 class NodesMap {
 public:
 
-    NodesMap(const char * fileName);
+    NodesMap(const char * fileName, std::string modeDb);
     ~NodesMap(); //deconstructor
 
     void showContent();
@@ -31,8 +33,12 @@ public:
     NodeNew * getNode(nodeNew::index idx);        //return the Node required
 
     bool readFromMemory();
+    
+    unsigned long getNumberOfElement();
 
 private:
+
+    std::string DBMODE; //Database reading or writing mode
 
     leveldb::DB* db;
 

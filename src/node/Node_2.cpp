@@ -15,7 +15,6 @@ NodeNew::NodeNew() {
 
 NodeNew::~NodeNew() {
     std::cout << "Nodes deconstructor called\n" << std::endl;
-
 }
 
 NodeNew::NodeNew(char * raw_data) {
@@ -24,12 +23,47 @@ NodeNew::NodeNew(char * raw_data) {
 
 int NodeNew::serialize(char * buffer) {
 
-    unsigned int pointer = 0;
+    //Add a check of the buffer size
 
+    unsigned int pointer = 0;
     memcpy(buffer, &index, sizeof(nodeNew::index));
 
     pointer += sizeof(nodeNew::depth);
     memcpy(buffer + pointer, &depth, sizeof(nodeNew::depth));
+
+    pointer += sizeof(nodeNew::nodeDepth);
+    memcpy(buffer + pointer, &nodeDepth, sizeof(nodeNew::nodeDepth));
+
+    pointer += sizeof(nodeNew::lb);
+    memcpy(buffer + pointer, &lb, sizeof(nodeNew::lb));
+
+    pointer += sizeof(nodeNew::rb);
+    memcpy(buffer + pointer, &rb, sizeof(nodeNew::rb));
+
+
+    //label
+
+    //father label
+
+    //edge len
+
+    //edge idx
+
+    //Children of children
+    /*
+    pointer += sizeof(nodeNew::numberOfChildren);
+    memcpy(buffer + pointer, &numberOfChildren, sizeof(nodeNew::numberOfChildren));
+
+    for(int i = 0; i < numberOfChildren; i++){
+        pointer += sizeof(nodeNew::index);
+        memcpy(buffer + pointer, &(children->at(i)), sizeof(nodeNew::index));
+        //printf("Figlio: %u", children->at(i));
+    } todo fix produce error
+     */
+
+    //etc
+
+    //TODO add other element update pointer and add element ...
 
     return 0;
 }
@@ -186,6 +220,11 @@ void NodeNew::setHEntropy2(nodeNew::hEntropy2 hEntropy2) {
     NodeNew::hEntropy2 = hEntropy2;
 }
 
+nodeNew::frequency NodeNew::getFrequency() const {
+    return rb - lb + 1;
+}
+
+
 const unsigned int NodeNew::get_bytes_size() {
 
     unsigned int tmp = 0;
@@ -212,6 +251,6 @@ const unsigned int NodeNew::get_bytes_size() {
     nodeNew::hEntropy2 hEntropy2;
     */
 
-    return tmp;
+    return 500; //todo fix
 }
 

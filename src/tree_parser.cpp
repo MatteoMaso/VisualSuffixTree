@@ -148,11 +148,6 @@ int main(int argc, char **argv) {
 	//ConfigParser cfPars("/root/Desktop/Progetti/visualSuffixTree/VisualSuffixTree/Settings/config.cfg", &configParameter); //Initialize the configurations Parameter
 	ConfigParser cfPars(config_path, &configParameter); //Initialize the configurations Parameter
 
-    //reading test
-    //NodesMap my_map = NodesMap(output_filename_path);
-    //my_map.readFromMemory();
-    //my_map.showContent();
-
     TreeParser(input_file_path, output_filename_path, &configParameter);
     //todo check if there's two node with the same index!
 

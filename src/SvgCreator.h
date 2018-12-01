@@ -5,12 +5,13 @@
 #ifndef VISUALSUFFIXTREE_SVGCREATOR_H
 #define VISUALSUFFIXTREE_SVGCREATOR_H
 
-#include "BitIo.h"
 #include "ConfigParser.h"
 #include "SvgUtils.h"
 #include "NodeInfoStructure.h"
-#include "ObjNode.h"
 #include "NodeInfo.h"
+#include "node/Node_2.h"
+#include "nodeMap/NodesMap.h"
+#include "ObjNode.h"
 
 
 class SvgCreator {
@@ -23,7 +24,7 @@ public:
 
     SvgCreator(char *inputFileName, char *outputFile, map<string, string> *configParameter, char *stringFileName);
 
-    void openFile(std::ifstream *bin_in, char *inputFileName, BitIo<16> *bio) {
+    /*void openFile(std::ifstream *bin_in, char *inputFileName, BitIo<16> *bio) {
         if (!(*bin_in).is_open()) {
             std::cout << "I'm not able to open file: " << inputFileName
                       << " probably you must create the file test.bin inside Output with "
@@ -38,8 +39,9 @@ public:
             exit(81);
         }
 
-    }
+    }*/
 
+    /*
     string readNextNodeInfo(BitIo<16> *bio) {
 
         string nodeInfo = "";
@@ -52,6 +54,7 @@ public:
 
         return nodeInfo;
     }
+     */
 
     string infoStatusBar;
 
@@ -67,6 +70,8 @@ public:
     }
 
 private:
+
+
 
     enum MAXREP_TYPE {
         non_supermaximal = 0, maxrep = 1, nearsupermaximal = 2, supermaximalrep = 3
@@ -155,21 +160,21 @@ private:
 
 
     //passo un node di tipo tmp_basic_nodeInfo e lui salva la posizione nella struttura designata
-    void setNodePosition(tmp_basic_nodeInfo *node) {
+    void setNodePosition(NodeNew *node, NodesMap * my_map) {
 
         plotting_info position;
 
         //Search if father already set
-        if (plot_map.count(node->fatherLabel) == 0) {
-            setNodePosition(&general_map[node->fatherLabel]);
+        if (plot_map.count(node->getFatherLabel()) == 0) {
+            setNodePosition(my_map->getNode(node->getFatherLabel()), my_map);
         }
 
-        plotting_info *father = &plot_map[node->fatherLabel];
+        plotting_info *father = &plot_map[node->getFatherLabel()];
 
         switch (stoi(configParameter->at("TYPE_NODE_DIMENSION"))) {
             case 1:
                 //means each children have the same dimension of their brother
-                position.w = father->w / general_map[node->fatherLabel].numberOfChildren;
+                position.w = father->w / my_map->getNode(node->getFatherLabel())->getNumberOfChildren();
                 position.posX = father->posX + (father->child_set * position.w);
                 father->child_set++; //incrementa il numero di figli già settati
                 break;
@@ -177,13 +182,13 @@ private:
             case 2:
                 //means the dimensions of a node is proportional with the frequency
 
-                position.w = scaleUnit * (node->frequency);
+                position.w = scaleUnit * (node->getFrequency());
 
 //                    position.w = scaleUnit * (node->frequency+1);
 
 
 
-                position.posX = x0 + node->lb * scaleUnit;
+                position.posX = x0 + node->getLb() * scaleUnit;
                 break;
 
             default:
@@ -195,11 +200,11 @@ private:
 
         switch (stoi(configParameter->at("SVG_FROM_TOP"))) {
             case 1: //from top
-                position.posY = y0 + node->nodeDepth * (H + 0.7);
+                position.posY = y0 + node->getNodeDepth() * (H + 0.7);
                 break;
 
             case 0: //from bottom
-                position.posY = y0 - node->nodeDepth * (H + 0.7);
+                position.posY = y0 - node->getNodeDepth() * (H + 0.7);
                 break;
 
             default:
@@ -209,7 +214,7 @@ private:
         }
 
 
-        this->plot_map.insert({node->label, position}); //insert position in the map
+        this->plot_map.insert({node->getLabel(), position}); //insert position in the map
     }
 
     void basicMod_depth(tmp_basic_nodeInfo *node, RgbColor rgbColor) {
@@ -346,6 +351,7 @@ private:
 
     }
 
+    /*
     void setRootPosition(tmp_basic_nodeInfo *node) {
         plotting_info root;
 
@@ -359,6 +365,21 @@ private:
         scaleUnit = rootNodeWidth / (node->rb + 1);
 
         this->plot_map.insert({node->label, root}); //insert position in the map
+    }*/
+
+    void setRootPosition(NodeNew * node) {
+        plotting_info root;
+
+        root.w = rootNodeWidth;
+        root.posX = x0;
+        root.posY = y0;
+
+        //todo togliere da qui l'inizializzazione dei seguenti 3 parametri
+        numberOfNode = node->getLabel();
+        maxSuffixArrayLength = node->getRb();
+        scaleUnit = rootNodeWidth / (node->getRb() + 1);
+
+        this->plot_map.insert({node->getLabel(), root}); //insert position in the map
     }
 
 
