@@ -1,17 +1,16 @@
 //
 // Created by matteolus on 04/11/18.
 //
-#include <sdsl/suffix_trees.hpp>
+//#include <sdsl/suffix_trees.hpp>
 #include <iostream>
-#include <bitset> //to use quickly bit representation
-#include <vector>
+//#include <bitset> //to use quickly bit representation
+//#include <vector>
 #include <fstream>
 #include <sys/stat.h>
 #include <pwd.h>
 
 #include "TreeParser.h"
-#include "SvgCreator.h"
-#include "ConfigParser.h"
+//#include "ConfigParser.h"
 #include "utils/Utils.hpp"
 #include "logger/Logger.h"
 #include "nodeMap/NodesMap.h"

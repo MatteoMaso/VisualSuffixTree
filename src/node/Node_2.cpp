@@ -3,26 +3,111 @@
 //
 
 
-//todo this is a new class for the Node
+//this is a new class for the Node
 #include <iostream>
 #include <cstring>
 #include "Node_2.h"
+#include <vector>
+#include <sstream>
 
 
 NodeNew::NodeNew() {
     std::cout << "Nodes creator called\n" << std::endl;
 }
 
+//Constructor from data
+NodeNew::NodeNew(std::string ss){
+
+    NodeNew::children = new std::vector<nodeNew::index>();
+
+    std::cout << "Value read: " << ss << std::endl;
+
+    std::string s;
+
+    // Returns first token
+    char * token = strtok((char *)ss.c_str(), ":");
+    char * value = strtok(NULL, ":");
+
+    // Keep printing tokens while one of the
+    // delimiters present in str[].
+    while (token != NULL)
+    {
+        if(std::strcmp(token, "index")== 0){
+            NodeNew::index = strtoul (value, NULL, 0);
+        } else if(std::strcmp(token, "depth")== 0){
+            NodeNew::depth = strtoul (value, NULL, 0);
+        }else if(std::strcmp(token, "nodeDepth")== 0){
+            NodeNew::nodeDepth = strtoul (value, NULL, 0);
+        }else if(std::strcmp(token, "lb")== 0){
+            NodeNew::lb = strtoul (value, NULL, 0);
+        }else if(std::strcmp(token, "rb")== 0){
+            NodeNew::rb = strtoul (value, NULL, 0);
+        }else if(std::strcmp(token, "label")== 0){
+            NodeNew::label = strtoul (value, NULL, 0);
+        }else if(std::strcmp(token, "fatherLabel")== 0){
+            NodeNew::fatherLabel = strtoul (value, NULL, 0);
+        }else if(std::strcmp(token, "edgeLen")== 0){
+            NodeNew::edgeLen = strtoul (value, NULL, 0);
+        }else if(std::strcmp(token, "edgeIdx")== 0){
+            NodeNew::edgeIdx = strtoul (value, NULL, 0);
+        }else if(std::strcmp(token, "numberOfChildren")== 0){
+            NodeNew::numberOfChildren = strtoul (value, NULL, 0);
+        }else if(std::strcmp(token, "children")== 0){
+            NodeNew::children->push_back(strtoul (value, NULL, 0));
+        }
+
+        token = strtok(NULL, ":");
+        value = strtok(NULL, ":");
+
+    }
+
+}
+
+
 NodeNew::~NodeNew() {
     std::cout << "Nodes deconstructor called\n" << std::endl;
 }
 
-NodeNew::NodeNew(char * raw_data) {
+int NodeNew::serialize(std::ostringstream  * valueStream) {
 
+    *valueStream << "index:" << index << ":";
+
+    *valueStream << "depth:" << depth<< ":";
+
+    *valueStream << "nodeDepth:" << nodeDepth<< ":";
+
+    *valueStream << "lb:" << lb<< ":";
+
+    *valueStream << "rb:" << rb<< ":";
+
+    *valueStream << "label:" << label<< ":";
+
+    *valueStream << "fatherLabel:" << fatherLabel<< ":";
+
+    *valueStream << "edgeLen:" << edgeLen<< ":";
+
+    *valueStream << "edgeIdx:" << edgeIdx<< ":";
+
+    *valueStream << "numberOfChildren:" << numberOfChildren<< ":";
+
+    //Se number of children > 0 set children
+    if(NodeNew::numberOfChildren > 0){
+        for(int i = 0; i < numberOfChildren; i++){
+            if(children->size() > i){
+
+                *valueStream << "children:" << children->at(i)<< ":";
+
+            }else{
+                std::cout << "Children not present" << std::endl;
+            }
+        }
+    }
+
+    return 0;
 }
 
-int NodeNew::serialize(char * buffer) {
 
+int NodeNew::serialize(unsigned char * buffer) {
     //Add a check of the buffer size
 
     unsigned int pointer = 0;
@@ -40,27 +125,43 @@ int NodeNew::serialize(char * buffer) {
     pointer += sizeof(nodeNew::rb);
     memcpy(buffer + pointer, &rb, sizeof(nodeNew::rb));
 
-
     //label
+    pointer += sizeof(nodeNew::label);
+    memcpy(buffer + pointer, &label, sizeof(nodeNew::label));
 
     //father label
+    pointer += sizeof(nodeNew::fatherLabel);
+    memcpy(buffer + pointer, &fatherLabel, sizeof(nodeNew::fatherLabel));
 
     //edge len
+    pointer += sizeof(nodeNew::edgeLen);
+    memcpy(buffer + pointer, &edgeLen, sizeof(nodeNew::edgeLen));
 
     //edge idx
+    pointer += sizeof(nodeNew::edgeIdx);
+    memcpy(buffer + pointer, &edgeIdx, sizeof(nodeNew::edgeIdx));
 
-    //Children of children
-    /*
+    //Number of children
     pointer += sizeof(nodeNew::numberOfChildren);
     memcpy(buffer + pointer, &numberOfChildren, sizeof(nodeNew::numberOfChildren));
 
-    for(int i = 0; i < numberOfChildren; i++){
-        pointer += sizeof(nodeNew::index);
-        memcpy(buffer + pointer, &(children->at(i)), sizeof(nodeNew::index));
-        //printf("Figlio: %u", children->at(i));
-    } todo fix produce error
-     */
+    //Se number of children > 0 set children
+    if(NodeNew::numberOfChildren > 0){
+        for(int i = 0; i < numberOfChildren; i++){
+            if(children->size() > i){
+                pointer += sizeof(nodeNew::index);
+                memcpy(buffer + pointer, &(children->at(i)), sizeof(nodeNew::index));
+                //printf("Figlio: %u\n", children->at(i));
+            }else{
+                std::cout << "Children not present" << std::endl;
+            }
+        }
+    }
 
+
+    //for(int i = 0; i < 5; i++){
+    //    buffer[i] = 0b11110001;
+    //}
     //etc
 
     //TODO add other element update pointer and add element ...
@@ -74,7 +175,7 @@ int NodeNew::serialize(char * buffer) {
 
 
 nodeNew::index NodeNew::get_index() {
-    return index;
+    return NodeNew::index;
 }
 
 void NodeNew::set_index(nodeNew::index idx) {
@@ -158,9 +259,13 @@ const std::vector<nodeNew::index> *NodeNew::getChildren() const {
 }
 
 void NodeNew::setChildren(const std::vector<nodeNew::index> *children) {
-    NodeNew::children = (nodeNew::children)children;
-    //maybe copy the vector elements ...
-    //todo important
+    NodeNew::children = new std::vector<nodeNew::index>(); //support structure
+
+    for(int i = 0; i < children->size(); i++){
+        NodeNew::children->push_back(children->at(i));
+    }
+
+    setNumberOfChildren(children->size());
 }
 
 nodeNew::numberOfWinerLink NodeNew::getNumberOfWinerLink() const {
@@ -234,14 +339,13 @@ const unsigned int NodeNew::get_bytes_size() {
     tmp += sizeof(nodeNew::nodeDepth);
     tmp += sizeof(nodeNew::lb);
     tmp += sizeof(nodeNew::rb);
-
+    tmp += sizeof(nodeNew::label);
+    tmp += sizeof(nodeNew::fatherLabel);
+    tmp += sizeof(nodeNew::edgeLen);
+    tmp += sizeof(nodeNew::edgeIdx);
+    tmp += sizeof(nodeNew::numberOfChildren);
+    tmp += sizeof(nodeNew::children);
     /*
-    nodeNew::label label;
-    nodeNew::fatherLabel fatherLabel;
-    nodeNew::edgeLen edgeLen;
-    nodeNew::edgeIdx edgeIdx;
-    nodeNew::numberOfChildren numberOfChildren;
-    nodeNew::children children;
     nodeNew::numberOfWinerLink numberOfWinerLink;
     nodeNew::winerLink winerLink;
     nodeNew::klDivergence klDivergence;
@@ -251,6 +355,17 @@ const unsigned int NodeNew::get_bytes_size() {
     nodeNew::hEntropy2 hEntropy2;
     */
 
-    return 500; //todo fix
+    return tmp; //todo fix
+}
+
+std::string NodeNew::toString() {
+
+    std::ostringstream oss;
+    oss << "Node info\nKey: " << NodeNew::index <<
+        "\nDepth: " << getDepth() ;
+
+
+
+    return oss.str();
 }
 

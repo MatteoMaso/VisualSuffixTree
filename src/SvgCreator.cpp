@@ -36,9 +36,12 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
     //New data load!!!!! da tenere
     NodesMap my_map = NodesMap(inputFileName, "r");
     my_map.readFromMemory(); //load all the node from the db into a local map
-
-
+    //std::cout << "Read data from memory" << std::endl;
+    my_map.showContent();
+    //std::cout << "Show content" << std::endl;
     this->configParameter = configParameter;
+
+    
     //READ BINARY FILE
     //std::ifstream bin_in(inputFileName, std::ios::binary);
     //BitIo<16> bio2;

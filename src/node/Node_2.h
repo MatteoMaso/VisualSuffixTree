@@ -41,13 +41,19 @@ public:
 
     NodeNew();         //Normal constructor
 
+    NodeNew(std::string ss);         //Constructor from data
+
     ~NodeNew();        //Deconstructor
 
     NodeNew(char * raw_data);  //constructor from the raw_data, the same produced from the serialize
 
-    int serialize(char * buffer); //put the data of the node in a series of bytes in the buffer and return the length of bytes used
+    int serialize(std::ostringstream  * valueStream);
+    
+    int serialize(unsigned char * buffer); //put the data of the node in a series of bytes in the buffer and return the length of bytes used
 
     const unsigned int get_bytes_size();
+
+    std::string toString();
 
     //GETTER AND SETTER
     nodeNew::index get_index();
@@ -123,21 +129,21 @@ public:
     void setHEntropy2(nodeNew::hEntropy2 hEntropy2);
 
     nodeNew::frequency getFrequency() const;
-    
-    
+
+
 private:
 
-    nodeNew::index index;
-    nodeNew::depth depth;
-    nodeNew::nodeDepth nodeDepth;
-    nodeNew::lb lb;
-    nodeNew::rb rb;
-    nodeNew::label label;
-    nodeNew::fatherLabel fatherLabel;
-    nodeNew::edgeLen edgeLen;
-    nodeNew::edgeIdx edgeIdx;
-    nodeNew::numberOfChildren numberOfChildren;
-    nodeNew::children children;
+    nodeNew::index index;                              //ok
+    nodeNew::depth depth;                              //ok
+    nodeNew::nodeDepth nodeDepth;                      //ok
+    nodeNew::lb lb;                                    //ok
+    nodeNew::rb rb;                                    //ok
+    nodeNew::label label;                              //ok
+    nodeNew::fatherLabel fatherLabel;                  //ok
+    nodeNew::edgeLen edgeLen;                          //ok
+    nodeNew::edgeIdx edgeIdx;                          //ok
+    nodeNew::numberOfChildren numberOfChildren;        //ok
+    nodeNew::children children;                        //ok
     nodeNew::numberOfWinerLink numberOfWinerLink;
     nodeNew::winerLink winerLink;
     nodeNew::klDivergence klDivergence;

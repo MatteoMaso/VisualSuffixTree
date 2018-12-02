@@ -106,7 +106,7 @@ TreeParser::TreeParser(char * inputFileName, char * outputFileName, map<string, 
 
     }
 
-    my_map.showContent();
+    //my_map.showContent();
 
     std::cout << "Tree max depth: " << tree_max_depth << std::endl;
 };
