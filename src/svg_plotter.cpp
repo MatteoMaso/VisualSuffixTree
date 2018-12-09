@@ -4,16 +4,12 @@
 #include <bitset> //to use quickly bit representation
 #include <fstream>
 #include <sys/stat.h>
-
-//#include "TreeParser.h"
 #include "SvgCreator.h"
 #include "ConfigParser.h"
 #include "utils/Utils.hpp"
 #include "logger/Logger.h"
 
-/**
- * This is the entry point for the svg plotter. The executable is called "SVG_parser"
- */
+
 std::string OUTPUT_DEFAULT_PATH = "/Output";
 
 /**

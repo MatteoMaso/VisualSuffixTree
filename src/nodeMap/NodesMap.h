@@ -24,6 +24,8 @@ public:
     NodesMap(const char * fileName, std::string modeDb);
     ~NodesMap(); //deconstructor
 
+    void showDBcontent();
+
     void showContent();
 
     void addNode(NodeNew * n);             //add a node into the local map

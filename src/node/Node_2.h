@@ -19,7 +19,7 @@ namespace nodeNew{
     typedef unsigned long nodeDepth;
     typedef unsigned long lb;
     typedef unsigned long rb;
-    typedef unsigned long label;
+    //typedef unsigned long label;
     typedef unsigned long fatherLabel;
     typedef unsigned long edgeLen;
     typedef unsigned int edgeIdx;
@@ -48,10 +48,6 @@ public:
     NodeNew(char * raw_data);  //constructor from the raw_data, the same produced from the serialize
 
     int serialize(std::ostringstream  * valueStream);
-    
-    int serialize(unsigned char * buffer); //put the data of the node in a series of bytes in the buffer and return the length of bytes used
-
-    const unsigned int get_bytes_size();
 
     std::string toString();
 
@@ -75,10 +71,6 @@ public:
     nodeNew::rb getRb() const;
 
     void setRb(nodeNew::rb rb);
-
-    nodeNew::label getLabel() const;
-
-    void setLabel(nodeNew::label label);
 
     nodeNew::fatherLabel getFatherLabel() const;
 
@@ -104,9 +96,9 @@ public:
 
     void setNumberOfWinerLink(nodeNew::numberOfWinerLink numberOfWinerLink);
 
-    const std::map<int, unsigned long> *getWinerLink() const;
+    std::map<int, unsigned long> *getWinerLink() const;
 
-    void setWinerLink(std::map<int, unsigned long> *winerLink);
+    void setWinerLink(std::map<int, nodeNew::index > * wl);
 
     nodeNew::klDivergence getKlDivergence() const;
 
@@ -138,19 +130,18 @@ private:
     nodeNew::nodeDepth nodeDepth;                      //ok
     nodeNew::lb lb;                                    //ok
     nodeNew::rb rb;                                    //ok
-    nodeNew::label label;                              //ok
     nodeNew::fatherLabel fatherLabel;                  //ok
     nodeNew::edgeLen edgeLen;                          //ok
     nodeNew::edgeIdx edgeIdx;                          //ok
     nodeNew::numberOfChildren numberOfChildren;        //ok
     nodeNew::children children;                        //ok
-    nodeNew::numberOfWinerLink numberOfWinerLink;
-    nodeNew::winerLink winerLink;
-    nodeNew::klDivergence klDivergence;
-    nodeNew::pNorm pNorm;
-    nodeNew::pNormNoParam pNormNoParam;
-    nodeNew::hEntropy hEntropy;
-    nodeNew::hEntropy2 hEntropy2;
+    nodeNew::numberOfWinerLink numberOfWinerLink;      //ok
+    nodeNew::winerLink winerLink;                      //ok
+    nodeNew::klDivergence klDivergence;                //ok
+    nodeNew::pNorm pNorm;                              //ok
+    nodeNew::pNormNoParam pNormNoParam;                //ok
+    nodeNew::hEntropy hEntropy;                        //ok
+    nodeNew::hEntropy2 hEntropy2;                      //ok
 
 
 };

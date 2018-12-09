@@ -14,7 +14,8 @@
 #include "utils/Utils.hpp"
 #include "logger/Logger.h"
 #include "nodeMap/NodesMap.h"
-
+#include "ConfigParser.h"
+#include <filesystem>
 
 /**
  * This is the entry point for the first parser. The executable is called "Parser"
@@ -114,6 +115,9 @@ int main(int argc, char **argv) {
         if(fexists(output_filename_path)){
             LOGGER->Log("ERROR: the file %s already exist!", output_filename_path);
             std::cerr <<  "ERROR: the file "<< output_filename_path << " already exist!" << std::endl;
+            string command = "rm -r ";
+            command += output_filename_path;
+            system(command.c_str()) ; // Deletes one or more files recursively.
             //todo (optional) add the option to override the file.
             //return 0; //todo remove the commentand let return 0, it was just for test
         }else{

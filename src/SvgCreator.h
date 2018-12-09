@@ -7,8 +7,6 @@
 
 #include "ConfigParser.h"
 #include "SvgUtils.h"
-#include "NodeInfoStructure.h"
-#include "NodeInfo.h"
 #include "node/Node_2.h"
 #include "nodeMap/NodesMap.h"
 #include "ObjNode.h"
@@ -24,40 +22,9 @@ public:
 
     SvgCreator(char *inputFileName, char *outputFile, map<string, string> *configParameter, char *stringFileName);
 
-    /*void openFile(std::ifstream *bin_in, char *inputFileName, BitIo<16> *bio) {
-        if (!(*bin_in).is_open()) {
-            std::cout << "I'm not able to open file: " << inputFileName
-                      << " probably you must create the file test.bin inside Output with "
-                         " the first program" << std::endl;
-            exit(7);
-        }
-        *bin_in >> *bio;
-
-        //Check that the node property file generate with the first program must contain informations
-        if ((*bio).size() == 8) {
-            printf("The node property file generated with the first program is empty, probably you have passed a bad string path");
-            exit(81);
-        }
-
-    }*/
-
-    /*
-    string readNextNodeInfo(BitIo<16> *bio) {
-
-        string nodeInfo = "";
-
-        int e = stoi((*bio).pop_front().to_string(), nullptr, 2);
-
-        for (int i = 0; i < e; i++) {
-            nodeInfo += (*bio).pop_front().to_string();
-        }
-
-        return nodeInfo;
-    }
-     */
-
     string infoStatusBar;
 
+    /* load the entire sequence of character from the file ??? do we have enough space?? todo check */
     void setOriginalStringParameter(char *originalStringFileName) {
         this->originalString = "";
         ifstream file(originalStringFileName);
@@ -71,12 +38,9 @@ public:
 
 private:
 
-
-
     enum MAXREP_TYPE {
         non_supermaximal = 0, maxrep = 1, nearsupermaximal = 2, supermaximalrep = 3
     };
-
 
     enum MODALITY_TYPE {
         BASIC = 0, STATISTIC = 1, MAXREP = 2
@@ -127,7 +91,7 @@ private:
 
     }
 
-    std::map<unsigned long, tmp_basic_nodeInfo> general_map; //First map with the initial data, id = label nodo
+    std::map<nodeNew::index, tmp_basic_nodeInfo> general_map; //First map with the initial data, id = label nodo
 
     struct plotting_info {
 
@@ -214,7 +178,7 @@ private:
         }
 
 
-        this->plot_map.insert({node->getLabel(), position}); //insert position in the map
+        this->plot_map.insert({node->get_index(), position}); //insert position in the map
     }
 
     void basicMod_depth(tmp_basic_nodeInfo *node, RgbColor rgbColor) {
@@ -351,21 +315,6 @@ private:
 
     }
 
-    /*
-    void setRootPosition(tmp_basic_nodeInfo *node) {
-        plotting_info root;
-
-        root.w = rootNodeWidth;
-        root.posX = x0;
-        root.posY = y0;
-
-        //todo togliere da qui l'inizializzazione dei seguenti 3 parametri
-        numberOfNode = node->label;
-        maxSuffixArrayLength = node->rb;
-        scaleUnit = rootNodeWidth / (node->rb + 1);
-
-        this->plot_map.insert({node->label, root}); //insert position in the map
-    }*/
 
     void setRootPosition(NodeNew * node) {
         plotting_info root;
@@ -375,11 +324,12 @@ private:
         root.posY = y0;
 
         //todo togliere da qui l'inizializzazione dei seguenti 3 parametri
-        numberOfNode = node->getLabel();
+        numberOfNode = node->get_index();
         maxSuffixArrayLength = node->getRb();
         scaleUnit = rootNodeWidth / (node->getRb() + 1);
 
-        this->plot_map.insert({node->getLabel(), root}); //insert position in the map
+        this->plot_map.insert({node->get_index(), root}); //insert position in the map
+
     }
 
 
@@ -414,7 +364,7 @@ private:
     };
 
 
-    map<string, string> *configParameter;
+    map<string, string> * configParameter;
     map<int, ObjNode> hashmap; //Useful only when we represent the dimension of the child equal to the dim of the brother
     int H; //the height of the block
     double x0, y0, w, x, y, rectWidth, rootNodeWidth;
@@ -594,68 +544,7 @@ private:
         *blenchedRgbColor = SvgUtils::HsvToRgb(*blenchedHsvColor);
     }
 
-    bool checkConfigParameter(map<string, string> *configParameter, NodeInfoStructure *nodeInfoStructure) {
 
-        string barInfo = "VISUALIZATION MODALITY:  " + configParameter->at("MODALITY");
-
-        string modality = configParameter->at("MODALITY");
-
-
-        if (modality.compare("BASIC") == 0) {
-            modality_type = MODALITY_TYPE::BASIC;
-            //If I want to use the same dimension for each brother
-            int TYPE_NODE_DIMENSION = stoi(configParameter->at("TYPE_NODE_DIMENSION"));
-            if (TYPE_NODE_DIMENSION == 1 || TYPE_NODE_DIMENSION == 2) {
-                //ok
-            } else {
-                TYPE_NODE_DIMENSION = 2; //default 2
-            }
-
-            if (TYPE_NODE_DIMENSION == 1) {
-                //I need the children, lable and father label available
-                if (!(nodeInfoStructure->OPT_CHILDREN_INFO && nodeInfoStructure->OPT_FATHERLABLE &&
-                      nodeInfoStructure->OPT_LABEL)) {
-
-                    printf("if you chose TYPE_NODE_DIMENSION=1 you need: \n OPT_LABEL=1\n"
-                           " OPT_FATHERLABLE=1\n"
-                           " OPT_CHILDREN_INFO=1 \n Or you can chose TYPE_NODE_DIMENSION=2");
-                    return false;
-                }
-            }
-
-            //CHECK EDGE AVAILABILITY
-            if (stoi(configParameter->at("SHOW_EDGE_INFO")) == 1) {
-                //show edgeIdx info if available
-                if (nodeInfoStructure->OPT_EDGEINFO) {
-                    //ok
-                } else {
-                    //the edgeIdx info is not available
-                    printf("The edgeIdx info isn't available");
-                    configParameter->at("SHOW_EDGE_INFO") = "0";
-                }
-            } else {
-                //ok
-            }
-        } else if (modality.compare("STATISTIC") == 0) {
-            modality_type = MODALITY_TYPE::STATISTIC;
-
-        } else if (modality.compare("MAXREP") == 0) {
-            modality_type = MODALITY_TYPE::MAXREP;
-
-        } else {
-            //error
-            std::cout << "MODALITY WRONG, you must chose one among: BASIC, STATISTIC, MAXREP" << std::endl;
-            return false;
-        }
-
-
-        return true;
-    }
-
-    void closeOpenFile(std::ifstream *bin_in, std::ofstream *svg_out) {
-        bin_in->close(); //Close the input file
-        svg_out->close(); //chiudo il file on output*/
-    }
 
     string getEdge(unsigned long idx, unsigned long length) {
         string edge = "";
@@ -671,36 +560,45 @@ private:
         return edge;
     }
 
-
-    tmp_basic_nodeInfo createTmpNode(NodeInfo *nodeInfoObj) {
+    tmp_basic_nodeInfo createTmpNode(NodeNew * nodeInfoObj) {
 
         tmp_basic_nodeInfo tmpNode;
 
-        tmpNode.label = nodeInfoObj->getLabel();
+        tmpNode.label = nodeInfoObj->get_index();
         tmpNode.nodeDepth = nodeInfoObj->getNodeDepth();
         tmpNode.depth = nodeInfoObj->getDepth();
         tmpNode.lb = nodeInfoObj->getLb();
         tmpNode.rb = nodeInfoObj->getRb();
         tmpNode.frequency = tmpNode.rb - tmpNode.lb + 1;
         tmpNode.fatherLabel = nodeInfoObj->getFatherLabel();
-        tmpNode.numberOfChildren = nodeInfoObj->getNumbrOfChildren();
-        tmpNode.numberOfWl = nodeInfoObj->getNumberOfWl();
-        tmpNode.edge_index = nodeInfoObj->getEdgeIndex();
-        tmpNode.edge_length = nodeInfoObj->getEdgeLength();
-        tmpNode.childrenId = nodeInfoObj->getChildrenId();
-        tmpNode.wlId = nodeInfoObj->getWlId();
+        tmpNode.numberOfChildren = nodeInfoObj->getNumberOfChildren();
+        tmpNode.numberOfWl = nodeInfoObj->getNumberOfWinerLink();
+        tmpNode.edge_index = nodeInfoObj->getEdgeIdx();
+        tmpNode.edge_length = nodeInfoObj->getEdgeLen();
+        tmpNode.childrenId = *nodeInfoObj->getChildren();   //todo check if ok assign the value inside the pointer to the vector...
+
+        if(nodeInfoObj->getWinerLink()->size() > 0 ){
+            for (auto const& x : *nodeInfoObj->getWinerLink())
+            {
+                pair<int, unsigned long> pair = {x.first, x.second};
+                tmpNode.wlId.insert(pair);
+            }
+
+        }
+
+
+
         tmpNode.is_leaf = (tmpNode.numberOfChildren == 0);
         tmpNode.maxrep_type = (tmpNode.numberOfWl > 1) ? MAXREP_TYPE::maxrep : MAXREP_TYPE::non_supermaximal;
         tmpNode.edge = "not s";
-        tmpNode.kl_divergence = nodeInfoObj->getKl_divergence();
-        tmpNode.p_norm = nodeInfoObj->getP_norm();
-        tmpNode.p_normNoParam = nodeInfoObj->getP_normNoParam();
-        tmpNode.h_entropy = nodeInfoObj->getH_entropy();
-        tmpNode.h_entropySpecial = nodeInfoObj->getH_entropySpecial();
+        tmpNode.kl_divergence = nodeInfoObj->getKlDivergence();
+        tmpNode.p_norm = nodeInfoObj->getPNorm();
+        tmpNode.p_normNoParam = nodeInfoObj->getPNormNoParam();
+        tmpNode.h_entropy = nodeInfoObj->getHEntropy();
+        tmpNode.h_entropySpecial = nodeInfoObj->getHEntropy2();
 
         return tmpNode;
     }
-
 
 };
 

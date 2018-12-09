@@ -2,7 +2,6 @@
 // Created by root on 4/29/18.
 //
 #include <string>
-#include "NodeInfo.h"
 #include <sdsl/suffix_trees.hpp>
 
 #ifndef VISUALSUFFIXTREE_TREEPARSER_H
@@ -29,7 +28,7 @@ public:
 
     void printBinFile(string &s, std::ofstream &bin_out);
 
-    void printNode(NodeInfo *nodeInfo, std::ofstream *bin_out);
+    //void printNode(NodeInfo *nodeInfo, std::ofstream *bin_out);
 
     string getEdge(cst_t *cst, iterator1 *it);
 
@@ -42,8 +41,6 @@ private:
     long numberOfNode = 0;
 
     int tree_max_depth = 0;
-
-    bool checkNumberOfBit(int nBit, NodeInfoStructure *nodeInfoStructure);
 
     void setAlphabet(char *inputFileName, TreeParser *treeParser);
 
@@ -119,8 +116,8 @@ private:
 
     float entropy(iterator1 *it) {
 
-        float f_Wb = 0; //frequenza figlio
-        float f_W = nF(it); //frequenza nodo
+        float f_Wb = 0;     //son's frequency
+        float f_W = nF(it); //node's frequency
 
         float h = 0;
 

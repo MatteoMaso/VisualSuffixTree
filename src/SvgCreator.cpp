@@ -1,4 +1,4 @@
-#include <sdsl/suffix_trees.hpp>
+//#include <sdsl/suffix_trees.hpp>
 #include <iostream>
 #include <string>
 #include <bitset>       //to use quickly bit representation
@@ -9,57 +9,26 @@
 
 #include "SvgCreator.h"
 #include "ConfigParser.h"
-#include "NodeInfoStructure.h"
-//#include "Header.h"
-#include "NodeInfo.h"
 #include "ObjNode.h"
 #include "SvgUtils.h"
 #include "nodeMap/NodesMap.h"
 
-float strToFLoat(string s){
-
-    int n = 0;
-    //for(int i = 0; i < 32; ++i)
-    for(int i = 31; i >= 0; --i)
-    {
-        n |= (s[i] - 48) << i;
-    }
-
-    return *(float *)&n;
-}
-
-using namespace std;
 
 SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string> *configParameter, char *stringFileName) {
 
-
-    //New data load!!!!! da tenere
+    //New data load
     NodesMap my_map = NodesMap(inputFileName, "r");
-    my_map.readFromMemory(); //load all the node from the db into a local map
-    //std::cout << "Read data from memory" << std::endl;
-    my_map.showContent();
-    //std::cout << "Show content" << std::endl;
+    if(!my_map.readFromMemory())
+    {
+        std::cerr << "Error occurred in loading map" << std::endl;
+        exit(-1);
+    } //load all the node from the db into a local map
+
     this->configParameter = configParameter;
 
-    
-    //READ BINARY FILE
-    //std::ifstream bin_in(inputFileName, std::ios::binary);
-    //BitIo<16> bio2;
-    //openFile(&bin_in, inputFileName, &bio2);
-
-    //PARAMETER CONFIGURATION
-    //Header header = Header();
-    //header.readHeader(&bio2);
-    //Acquire the original string and the size of it
+    //load the entire char sequence in memory todo check
     setOriginalStringParameter(stringFileName);
 
-
-    //After reading header create the NodeInfoStructure
-    //NodeInfoStructure nodeStructure = NodeInfoStructure(header.getNodeInfoStructure(), configParameter, stringFileName);
-
-    //if (!checkConfigParameter(configParameter, &nodeStructure)) exit(-1);
-
-    bool VERBOSE = (stoi(configParameter->at("VERBOSE"))) == 1;
 
     //BEGIN SVG CREATOR
     std::ofstream svg_out(outputFile, std::ios::out | std::ios::binary);
@@ -70,7 +39,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
     //PARAMETER THAT I NEED
     SVG_FROM_TOP = stoi(configParameter->at("SVG_FROM_TOP")) == 1;
     BASIC_KVALUE_KMER = stoi(configParameter->at("BASIC_KVALUE_KMER"));
-    string modality = configParameter->at("MODALITY"); //todo togliere sto parametro
+    //string modality = configParameter->at("MODALITY");
 
     RgbColor rgbColor, blenchedRgbColor;    //RGB COLOR rgbColor : colore pieno, blenchedRgbColor: colore sfumato settato dal config
     HsvColor hsvColor, blenchedHsvColor;    //HSV COLOR
@@ -93,44 +62,42 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
     }
 
 
-    //NodeInfo nodeInfoObj(&nodeStructure, &originalString);
+    //for each element devo trasformarlo in tmp_basic_nodeinfo
+    //todo future create an onject bigger than the normal node object to add more info
+    for(int i = 1; i <= my_map.getNumberOfElement(); i++)  //check theindex start and end ... problem with 0 element check the tree parser
+    {
+        //todo check for the double 1 presence
+        std::cout << my_map.getNode(i)->get_index() << std::endl;
+        tmp_basic_nodeInfo tmpNode = createTmpNode(my_map.getNode(i));
+
+        general_map.insert({my_map.getNode(i)->get_index(), tmpNode});
+    }
 
 
-    //my_map2.showContent();
-
-    /*while (!bio2.empty()) {
-        //READ AN OTHER NODE AND PUT THE INFOMATION INSIDE THE nodeInfoObj
-        nodeInfo = readNextNodeInfo(&bio2);
-        nodeInfoObj.setNodeField(&nodeInfo);
-
-        tmp_basic_nodeInfo tmpNode = createTmpNode(&nodeInfoObj);
-
-        general_map.insert({nodeInfoObj.getLabel(), tmpNode});
-    }*/
-
-
-    //set root //todo controllare se posso fare sto ciclo alla fine
+    //set root
     setRootPosition(my_map.getNode(my_map.getNumberOfElement()));
-    for(int i = 0; i < my_map.getNumberOfElement(); i++){
+    for(int i = 1; i <= my_map.getNumberOfElement(); i++){
 
         //if not already insert generate the position
         if (plot_map.count(my_map.getNode(i)->get_index()) == 0) {
             setNodePosition(my_map.getNode(i), &my_map);
         }
     };
-    /*
-    for (std::pair<unsigned long, tmp_basic_nodeInfo> node : general_map) {
 
-        //if not already insert generate the position
-        if (plot_map.count(node.first) == 0) {
-            setNodePosition(&node.second);
-        }
-    };*/
+
+
+    if(configParameter->at("MODALITY")== "MAXREP"){
+        modality_type = MAXREP;
+    }else if(configParameter->at("MODALITY")== "STATISTIC"){
+        modality_type = STATISTIC;
+    }else if(configParameter->at("MODALITY")== "BASIC"){
+        modality_type = BASIC;
+    }
 
     //some statistic parameter to initialize
     double p_pnorm_parameter = stod(configParameter->at("STATISTIC_PNORM_PARAMETER")); //P-parameter user set;
     int statistics_type = stoi(configParameter->at("STATISTIC_TYPE"));
-//    string tau = "STATISTIC_TAU_" + to_string(statistics_type);
+    //    string tau = "STATISTIC_TAU_" + to_string(statistics_type);
     string tau = "STATISTIC_TAU";
     double tau_i = stod(configParameter->at("STATISTIC_TAU"));
 
@@ -270,7 +237,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
 
                     default:
-                        //error todo some error
+                        //error
                         break;
 
                 }
@@ -279,15 +246,18 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
 
             break;
 
-        /*case MODALITY_TYPE::MAXREP:
+        case MODALITY_TYPE::MAXREP:
 
-            int charNumber = (int) nodeStructure.alphabet.size();
+            auto new_alphabet = new vector<char>;
+            getAlphabet(stringFileName, new_alphabet);
+
+            //int charNumber = (int) nodeStructure.alphabet.size();
             unsigned long maxrep_counter = 0, supermaxrep_counter = 0, nearsupermax_counter = 0;
 
             if (configParameter->at("MAXREP_MODALITY") == "frequency") {
 
                 for (std::pair<unsigned long, tmp_basic_nodeInfo> node : general_map) {
-                    maxrep_frequency(&node.second, charNumber);
+                    maxrep_frequency(&node.second, (int)new_alphabet->size());
                 }
 
                 infoStatusBar = "REP   Modality: MaxRep Frequency    StringLength: " +
@@ -310,7 +280,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
             }
 
             break;
-            */
+
     }
 
 
@@ -373,7 +343,7 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
     char svgEnd[] = {"</svg>"};  //Close the SVG File
     svg_out << svgEnd;
 
-    //closeOpenFile(&bin_in, &svg_out);
+
 }
 
 //todo aggiungere il taglio della lunghezza sulle foglie anche nella modalità BASIC
