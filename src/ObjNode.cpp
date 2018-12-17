@@ -6,7 +6,7 @@
 #include <iostream>
 #include <bitset>
 
-#include "../Include/ObjNode.h"
+#include "ObjNode.h"
 
 using namespace std;
 

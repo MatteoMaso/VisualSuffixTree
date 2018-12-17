@@ -6,11 +6,13 @@
 #include <fstream>
 #include <algorithm>
 #include <iostream>
-#include "../Include/ConfigParser.h"
+#include "ConfigParser.h"
 
-ConfigParser::ConfigParser(string configFileName, map<string, string> *configParameter){
+ConfigParser::ConfigParser(std::string configFileName, std::map<std::string, std::string> * configParameter){
 
+    std::cout << configFileName << std::endl;
     std::ifstream cFile (configFileName);
+
     if (cFile.is_open())
     {
         std::string line;
@@ -20,9 +22,9 @@ ConfigParser::ConfigParser(string configFileName, map<string, string> *configPar
             if(line[0] == '#' || line.empty())
                 continue;
             auto delimiterPos = line.find("=");
-            string name = line.substr(0, delimiterPos);
-            string value = line.substr(delimiterPos + 1);
-            pair<string, string> element = {name, value};
+            std::string name = line.substr(0, delimiterPos);
+            std::string value = line.substr(delimiterPos + 1);
+            std::pair<std::string, std::string> element = {name, value};
             configParameter->insert(element);
 //            std::cout << name << " " << value << '\n';
         }
