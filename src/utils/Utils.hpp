@@ -1,14 +1,14 @@
 //
 // Created by root on 5/8/18.
 //
+#ifndef VISUALSUFFIXTREE_UTILS_H
+#define VISUALSUFFIXTREE_UTILS_H
+
 #include <string>
 #include <iostream>
 #include <vector>
 #include <sys/stat.h>
 #include <cstring>
-
-#ifndef VISUALSUFFIXTREE_UTILS_H
-#define VISUALSUFFIXTREE_UTILS_H
 
 class InputParser{
 public:

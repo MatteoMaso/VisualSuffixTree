@@ -1,10 +1,10 @@
 //
 // Created by alessia on 07/05/18.
 //
-#include <string>
-
 #ifndef VISUALSUFFIXTREE_OBJNODE_H
 #define VISUALSUFFIXTREE_OBJNODE_H
+
+#include <string>
 
 using namespace std;
 

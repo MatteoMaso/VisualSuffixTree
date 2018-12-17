@@ -26,12 +26,12 @@ namespace nodeNew{
     typedef int numberOfChildren;
     typedef std::vector<nodeNew::index> * children;
     typedef int numberOfWinerLink;
-    typedef std::map<int, unsigned long> * winerLink;
-    typedef float klDivergence;
-    typedef float pNorm;
-    typedef float pNormNoParam;
-    typedef float hEntropy;
-    typedef float hEntropy2;
+    typedef std::map<int, nodeNew::index> * wl_type;
+    typedef double klDivergence;
+    typedef double pNorm;
+    typedef double pNormNoParam;
+    typedef double hEntropy;
+    typedef double hEntropy2;
     typedef unsigned long frequency;
 }
 
@@ -96,7 +96,7 @@ public:
 
     void setNumberOfWinerLink(nodeNew::numberOfWinerLink numberOfWinerLink);
 
-    std::map<int, unsigned long> *getWinerLink() const;
+    std::map<int, unsigned long> * getWinerLink() const;
 
     void setWinerLink(std::map<int, nodeNew::index > * wl);
 
@@ -136,7 +136,7 @@ private:
     nodeNew::numberOfChildren numberOfChildren;        //ok
     nodeNew::children children;                        //ok
     nodeNew::numberOfWinerLink numberOfWinerLink;      //ok
-    nodeNew::winerLink winerLink;                      //ok
+    nodeNew::wl_type winerLink;                        //ok
     nodeNew::klDivergence klDivergence;                //ok
     nodeNew::pNorm pNorm;                              //ok
     nodeNew::pNormNoParam pNormNoParam;                //ok

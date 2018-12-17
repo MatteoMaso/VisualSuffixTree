@@ -8,7 +8,7 @@
 #include "../node/Node_2.h"
 #include <map>
 #include <exception>
-
+#include <sstream>
 
 NodesMap::NodesMap(const char * fileName, std::string modeDb) {
 
@@ -39,6 +39,7 @@ NodesMap::~NodesMap() {
         if(writeToMemory()) {
             std::cout << "Write in memory ok\n" << std::endl;
         }
+
     } else {
         //Error no valid db modality found
         std::cerr << "Set db modality\n" << std::endl;
@@ -51,17 +52,19 @@ NodesMap::~NodesMap() {
 
 void NodesMap::showDBcontent(){
     std::cout << "Show DATABASE CONTENT\n" << std::endl;
+    try{
+        leveldb::Iterator* it = db->NewIterator(leveldb::ReadOptions());
+        for (it->SeekToFirst(); it->Valid(); it->Next()) {
+            //leveldb::Slice key = it->key();
+            leveldb::Slice value = it->value();
 
-    leveldb::Iterator* it = db->NewIterator(leveldb::ReadOptions());
-    for (it->SeekToFirst(); it->Valid(); it->Next()) {
-        leveldb::Slice key = it->key();
-        leveldb::Slice value = it->value();
-        std::cout << "size of value " << value.size() << std::endl;
+            NodeNew * n3 = new NodeNew(value.ToString());
+        }
 
-        unsigned long d = *key.data();
-        //memcpy(&a, &key, sizeof(unsigned int));
-        printf("Read key: %u\n", d);
-        NodeNew *n3 = new NodeNew(value.data());
+        assert(it->status().ok());  // Check for any errors found during the scan
+        delete it;
+    } catch (...){
+        std::cerr << "Error occurred in reading element from db" << std::endl;
     }
 }
 
@@ -69,20 +72,18 @@ void NodesMap::showContent(){
     // Create a map iterator and point to beginning of map
     std::cout << "Show content\n" << std::endl;
     // Iterate over the map using c++11 range based for loop
-    for (std::pair<nodeNew::index, NodeNew*> element : local_map) {
+    for (std::pair<nodeNew::index, NodeNew * > element : local_map) {
         // Accessing KEY from element
-        std::cout << element.first << std::endl;
-        std::cout << element.second->toString() << std::endl;
+        std::cout << "element " << element.second->get_index() << std::endl;
+        std::cout << element.second->toString() << " end to string" << std::endl;
     }
 }
 
 void NodesMap::addNode(NodeNew * n) {
-    //todo (memory optimization) add a check to controll if it's to big and flush into the hdd
-
+    //todo (memory optimization) add a check to control if it's to big and flush into the hdd
     local_map.insert (std::pair<nodeNew::index, NodeNew * >(n->get_index(),n));
 
-    //Add memory
-    std::cout << "Add node: index: " << n->get_index() << " depth: "<< n->getDepth()<<" children: "<<n->getNumberOfChildren()   <<" wl: "<<n->getNumberOfWinerLink() << std::endl;
+    //std::cout << "Add node: index: " << n->get_index() << " depth: "<< n->getDepth()<<" children: "<<n->getNumberOfChildren()   <<" wl: "<<n->getNumberOfWinerLink() << std::endl;
 }
 
 void NodesMap::removeNode(nodeNew::index idx) {
@@ -100,20 +101,11 @@ bool NodesMap::readFromMemory() {
     try{
         leveldb::Iterator* it = db->NewIterator(leveldb::ReadOptions());
         for (it->SeekToFirst(); it->Valid(); it->Next()) {
-            leveldb::Slice key = it->key();
+            //leveldb::Slice key = it->key();
             leveldb::Slice value = it->value();
-            //std::cout << "size of value " << value.size() << std::endl;
-            //std::string key_str = key.ToString();
-            //std::string val_str = value.ToString();
-            //unsigned int a = (key.data()[3] << 24) | (key.data()[2] << 16) | (key.data()[1] << 8) | (key.data()[0]);
-            //unsigned long a = (key.data()[0] << 56) | (key.data()[1] << 48) | (key.data()[2] << 40) | (key.data()[3] << 32)| (key.data()[4] << 24)| (key.data()[5] << 16)| (key.data()[6] << 8)| (key.data()[7]);
-            //unsigned long a2 = (key.data()[7] << 56) | (key.data()[6] << 48) | (key.data()[5] << 40) | (key.data()[4] << 32)| (key.data()[3] << 24)| (key.data()[2] << 16)| (key.data()[1] << 8)| (key.data()[0]);
-            //unsigned int f;
-            unsigned long d = *key.data();
-            
-            value.ToString();
-            NodeNew * n3 = new NodeNew(value.data());
-            local_map.insert (std::pair<nodeNew::index, NodeNew * >(d,n3));
+
+            NodeNew * n3 = new NodeNew(value.ToString());
+            local_map.insert (std::pair<nodeNew::index, NodeNew * >(n3->get_index(),n3));
         }
         assert(it->status().ok());  // Check for any errors found during the scan
         delete it;
@@ -124,7 +116,7 @@ bool NodesMap::readFromMemory() {
 
     return true;
 }
-#include <sstream>
+
 //write all the map into a memory DataBase
 bool NodesMap::writeToMemory() {
     //Take all the element into the levelDB
@@ -133,19 +125,11 @@ bool NodesMap::writeToMemory() {
     // Map iterator
     for (std::map<nodeNew::index , NodeNew * >::iterator it=local_map.begin(); it!=local_map.end(); ++it){
 
-        //Manage the key
-        char key[sizeof(nodeNew::index)];
-        memcpy(key, &it->first, sizeof(nodeNew::index));
-
-        //it->second->serialize(buffer);
         std::ostringstream * valueStream = new std::ostringstream;
-        //use the string to save the value... optimize in the future!!
         it->second->serialize(valueStream);
 
-        std::cout << "value: " << valueStream->str() << std::endl;
-
         //Insert key and value
-        leveldb::Status s = db->Put(leveldb::WriteOptions(), key, valueStream->str());
+        leveldb::Status s = db->Put(leveldb::WriteOptions(), std::to_string(it->second->get_index()) , valueStream->str());
 
         delete valueStream;
     }

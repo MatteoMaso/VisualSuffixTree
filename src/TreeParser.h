@@ -1,20 +1,18 @@
 //
 // Created by root on 4/29/18.
 //
-#include <string>
-#include <sdsl/suffix_trees.hpp>
-
 #ifndef VISUALSUFFIXTREE_TREEPARSER_H
 #define VISUALSUFFIXTREE_TREEPARSER_H
+
+#include <string>
+#include <sdsl/suffix_trees.hpp>
 
 using namespace std;
 using namespace sdsl;
 
 typedef cst_sct3<> cst_t;
-
 typedef cst_bfs_iterator<cst_t> iterator1;
 
-class node_type;
 
 class TreeParser {
 
@@ -22,15 +20,7 @@ public:
 
     cst_t cst;                              //declare the suffix tree
 
-    bool VERBOSE;
-
     TreeParser(char *inputFileName, char *outputFileName, map<string, string> *configParameter);
-
-    void printBinFile(string &s, std::ofstream &bin_out);
-
-    //void printNode(NodeInfo *nodeInfo, std::ofstream *bin_out);
-
-    string getEdge(cst_t *cst, iterator1 *it);
 
     vector<cst_t::char_type> alphabet;
 
@@ -41,17 +31,6 @@ private:
     long numberOfNode = 0;
 
     int tree_max_depth = 0;
-
-    void setAlphabet(char *inputFileName, TreeParser *treeParser);
-
-    string print_node_info(cst_t *cst, iterator1 *it) {
-        string msg = "\n\n\nNodeDepth: " + to_string(cst->node_depth(**it)) + " Depth: " + to_string(cst->depth(**it)) +
-                     "-[" + to_string(cst->lb(**it)) +
-                     "-" + to_string(cst->rb(**it)) +
-                     "]";//<< "\nAll String length: " << allstring_length << " parent length: " << parent_strLength << "\nEdge: " << edgeIdx <<"\nEdge coded: " << e.edgeToString(&edgeIdx) << std::endl;
-
-        return msg;
-    }
 
 
     unsigned long nF( iterator1 *it){
@@ -170,13 +149,8 @@ private:
 
             }
         }
-
         return a;
-
     }
-
-
-
 };
 
 #endif //VISUALSUFFIXTREE_TREEPARSER_H

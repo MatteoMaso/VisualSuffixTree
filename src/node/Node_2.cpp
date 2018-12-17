@@ -12,16 +12,19 @@
 
 
 NodeNew::NodeNew() {
-    std::cout << "Nodes creator called\n" << std::endl;
+    //std::cout << "Nodes creator called\n" << std::endl;
+
+    children = new std::vector<nodeNew::index>();
+    winerLink = new std::map<int, nodeNew::index >;
 }
 
 //Constructor from data
 NodeNew::NodeNew(std::string ss){
 
-    NodeNew::children = new std::vector<nodeNew::index>();
-    NodeNew::winerLink;
+    children = new std::vector<nodeNew::index>();
+    winerLink = new std::map<int, nodeNew::index >;
 
-    std::cout << "Value read: " << ss << std::endl;
+    //std::cout << "Value read: " << ss << std::endl;
 
     std::string s;
 
@@ -60,8 +63,8 @@ NodeNew::NodeNew(std::string ss){
             token = strtok(NULL, ":");  //check if correct todo
             value = strtok(NULL, ":");
             if(std::strcmp(token, "wlidx")== 0){
-                std::pair<int, unsigned long> pair = {i, strtoul (value, NULL, 0)};
-                NodeNew::winerLink->insert(pair);
+                //std::pair<int, nodeNew::index > pair = {i, strtoul(value, NULL, 0)};
+                NodeNew::winerLink->insert({i, strtoul(value, NULL, 0)});
             }else{
                 std::cout << "Error in parsing wlidx" << std::endl;
             }
@@ -132,11 +135,11 @@ int NodeNew::serialize(std::ostringstream  * valueStream) {
         }
     }
 
-    *valueStream << "klDivergence:" << numberOfChildren<< ":";
-    *valueStream << "pNorm:" << numberOfChildren<< ":";
-    *valueStream << "pNormNoParam:" << numberOfChildren<< ":";
-    *valueStream << "hEntropy:" << numberOfChildren<< ":";
-    *valueStream << "hEntropy2:" << numberOfChildren<< ":";
+    *valueStream << "klDivergence:" << klDivergence<< ":";
+    *valueStream << "pNorm:" << pNorm<< ":";
+    *valueStream << "pNormNoParam:" << pNormNoParam<< ":";
+    *valueStream << "hEntropy:" << hEntropy<< ":";
+    *valueStream << "hEntropy2:" << hEntropy2<< ":";
 
     return 0;
 }
@@ -241,9 +244,14 @@ std::map<int, unsigned long> * NodeNew::getWinerLink() const {
 }
 
 void NodeNew::setWinerLink(std::map<int, nodeNew::index > * wl) {
-    NodeNew::winerLink = new std::map<int, nodeNew::index >(); //support structure
-    for (std::map<int,unsigned long>::iterator it=wl->begin(); it!=wl->end(); ++it)
-        NodeNew::winerLink->insert({10,12});
+    int i = 0;
+    for (std::map<int, unsigned long>::iterator it = wl->begin(); it != wl->end(); ++it) {
+        std::pair<int, nodeNew::index> pippo = {it->first, it->second};
+        NodeNew::winerLink->insert(pippo);
+        i += 1;
+    }
+
+    setNumberOfWinerLink(i);
 }
 
 nodeNew::klDivergence NodeNew::getKlDivergence() const {
@@ -295,9 +303,7 @@ nodeNew::frequency NodeNew::getFrequency() const {
 std::string NodeNew::toString() {
 
     std::ostringstream oss;
-    oss << "Node info\nKey: " << NodeNew::index <<
-        "\nDepth: " << getDepth() ;
-
+    oss << "Node info\nKey: " << NodeNew::index <<  "\nDepth: " << getDepth() ;
 
 
     return oss.str();

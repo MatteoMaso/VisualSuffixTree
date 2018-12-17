@@ -1,14 +1,10 @@
 //
 // Created by matteolus on 04/11/18.
 //
-//#include <sdsl/suffix_trees.hpp>
 #include <iostream>
-//#include <bitset> //to use quickly bit representation
-//#include <vector>
 #include <fstream>
 #include <sys/stat.h>
 #include <pwd.h>
-
 #include "TreeParser.h"
 //#include "ConfigParser.h"
 #include "utils/Utils.hpp"
@@ -29,6 +25,10 @@ std::string OUTPUT_DEFAULT_PATH = "/Output";
 void printHelp();
 
 void levelDB_test();
+
+
+//todo use string instead char *!
+//std::string homedir, input_file_path, output_folder, output_filename_path;
 
 int main(int argc, char **argv) {
 
@@ -119,7 +119,7 @@ int main(int argc, char **argv) {
             command += output_filename_path;
             system(command.c_str()) ; // Deletes one or more files recursively.
             //todo (optional) add the option to override the file.
-            //return 0; //todo remove the commentand let return 0, it was just for test
+            return 0;
         }else{
             strcpy(output_filename_path, output_folder);
             strcat(output_filename_path, "/");

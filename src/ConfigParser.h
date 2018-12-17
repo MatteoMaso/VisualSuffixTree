@@ -1,13 +1,12 @@
 //
 // Created by root on 4/29/18.
 //
+#ifndef VISUALSUFFIXTREE_CONDIFPARSER_H
+#define VISUALSUFFIXTREE_CONDIFPARSER_H
+
 #include <string>
 #include "utils/Utils.hpp"
 #include <map>
-
-#ifndef VISUALSUFFIXTREE_CONDIFPARSER_H
-
-#define VISUALSUFFIXTREE_CONDIFPARSER_H
 
 class ConfigParser {
 public:

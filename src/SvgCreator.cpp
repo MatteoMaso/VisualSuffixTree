@@ -23,6 +23,8 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
         std::cerr << "Error occurred in loading map" << std::endl;
         exit(-1);
     } //load all the node from the db into a local map
+    else
+        std::cout << "Load data complete. " << std::endl;
 
     this->configParameter = configParameter;
 
@@ -61,23 +63,17 @@ SvgCreator::SvgCreator(char *inputFileName, char *outputFile, map<string, string
         y0 = stoi(configParameter->at("WINDOW_HEIGHT")) - 100;
     }
 
-
     //for each element devo trasformarlo in tmp_basic_nodeinfo
     //todo future create an onject bigger than the normal node object to add more info
-    for(int i = 1; i <= my_map.getNumberOfElement(); i++)  //check theindex start and end ... problem with 0 element check the tree parser
+    for(int i = 1; i <= my_map.getNumberOfElement(); i++)
     {
-        //todo check for the double 1 presence
-        std::cout << my_map.getNode(i)->get_index() << std::endl;
         tmp_basic_nodeInfo tmpNode = createTmpNode(my_map.getNode(i));
-
         general_map.insert({my_map.getNode(i)->get_index(), tmpNode});
     }
-
 
     //set root
     setRootPosition(my_map.getNode(my_map.getNumberOfElement()));
     for(int i = 1; i <= my_map.getNumberOfElement(); i++){
-
         //if not already insert generate the position
         if (plot_map.count(my_map.getNode(i)->get_index()) == 0) {
             setNodePosition(my_map.getNode(i), &my_map);

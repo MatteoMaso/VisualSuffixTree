@@ -42,12 +42,12 @@ TreeParser::TreeParser(char * inputFileName, char * outputFileName, map<string, 
 
         //create the node in this way is memory expensive
         //maybe I could have one unique node, add the element and in each loop save just his
-        //serialization version.. todo think about
-        NodeNew *  nodeNew1 = new NodeNew(); //todo (optional) non creare inside , it depends
+
+        NodeNew *  nodeNew1 = new NodeNew();
 
         //Add element
         if(cst.id(*it) != 0){
-            std::cout << "set index: " << cst.id(*it) << std::endl;
+            //std::cout << "set index: " << cst.id(*it) << std::endl;
             nodeNew1->set_index((cst.id(*it)));
             nodeNew1->setDepth(cst.depth(*it));
             nodeNew1->setNodeDepth(cst.node_depth(*it));
@@ -68,14 +68,12 @@ TreeParser::TreeParser(char * inputFileName, char * outputFileName, map<string, 
             for (int i = 0; i < new_alphabet->size(); i++) {
                 const cst_t::char_type c = new_alphabet->at(i);
                 nodeNew::index t = cst.id(cst.wl(*it, c));
-                !!!capire come mai non si salva la mappa di wl!!!
                 if (t != numberOfNode) { // == number of node when there isn't a valid wl
                     pair<int, unsigned long> pair = {i, t};
                     wl.insert(pair);
-                    std::cout << "add wl" << std::endl;
+                    //std::cout << "add wl" << std::endl;
                 }
             }
-
             nodeNew1->setWinerLink(&wl);
 
 
@@ -95,14 +93,9 @@ TreeParser::TreeParser(char * inputFileName, char * outputFileName, map<string, 
                 }
             }
 
-
             my_map.addNode(nodeNew1);
         }
-
-
-
     }
-
 
     //my_map.showContent();
 
